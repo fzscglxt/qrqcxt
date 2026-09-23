@@ -5078,7 +5078,8 @@ function renderDashboardCharts(issues, periodIssues, period, analytics = {}) {
             // custom：按 dashboardCustomRange.start/end 生成桶
             const s0 = dashboardCustomRange?.startDate ? dayStart(dashboardCustomRange.startDate) : dayStart(now);
             const e0 = dashboardCustomRange?.endDate   ? dayEnd(dashboardCustomRange.endDate)   : dayEnd(now);
-            const totalDays = Math.max(1, Math.round((e0.getTime() - s0.getTime()) / 86400000) + 1);
+            const _e0d = new Date(e0); _e0d.setHours(0,0,0,0);
+            const totalDays = Math.max(1, Math.round((_e0d.getTime() - s0.getTime()) / 86400000) + 1);
             if (totalDays <= 14) {
                 for (let k = 0; k < totalDays; k++) {
                     const d = new Date(s0); d.setDate(s0.getDate()+k);
@@ -5976,7 +5977,9 @@ function renderCustomDatePicker() {
             : '请点击日历选择一个日期';
     } else if (dpState.pickTarget === 'both') {
         if (dpState.selectedStart && dpState.selectedEnd) {
-            const n = Math.round((dpState.selectedEnd - dpState.selectedStart) / 86400000) + 1;
+            const _d0 = new Date(dpState.selectedStart); _d0.setHours(0,0,0,0);
+            const _d1 = new Date(dpState.selectedEnd);   _d1.setHours(0,0,0,0);
+            const n = Math.round((_d1 - _d0) / 86400000) + 1;
             hint.innerHTML = `🔗 联动已选：<b>${formatDate(dpState.selectedStart)}</b> 至 <b>${formatDate(dpState.selectedEnd)}</b>（共 ${n} 天）`;
         } else if (dpState.selectedStart) {
             hint.innerHTML = `已选择起点 <b>${formatDate(dpState.selectedStart)}</b>，请继续点击日历选择终点`;
@@ -6103,8 +6106,10 @@ function refreshCustomRangeDisplay() {
     }
     const s = formatDate(dashboardCustomRange.startDate);
     const e = formatDate(dashboardCustomRange.endDate);
+    const _ds = new Date(dashboardCustomRange.startDate); _ds.setHours(0,0,0,0);
+    const _de = new Date(dashboardCustomRange.endDate);   _de.setHours(0,0,0,0);
     const days = dashboardCustomRange.mode === 'single'
-        ? 1 : Math.round((dashboardCustomRange.endDate - dashboardCustomRange.startDate)/86400000) + 1;
+        ? 1 : Math.round((_de - _ds)/86400000) + 1;
     badge.innerHTML = (dashboardCustomRange.mode === 'single'
         ? `🔬 QRQC 分析 · 单日：${s}（共 1 天）`
         : `🔬 QRQC 分析 · 区间：${s} 至 ${e}（共 ${days} 天）`)
@@ -8752,22 +8757,28 @@ function enterSystem() {
 
     // 数据初始化（云优先：首次先拉云端最新；云端失败/单机则用本地数据）
     const bootstrapData = () => {
-        initDemoData();
-        // 清缓存 + 完全基于 ISSUES 重新分析看板/报表/台账，保证不存在历史缓存 / mock 数据
-        completeReanalyzeFromLedger({ silent: true });
-        refreshAll();
-        // ===== 预警中心：启动双向一致性定时校验器（5分钟一次，发现不一致自动巡检重建）=====
-        startAlertValidationScheduler();
-        // ===== 跨设备数据检测（云端无数据时兜底引导导入）=====
-        checkDataOnStartup();
-        // 进入系统时，先执行一次预警校验并记录（静默）
+        // 启动引导期：建演示数据 / 重算派生统计属确定性初始化，不应误报“有未保存修改”
+        window._qrqcBootstrapping = true;
         try {
-            const initV = validateAlertLedgerConsistency();
-            if (!initV.pass) {
-                addAuditLog('system', '预警初始化校验', `启动时发现${initV.diffs.length}处不一致，自动执行巡检重建`);
-                runAIPatrol();
-            }
-        } catch (e) {}
+            initDemoData();
+            // 清缓存 + 完全基于 ISSUES 重新分析看板/报表/台账，保证不存在历史缓存 / mock 数据
+            completeReanalyzeFromLedger({ silent: true });
+            refreshAll();
+            // ===== 预警中心：启动双向一致性定时校验器（5分钟一次，发现不一致自动巡检重建）=====
+            startAlertValidationScheduler();
+            // ===== 跨设备数据检测（云端无数据时兜底引导导入）=====
+            checkDataOnStartup();
+            // 进入系统时，先执行一次预警校验并记录（静默）
+            try {
+                const initV = validateAlertLedgerConsistency();
+                if (!initV.pass) {
+                    addAuditLog('system', '预警初始化校验', `启动时发现${initV.diffs.length}处不一致，自动执行巡检重建`);
+                    runAIPatrol();
+                }
+            } catch (e) {}
+        } finally {
+            window._qrqcBootstrapping = false;
+        }
     };
     if (window._qrqcCloudInited) {
         bootstrapData();
@@ -9016,7 +9027,8 @@ function manualSave() {
 }
 // 业务数据有改动：仅标记待保存（不自动上传，等用户点 💾）
 function scheduleCloudSave() {
-    if (!cloud.ready || _applyingCloud) return;
+    // _applyingCloud：正在应用云端数据；_qrqcBootstrapping：启动引导期（建演示数据/重算派生统计），均为误报来源
+    if (!cloud.ready || _applyingCloud || window._qrqcBootstrapping) return;
     cloud.pending = true;
     setCloudStatus('pending', '有未保存的修改，点击「💾」上传');
 }
