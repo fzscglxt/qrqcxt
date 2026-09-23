@@ -2018,6 +2018,160 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* ===== patch4 dark-theme final (last in stylesheet, wins over later light rules) ===== */
+        /* modal */
+        .modal-overlay { background: rgba(2,8,20,.62); }
+        .modal { background: var(--card-bg); border: 1px solid var(--border); box-shadow: 0 12px 44px rgba(0,0,0,.6); }
+        .modal-header { background: var(--card-bg); border-bottom: 1px solid var(--border); }
+        .modal-footer { background: var(--card-bg); border-top: 1px solid var(--border); }
+        .modal-close { color: var(--text-tertiary); }
+        .modal-close:hover { background: rgba(255,255,255,.08); color: var(--text); }
+        /* login */
+        .login-card { background: var(--card-bg); border: 1px solid var(--border); box-shadow: 0 24px 64px rgba(0,0,0,.55); }
+        .login-logo h2 { color: var(--text); }
+        .login-logo p { color: var(--text-secondary); }
+        .login-form label { color: var(--text-secondary); }
+        .login-features { border-top: 1px solid var(--border); }
+        .login-feature { color: var(--text-tertiary); }
+        .login-hint { color: var(--text-tertiary); }
+        .login-error { background: rgba(239,68,68,.14); border: 1px solid rgba(239,68,68,.40); color: #f87171; }
+        .login-btn { background: linear-gradient(135deg,#00d4ff,#0891b2); color: #04121f; border: none; }
+        .login-btn:hover { background: linear-gradient(135deg,#22d3ee,#0e7490); }
+        /* buttons */
+        .btn-outline { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
+        .btn-outline:hover { background: rgba(0,212,255,.10); border-color: var(--primary); color: var(--primary); }
+        .btn-icon { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
+        .btn-icon:hover { background: rgba(255,255,255,.06); color: var(--text); }
+        .btn-primary, .btn-success { color: #04121f; }
+        .btn-sm-del { background: var(--input-bg); border: 1px solid rgba(239,68,68,.5); color: #f87171; }
+        .btn-sm-del:hover { background: rgba(239,68,68,.18); }
+        .btn-sm-restore { background: var(--input-bg); border: 1px solid rgba(34,197,94,.5); color: #4ade80; }
+        .btn-sm-restore:hover { background: rgba(34,197,94,.18); }
+        /* alert list items */
+        .alert-item.danger { background: rgba(239,68,68,.12); border-color: var(--danger); }
+        .alert-item.warning { background: rgba(245,158,11,.12); border-color: var(--warning); }
+        .alert-item.info { background: rgba(0,212,255,.10); border-color: var(--primary); }
+        .alert-item.success { background: rgba(34,197,94,.10); border-color: var(--success); }
+        .alert-item:hover { background: rgba(255,255,255,.05); }
+        /* progress / detail sections */
+        .progress-bar { background: var(--cell); }
+        .detail-section { background: var(--cell); }
+        /* stage timeline */
+        .stage-step-circle { background: var(--cell); color: var(--text-tertiary); }
+        .stage-content-header.locked { background: var(--cell); }
+        .stage-content-header.active { background: linear-gradient(90deg, rgba(0,212,255,.18) 0%, var(--card-bg) 100%); }
+        .stage-content-header.completed { background: linear-gradient(90deg, rgba(34,197,94,.16) 0%, var(--card-bg) 100%); }
+        .stage-content-header.overdue { background: linear-gradient(90deg, rgba(239,68,68,.16) 0%, var(--card-bg) 100%); }
+        /* kanban */
+        .kanban-column { background: var(--cell); }
+        .kanban-card { background: var(--card-bg); }
+        .kanban-card.overdue { background: rgba(239,68,68,.10); }
+        .kanban-card-tag { background: rgba(0,212,255,.16); color: #22d3ee; }
+        /* audit icons */
+        .audit-log-icon.danger { background: rgba(239,68,68,.16); color: #f87171; }
+        .audit-log-icon.warning { background: rgba(245,158,11,.16); color: #fbbf24; }
+        .audit-log-icon.success { background: rgba(34,197,94,.16); color: #4ade80; }
+        /* file list */
+        .file-item { background: var(--cell); }
+        /* loading overlay */
+        .loading-overlay { background: rgba(6,14,31,.72); backdrop-filter: blur(2px); }
+        .loading-overlay .loading-text { color: var(--text); }
+        .loading-overlay .spinner { border-color: rgba(0,212,255,.25); border-top-color: #00d4ff; }
+        /* toast */
+        .app-toast { background: var(--card-bg); color: var(--text); border: 1px solid var(--border); }
+        .app-toast-success { border-color: rgba(34,197,94,.5); background: rgba(34,197,94,.14); color: #4ade80; }
+        .app-toast-error { border-color: rgba(239,68,68,.5); background: rgba(239,68,68,.14); color: #f87171; }
+        .app-toast-warning { border-color: rgba(245,158,11,.5); background: rgba(245,158,11,.14); color: #fbbf24; }
+        .app-toast-info { border-color: rgba(0,212,255,.45); background: rgba(0,212,255,.12); color: #22d3ee; }
+        /* delete confirm / recycle */
+        .del-confirm-title { color: var(--text); }
+        .del-confirm-desc { color: var(--text-secondary); }
+        .del-confirm-meta { background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.4); color: #f87171; }
+        .recycle-table th { background: var(--cell); color: var(--text-secondary); }
+        .recycle-table th, .recycle-table td { border-bottom: 1px solid var(--border); }
+        .recycle-tip { color: var(--text-tertiary); }
+        /* custom date picker */
+        .datepicker-mode, .dp-pick-mode { background: var(--input-bg); }
+        .datepicker-mode button.active, .dp-pick-mode button.active { background: var(--cell); color: #22d3ee; box-shadow: none; }
+        .datepicker-calendar-group { background: var(--cell); border: 1px solid var(--border); }
+        .dp-month { background: var(--card-bg); border: 1px solid var(--border); }
+        .dp-month-title { color: var(--text); }
+        .dp-month-title button:hover { background: rgba(0,212,255,.12); color: #22d3ee; }
+        .dp-day { color: var(--text); }
+        .dp-day:hover:not(.dp-day-disabled) { background: rgba(0,212,255,.12); color: #22d3ee; }
+        .dp-day-dim { color: #475569; }
+        .dp-day-disabled { color: #334155; }
+        .dp-day-today { outline: 1px solid #00d4ff; }
+        .dp-day-selected { background: #00d4ff !important; color: #04121f !important; }
+        .dp-day-range { background: rgba(0,212,255,.22); color: #e8f1fb; }
+        .dp-preset-btn { background: var(--card-bg); color: var(--text); border: 1px solid var(--border); }
+        .dp-preset-btn small { color: var(--text-tertiary); }
+        .dp-preset-btn:hover { background: rgba(0,212,255,.12); border-color: var(--primary); color: #22d3ee; }
+        .dp-date-field label { color: var(--text-secondary); }
+        .dp-date-input-wrap input[type="date"] { background: var(--input-bg); color: var(--text); border: 1.5px solid var(--border); }
+        .dp-date-input-wrap input[type="date"].invalid { background: rgba(239,68,68,.12); border-color: var(--danger); }
+        .dp-date-cal-btn { background: rgba(0,212,255,.14); color: #22d3ee; }
+        .dp-date-cal-btn:hover { background: rgba(0,212,255,.26); color: #00d4ff; }
+        .dp-footer { border-top: 1px dashed var(--border); }
+        .dp-hint { color: var(--text-tertiary); }
+        .dp-hint.success { color: #4ade80; }
+        .dp-hint.error { color: #f87171; }
+        /* activity feed */
+        .activity-item::before { background: var(--card-bg); }
+        .activity-user { color: var(--primary); }
+        /* period tabs / segmented controls */
+        .report-period-tabs { background: var(--input-bg); }
+        .report-period-tab.active { background: var(--cell); color: #22d3ee; box-shadow: none; }
+        .report-period-tab.report-period-tab-custom { background: transparent; border: 1px dashed var(--border); color: var(--text-secondary); }
+        .report-period-tab.report-period-tab-custom.active { background: rgba(168,85,247,.2); color: #c084fc; border: 1px solid transparent; }
+        .panel-tools .seg { background: var(--input-bg); }
+        .panel-tools .seg button.active { background: var(--cell); color: #22d3ee; box-shadow: none; }
+        .panel-tools input[type="number"], .panel-tools input[type="date"] { background: var(--input-bg); color: var(--text); }
+        .custom-range-display { background: var(--cell); border: 1px solid var(--border); color: var(--text); box-shadow: none; }
+        .custom-range-display:hover { background: var(--hover); box-shadow: none; }
+        .custom-range-display .clear-range { background: rgba(239,68,68,.18); color: #f87171; }
+        /* high-specificity active states on dashboard/reports */
+        #page-dashboard #dashboard-period .report-period-tab.active,
+        #page-reports #report-period .report-period-tab.active {
+            color: #04121f;
+            background: linear-gradient(135deg,#00d4ff,#0891b2);
+            border-color: #0891b2;
+            box-shadow: none;
+        }
+        #page-dashboard #dashboard-period .report-period-tab,
+        #page-reports #report-period .report-period-tab { color: var(--text-secondary); }
+        /* ledger date range */
+        .ledger-date-wrap { background: rgba(0,212,255,.06); border-color: rgba(0,212,255,.25); }
+        .ledger-date-wrap input[type="date"] { background: var(--input-bg); color: var(--text); }
+        /* stat icons */
+        .stat-icon.blue { background: rgba(0,212,255,.16); color: #22d3ee; }
+        .stat-icon.green { background: rgba(34,197,94,.16); color: #4ade80; }
+        .stat-icon.yellow { background: rgba(245,158,11,.16); color: #fbbf24; }
+        .stat-icon.red { background: rgba(239,68,68,.16); color: #f87171; }
+        .stat-icon.purple { background: rgba(168,85,247,.17); color: #c084fc; }
+        /* light badge/stage residuals */
+        .badge-purple { background: rgba(168,85,247,.17); color: #c084fc; }
+        .stage-5 { background: rgba(168,85,247,.17); color: #c084fc; }
+        /* scrollbars */
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-thumb { background: #26435f; border-radius: 6px; }
+        ::-webkit-scrollbar-thumb:hover { background: #33577a; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        /* patch5: selects/textareas lost the cascade at element specificity */
+        select, textarea {
+            background-color: var(--input-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        select:focus, textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0,212,255,.15);
+        }
+        select:disabled, textarea:disabled { background-color: var(--cell); color: var(--text-secondary); }
+        select option { background: #0d1f3c; color: #e8f1fb; }
+        /* end patch5 */
+        /* ===== end patch4 ===== */
     </style>
 </head>
 <body>
@@ -2151,7 +2305,8 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                 </div>
                 <div class="topbar-actions">
                     <div class="report-period-tabs" id="dashboard-period">
-                        <div class="report-period-tab active" data-period="day" onclick="switchDashboardPeriod('day')">日报</div>
+                        <div class="report-period-tab active" data-period="all" onclick="switchDashboardPeriod('all')">全部</div>
+                        <div class="report-period-tab" data-period="day" onclick="switchDashboardPeriod('day')">日报</div>
                         <div class="report-period-tab" data-period="week" onclick="switchDashboardPeriod('week')">周报</div>
                         <div class="report-period-tab" data-period="month" onclick="switchDashboardPeriod('month')">月报</div>
                         <div class="report-period-tab report-period-tab-custom" data-period="custom" onclick="openCustomDatePicker()" title="选择单个日期或日期范围">
@@ -2539,7 +2694,8 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                 </div>
                 <div class="topbar-actions">
                     <div class="report-period-tabs" id="report-period">
-                        <div class="report-period-tab active" data-period="day" onclick="switchReportPeriod('day')">日报</div>
+                        <div class="report-period-tab active" data-period="all" onclick="switchReportPeriod('all')">全部</div>
+                        <div class="report-period-tab" data-period="day" onclick="switchReportPeriod('day')">日报</div>
                         <div class="report-period-tab" data-period="week" onclick="switchReportPeriod('week')">周报</div>
                         <div class="report-period-tab" data-period="month" onclick="switchReportPeriod('month')">月报</div>
                     </div>
@@ -3745,9 +3901,9 @@ function clearLedgerDateRange() {
     // 清空后：回到默认周期「月」，保证统计口径可预期
     dashboardCustomRange.active = false;
     if (currentPeriod === 'custom') {
-        currentPeriod = 'month';
+        currentPeriod = 'all';
         document.querySelectorAll('.period-btn').forEach(b => {
-            b.classList.toggle('active', b.dataset.period === 'month');
+            b.classList.toggle('active', b.dataset.period === 'all');
         });
         updateCustomRangeBtnLabel();
     }
@@ -4126,7 +4282,7 @@ let currentPage = 'dashboard';
 let currentIssueId = null;
 let dashboardCharts = {};
 let reportCharts = {};
-let currentPeriod = 'day';
+let currentPeriod = 'all';
 // 看板周度趋势范围控制：默认展示最近12周，支持自定义起止日期（ISO周）
 let dashboardWeekConfig = { mode: 'recent', recentN: 12, startDate: null, endDate: null };
 // 看板自定义日期范围（period='custom'时使用）
@@ -4428,7 +4584,9 @@ function getFilteredIssuesByPeriod(period) {
     const now = new Date();
     let startDate, endDate = null;
 
-    if (period === 'custom' && dashboardCustomRange.active && dashboardCustomRange.startDate) {
+    if (period === 'all') {
+        startDate = null; endDate = null;
+    } else if (period === 'custom' && dashboardCustomRange.active && dashboardCustomRange.startDate) {
         startDate = dayStart(dashboardCustomRange.startDate);
         // single 模式下 endDate 已经被设置为当天 23:59:59，这里做一层兜底
         endDate = dashboardCustomRange.endDate
@@ -4446,14 +4604,14 @@ function getFilteredIssuesByPeriod(period) {
     }
 
     // 统一过滤（与台账完全共享 applyDateRangeFilter → parseLocalDate → isInDateRange 三段式）
-    const filtered = applyDateRangeFilter(issues, startDate, endDate, 'createdAt');
+    const filtered = (period === 'all') ? issues : applyDateRangeFilter(issues, startDate, endDate, 'createdAt');
 
     return {
         all: issues,
         currentPeriod: filtered,
         startDate, endDate, now,
         // 附带便捷方法：判断任意日期/字段是否落在当前 period（闭环数/预警复用）
-        inRangeFn: (issue, dateField='createdAt') => isInDateRange(issue, startDate, endDate, dateField)
+        inRangeFn: (issue, dateField='createdAt') => (period === 'all' ? true : isInDateRange(issue, startDate, endDate, dateField))
     };
 }
 
@@ -4849,7 +5007,7 @@ function renderDashboardCharts(issues, periodIssues, period, analytics = {}) {
             datasets: [{
                 label: '问题数量',
                 data: sourceHasData ? sourceCounts : new Array(ISSUE_SOURCES.length).fill(0),
-                backgroundColor: ['#e8f0fe', '#e6f4ea', '#fef7e0', '#fce8e6', '#f3e8fd'],
+                backgroundColor: ['rgba(0,212,255,.75)', 'rgba(34,197,94,.75)', 'rgba(245,158,11,.75)', 'rgba(239,68,68,.75)', 'rgba(168,85,247,.75)'],
                 borderColor: ['#1a73e8', '#34a853', '#f9ab00', '#ea4335', '#7c1fa2'],
                 borderWidth: 1.5, borderRadius: 6
             }]
@@ -5074,6 +5232,9 @@ function renderDashboardCharts(issues, periodIssues, period, analytics = {}) {
                 added.push(a); closed.push(c);
             }
             totalActive = labels.map((_,k)=>{ let t=0; for(let j=0;j<=k;j++) t += added[j]-closed[j]; return t; });
+        } else if (period === 'all') {
+            const m12 = aggregateIssuesByRecentMonths(periodIssues, 12);
+            labels = m12.labels; added = m12.added; closed = m12.closed; totalActive = m12.totalActive;
         } else {
             // custom：按 dashboardCustomRange.start/end 生成桶
             const s0 = dashboardCustomRange?.startDate ? dayStart(dashboardCustomRange.startDate) : dayStart(now);
@@ -7225,16 +7386,16 @@ function renderDetailAttachments() {
                 ${imageItems.map(f => {
                     const hasReal = f.dataUrl && typeof f.dataUrl === 'string' && f.dataUrl.indexOf('data:') === 0;
                     const tileContent = hasReal
-                        ? `<img src="${f.dataUrl}" alt="${f.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;background:#f5f7fb">`
-                        : `<div style="aspect-ratio:1/1;background:linear-gradient(135deg,#eef2ff,#fff);display:flex;align-items:center;justify-content:center"><div style="font-size:56px">${f.icon}</div></div>`;
+                        ? `<img src="${f.dataUrl}" alt="${f.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;background:var(--cell)">`
+                        : `<div style="aspect-ratio:1/1;background:linear-gradient(135deg,rgba(0,212,255,.18),var(--card-bg));display:flex;align-items:center;justify-content:center"><div style="font-size:56px">${f.icon}</div></div>`;
                     return `
-                    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff;transition:transform .15s,box-shadow .15s;cursor:pointer" onclick="previewAttachmentImage('${f.id}')" onmouseenter="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 16px rgba(26,115,232,.15)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
+                    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--card-bg);transition:transform .15s,box-shadow .15s;cursor:pointer" onclick="previewAttachmentImage('${f.id}')" onmouseenter="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 16px rgba(26,115,232,.15)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
                         <div style="position:relative;${hasReal ? '' : 'aspect-ratio:1/1'}">
                             ${tileContent}
                             <div style="position:absolute;top:6px;right:6px"><span class="badge ${f.sourceBadge}" style="font-size:10px;padding:1px 6px;backdrop-filter:blur(2px)">${f.sourceLabel.split('-')[0]}</span></div>
                             ${hasReal ? `<div style="position:absolute;bottom:0;left:0;right:0;padding:3px 6px;background:linear-gradient(to top,rgba(0,0,0,.55),transparent);color:#fff;font-size:10px;text-align:right">🔍 放大查看</div>` : ''}
                         </div>
-                        <div style="padding:8px 10px;border-top:1px solid #f0f0f0">
+                        <div style="padding:8px 10px;border-top:1px solid var(--border)">
                             <div class="file-item-name" style="font-size:12px;color:var(--text-primary)" title="${f.name}">${f.name}</div>
                             <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;font-size:11px;color:var(--text-tertiary)">
                                 <span>${f.size ? (f.size/1024).toFixed(1)+'KB' : '--'}</span>
@@ -7325,13 +7486,13 @@ function previewAttachmentImage(id) {
         img.src = `data:image/svg+xml;utf8,` + encodeURIComponent(
             `<svg xmlns='http://www.w3.org/2000/svg' width='800' height='600' viewBox='0 0 800 600'>
                 <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
-                    <stop offset='0%' stop-color='#f8fafc'/><stop offset='100%' stop-color='#cbd5e1'/>
+                    <stop offset='0%' stop-color='#0d1f3c'/><stop offset='100%' stop-color='#1a3a5c'/>
                 </linearGradient></defs>
                 <rect width='800' height='600' fill='url(#g)'/>
                 <text x='50%' y='44%' text-anchor='middle' font-size='160'>${f.icon}</text>
-                <text x='50%' y='62%' text-anchor='middle' font-size='26' font-family='Arial' fill='#334155' font-weight='bold'>${escName}</text>
-                <text x='50%' y='72%' text-anchor='middle' font-size='16' font-family='Arial' fill='#64748b'>当前未保存原始像素数据（演示模式/历史数据）</text>
-                <text x='50%' y='78%' text-anchor='middle' font-size='15' font-family='Arial' fill='#94a3b8'>来源：${f.sourceLabel} · 格式：${(f.ext||'').toUpperCase()}</text>
+                <text x='50%' y='62%' text-anchor='middle' font-size='26' font-family='Arial' fill='#e8f1fb' font-weight='bold'>${escName}</text>
+                <text x='50%' y='72%' text-anchor='middle' font-size='16' font-family='Arial' fill='#9db8d2'>当前未保存原始像素数据（演示模式/历史数据）</text>
+                <text x='50%' y='78%' text-anchor='middle' font-size='15' font-family='Arial' fill='#9db8d2'>来源：${f.sourceLabel} · 格式：${(f.ext||'').toUpperCase()}</text>
                 <text x='50%' y='86%' text-anchor='middle' font-size='14' font-family='Arial' fill='#0ea5e9'>在“新增问题单”中重新上传该图片即可获得原图预览</text>
             </svg>`);
     }
@@ -7424,12 +7585,12 @@ function renderDetailStages(issue) {
             : (sc && isCurrent ? `<span class="countdown ${sc.overdue ? 'danger' : 'warning'}">${sc.text}</span>` : '');
         
         const bgColors = {
-            1: 'background:linear-gradient(135deg,#e8f0fe,#fff)',
-            2: 'background:linear-gradient(135deg,#e6f4ea,#fff)',
-            3: 'background:linear-gradient(135deg,#fef7e0,#fff)',
-            4: 'background:linear-gradient(135deg,#fce8e6,#fff)',
-            5: 'background:linear-gradient(135deg,#f3e8fd,#fff)',
-            6: 'background:linear-gradient(135deg,#e0f2f1,#fff)'
+            1: 'background:linear-gradient(135deg,rgba(0,212,255,.22),var(--card-bg))',
+            2: 'background:linear-gradient(135deg,rgba(34,197,94,.22),var(--card-bg))',
+            3: 'background:linear-gradient(135deg,rgba(245,158,11,.22),var(--card-bg))',
+            4: 'background:linear-gradient(135deg,rgba(239,68,68,.22),var(--card-bg))',
+            5: 'background:linear-gradient(135deg,rgba(168,85,247,.22),var(--card-bg))',
+            6: 'background:linear-gradient(135deg,rgba(20,184,166,.22),var(--card-bg))'
         };
 
         const stepNumDisplay = stepIdx + 1; // 当前流程中"第几步"，显示 1..3（simple）或 1..6（full）
