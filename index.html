@@ -2018,171 +2018,6 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        /* ===== patch4 dark-theme final (last in stylesheet, wins over later light rules) ===== */
-        /* modal */
-        .modal-overlay { background: rgba(2,8,20,.62); }
-        .modal { background: var(--card-bg); border: 1px solid var(--border); box-shadow: 0 12px 44px rgba(0,0,0,.6); }
-        .modal-header { background: var(--card-bg); border-bottom: 1px solid var(--border); }
-        .modal-footer { background: var(--card-bg); border-top: 1px solid var(--border); }
-        .modal-close { color: var(--text-tertiary); }
-        .modal-close:hover { background: rgba(255,255,255,.08); color: var(--text); }
-        /* login */
-        .login-card { background: var(--card-bg); border: 1px solid var(--border); box-shadow: 0 24px 64px rgba(0,0,0,.55); }
-        .login-logo h2 { color: var(--text); }
-        .login-logo p { color: var(--text-secondary); }
-        .login-form label { color: var(--text-secondary); }
-        .login-features { border-top: 1px solid var(--border); }
-        .login-feature { color: var(--text-tertiary); }
-        .login-hint { color: var(--text-tertiary); }
-        .login-error { background: rgba(239,68,68,.14); border: 1px solid rgba(239,68,68,.40); color: #f87171; }
-        .login-btn { background: linear-gradient(135deg,#00d4ff,#0891b2); color: #04121f; border: none; }
-        .login-btn:hover { background: linear-gradient(135deg,#22d3ee,#0e7490); }
-        /* buttons */
-        .btn-outline { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
-        .btn-outline:hover { background: rgba(0,212,255,.10); border-color: var(--primary); color: var(--primary); }
-        .btn-icon { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
-        .btn-icon:hover { background: rgba(255,255,255,.06); color: var(--text); }
-        .btn-primary, .btn-success { color: #04121f; }
-        .btn-sm-del { background: var(--input-bg); border: 1px solid rgba(239,68,68,.5); color: #f87171; }
-        .btn-sm-del:hover { background: rgba(239,68,68,.18); }
-        .btn-sm-restore { background: var(--input-bg); border: 1px solid rgba(34,197,94,.5); color: #4ade80; }
-        .btn-sm-restore:hover { background: rgba(34,197,94,.18); }
-        /* alert list items */
-        .alert-item.danger { background: rgba(239,68,68,.12); border-color: var(--danger); }
-        .alert-item.warning { background: rgba(245,158,11,.12); border-color: var(--warning); }
-        .alert-item.info { background: rgba(0,212,255,.10); border-color: var(--primary); }
-        .alert-item.success { background: rgba(34,197,94,.10); border-color: var(--success); }
-        .alert-item:hover { background: rgba(255,255,255,.05); }
-        /* progress / detail sections */
-        .progress-bar { background: var(--cell); }
-        .detail-section { background: var(--cell); }
-        /* stage timeline */
-        .stage-step-circle { background: var(--cell); color: var(--text-tertiary); }
-        .stage-content-header.locked { background: var(--cell); }
-        .stage-content-header.active { background: linear-gradient(90deg, rgba(0,212,255,.18) 0%, var(--card-bg) 100%); }
-        .stage-content-header.completed { background: linear-gradient(90deg, rgba(34,197,94,.16) 0%, var(--card-bg) 100%); }
-        .stage-content-header.overdue { background: linear-gradient(90deg, rgba(239,68,68,.16) 0%, var(--card-bg) 100%); }
-        /* kanban */
-        .kanban-column { background: var(--cell); }
-        .kanban-card { background: var(--card-bg); }
-        .kanban-card.overdue { background: rgba(239,68,68,.10); }
-        .kanban-card-tag { background: rgba(0,212,255,.16); color: #22d3ee; }
-        /* audit icons */
-        .audit-log-icon.danger { background: rgba(239,68,68,.16); color: #f87171; }
-        .audit-log-icon.warning { background: rgba(245,158,11,.16); color: #fbbf24; }
-        .audit-log-icon.success { background: rgba(34,197,94,.16); color: #4ade80; }
-        /* file list */
-        .file-item { background: var(--cell); }
-        /* loading overlay */
-        .loading-overlay { background: rgba(6,14,31,.72); backdrop-filter: blur(2px); }
-        .loading-overlay .loading-text { color: var(--text); }
-        .loading-overlay .spinner { border-color: rgba(0,212,255,.25); border-top-color: #00d4ff; }
-        /* toast */
-        .app-toast { background: var(--card-bg); color: var(--text); border: 1px solid var(--border); }
-        .app-toast-success { border-color: rgba(34,197,94,.5); background: rgba(34,197,94,.14); color: #4ade80; }
-        .app-toast-error { border-color: rgba(239,68,68,.5); background: rgba(239,68,68,.14); color: #f87171; }
-        .app-toast-warning { border-color: rgba(245,158,11,.5); background: rgba(245,158,11,.14); color: #fbbf24; }
-        .app-toast-info { border-color: rgba(0,212,255,.45); background: rgba(0,212,255,.12); color: #22d3ee; }
-        /* delete confirm / recycle */
-        .del-confirm-title { color: var(--text); }
-        .del-confirm-desc { color: var(--text-secondary); }
-        .del-confirm-meta { background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.4); color: #f87171; }
-        .recycle-table th { background: var(--cell); color: var(--text-secondary); }
-        .recycle-table th, .recycle-table td { border-bottom: 1px solid var(--border); }
-        .recycle-tip { color: var(--text-tertiary); }
-        /* custom date picker */
-        .datepicker-mode, .dp-pick-mode { background: var(--input-bg); }
-        .datepicker-mode button.active, .dp-pick-mode button.active { background: var(--cell); color: #22d3ee; box-shadow: none; }
-        .datepicker-calendar-group { background: var(--cell); border: 1px solid var(--border); }
-        .dp-month { background: var(--card-bg); border: 1px solid var(--border); }
-        .dp-month-title { color: var(--text); }
-        .dp-month-title button:hover { background: rgba(0,212,255,.12); color: #22d3ee; }
-        .dp-day { color: var(--text); }
-        .dp-day:hover:not(.dp-day-disabled) { background: rgba(0,212,255,.12); color: #22d3ee; }
-        .dp-day-dim { color: #475569; }
-        .dp-day-disabled { color: #334155; }
-        .dp-day-today { outline: 1px solid #00d4ff; }
-        .dp-day-selected { background: #00d4ff !important; color: #04121f !important; }
-        .dp-day-range { background: rgba(0,212,255,.22); color: #e8f1fb; }
-        .dp-preset-btn { background: var(--card-bg); color: var(--text); border: 1px solid var(--border); }
-        .dp-preset-btn small { color: var(--text-tertiary); }
-        .dp-preset-btn:hover { background: rgba(0,212,255,.12); border-color: var(--primary); color: #22d3ee; }
-        .dp-date-field label { color: var(--text-secondary); }
-        .dp-date-input-wrap input[type="date"] { background: var(--input-bg); color: var(--text); border: 1.5px solid var(--border); }
-        .dp-date-input-wrap input[type="date"].invalid { background: rgba(239,68,68,.12); border-color: var(--danger); }
-        .dp-date-cal-btn { background: rgba(0,212,255,.14); color: #22d3ee; }
-        .dp-date-cal-btn:hover { background: rgba(0,212,255,.26); color: #00d4ff; }
-        .dp-footer { border-top: 1px dashed var(--border); }
-        .dp-hint { color: var(--text-tertiary); }
-        .dp-hint.success { color: #4ade80; }
-        .dp-hint.error { color: #f87171; }
-        /* activity feed */
-        .activity-item::before { background: var(--card-bg); }
-        .activity-user { color: var(--primary); }
-        /* period tabs / segmented controls */
-        .report-period-tabs { background: var(--input-bg); }
-        .report-period-tab.active { background: var(--cell); color: #22d3ee; box-shadow: none; }
-        .report-period-tab.report-period-tab-custom { background: transparent; border: 1px dashed var(--border); color: var(--text-secondary); }
-        .report-period-tab.report-period-tab-custom.active { background: rgba(168,85,247,.2); color: #c084fc; border: 1px solid transparent; }
-        .panel-tools .seg { background: var(--input-bg); }
-        .panel-tools .seg button.active { background: var(--cell); color: #22d3ee; box-shadow: none; }
-        .panel-tools input[type="number"], .panel-tools input[type="date"] { background: var(--input-bg); color: var(--text); }
-        .custom-range-display { background: var(--cell); border: 1px solid var(--border); color: var(--text); box-shadow: none; }
-        .custom-range-display:hover { background: var(--hover); box-shadow: none; }
-        .custom-range-display .clear-range { background: rgba(239,68,68,.18); color: #f87171; }
-        /* high-specificity active states on dashboard/reports */
-        #page-dashboard #dashboard-period .report-period-tab.active,
-        #page-reports #report-period .report-period-tab.active {
-            color: #04121f;
-            background: linear-gradient(135deg,#00d4ff,#0891b2);
-            border-color: #0891b2;
-            box-shadow: none;
-        }
-        #page-dashboard #dashboard-period .report-period-tab,
-        #page-reports #report-period .report-period-tab { color: var(--text-secondary); }
-        /* ledger date range */
-        .ledger-date-wrap { background: rgba(0,212,255,.06); border-color: rgba(0,212,255,.25); }
-        .ledger-date-wrap input[type="date"] { background: var(--input-bg); color: var(--text); }
-        /* stat icons */
-        .stat-icon.blue { background: rgba(0,212,255,.16); color: #22d3ee; }
-        .stat-icon.green { background: rgba(34,197,94,.16); color: #4ade80; }
-        .stat-icon.yellow { background: rgba(245,158,11,.16); color: #fbbf24; }
-        .stat-icon.red { background: rgba(239,68,68,.16); color: #f87171; }
-        .stat-icon.purple { background: rgba(168,85,247,.17); color: #c084fc; }
-        /* light badge/stage residuals */
-        .badge-purple { background: rgba(168,85,247,.17); color: #c084fc; }
-        .stage-5 { background: rgba(168,85,247,.17); color: #c084fc; }
-        /* scrollbars */
-        ::-webkit-scrollbar { width: 10px; height: 10px; }
-        ::-webkit-scrollbar-thumb { background: #26435f; border-radius: 6px; }
-        ::-webkit-scrollbar-thumb:hover { background: #33577a; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        /* patch5: selects/textareas lost the cascade at element specificity */
-        select, textarea {
-            background-color: var(--input-bg);
-            color: var(--text);
-            border: 1px solid var(--border);
-        }
-        select:focus, textarea:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0,212,255,.15);
-        }
-        select:disabled, textarea:disabled { background-color: var(--cell); color: var(--text-secondary); }
-        select option { background: #0d1f3c; color: #e8f1fb; }
-        /* end patch5 */
-        /* patch6: role system + danger outline buttons */
-        .btn-outline.btn-danger {
-            background: rgba(239,68,68,.12);
-            color: var(--danger);
-            border: 1px solid rgba(239,68,68,.5);
-        }
-        .btn-outline.btn-danger:hover {
-            background: rgba(239,68,68,.25);
-            color: #fff;
-            border-color: var(--danger);
-        }
-        /* ===== end patch4 ===== */
     </style>
 </head>
 <body>
@@ -2278,7 +2113,7 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
             <div class="nav-item" data-page="users" id="nav-users" style="display:none">
                 <span class="icon">👥</span><span>用户管理</span>
             </div>
-            <div class="nav-item" data-page="settings" id="nav-settings" style="display:none">
+            <div class="nav-item" data-page="settings">
                 <span class="icon">⚙️</span><span>系统设置</span>
             </div>
         </nav>
@@ -2286,7 +2121,7 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
             <div class="avatar" id="user-avatar">A</div>
             <div class="user-info">
                 <div class="user-name" id="user-display-name">管理员</div>
-                <div class="user-role" id="user-display-role">管理员</div>
+                <div class="user-role" id="user-display-role">系统管理员</div>
             </div>
             <button class="logout-btn" onclick="handleLogout()" title="退出登录">⏻</button>
         </div>
@@ -2316,8 +2151,7 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                 </div>
                 <div class="topbar-actions">
                     <div class="report-period-tabs" id="dashboard-period">
-                        <div class="report-period-tab active" data-period="all" onclick="switchDashboardPeriod('all')">全部</div>
-                        <div class="report-period-tab" data-period="day" onclick="switchDashboardPeriod('day')">日报</div>
+                        <div class="report-period-tab active" data-period="day" onclick="switchDashboardPeriod('day')">日报</div>
                         <div class="report-period-tab" data-period="week" onclick="switchDashboardPeriod('week')">周报</div>
                         <div class="report-period-tab" data-period="month" onclick="switchDashboardPeriod('month')">月报</div>
                         <div class="report-period-tab report-period-tab-custom" data-period="custom" onclick="openCustomDatePicker()" title="选择单个日期或日期范围">
@@ -2461,7 +2295,7 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                 <div class="topbar-actions">
                     <button class="btn btn-outline" id="btn-recycle-bin" onclick="openRecycleBin()" style="display:none">🗑️ 回收站</button>
                     <button class="btn btn-outline" onclick="exportIssuesExcel()">📥 导出</button>
-                    <button class="btn btn-primary" id="btn-new-issue" onclick="openIssueForm()">➕ 新建问题单</button>
+                    <button class="btn btn-primary" onclick="openIssueForm()">➕ 新建问题单</button>
                 </div>
             </div>
 
@@ -2652,7 +2486,7 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
             <div class="modal" style="background:transparent;box-shadow:none;max-width:96vw;width:96vw;max-height:96vh;margin:0 auto" onclick="event.stopPropagation()">
                 <button class="modal-close" onclick="closeModal('modal-image-preview')" title="关闭预览（ESC）" style="color:#fff;background:rgba(30,41,59,0.85);width:40px;height:40px;border-radius:50%;font-size:18px;display:flex;align-items:center;justify-content:center;position:absolute;top:10px;right:10px;border:2px solid rgba(255,255,255,.35)">✕</button>
                 <div id="preview-image-stage" style="text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;padding:0 8px">
-                    <img id="preview-image-src" src="" alt="" onload="document.getElementById('preview-image-meta').textContent = `原图分辨率：${this.naturalWidth} × ${this.naturalHeight} 像素`" style="max-width:92vw;max-height:78vh;width:auto;height:auto;object-fit:contain;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.6);background:#0a1428">
+                    <img id="preview-image-src" src="" alt="" onload="document.getElementById('preview-image-meta').textContent = `原图分辨率：${this.naturalWidth} × ${this.naturalHeight} 像素`" style="max-width:92vw;max-height:78vh;width:auto;height:auto;object-fit:contain;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.6);background:#fff">
                 </div>
                 <div id="preview-image-caption" style="margin-top:14px;color:#fff;font-size:14px;text-align:center;font-weight:600"></div>
                 <div id="preview-image-meta" style="margin-top:6px;color:#cbd5e1;font-size:12px;text-align:center"></div>
@@ -2705,8 +2539,7 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                 </div>
                 <div class="topbar-actions">
                     <div class="report-period-tabs" id="report-period">
-                        <div class="report-period-tab active" data-period="all" onclick="switchReportPeriod('all')">全部</div>
-                        <div class="report-period-tab" data-period="day" onclick="switchReportPeriod('day')">日报</div>
+                        <div class="report-period-tab active" data-period="day" onclick="switchReportPeriod('day')">日报</div>
                         <div class="report-period-tab" data-period="week" onclick="switchReportPeriod('week')">周报</div>
                         <div class="report-period-tab" data-period="month" onclick="switchReportPeriod('month')">月报</div>
                     </div>
@@ -2871,7 +2704,7 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                             <button class="btn btn-primary" style="flex:1" onclick="exportAllData()">📥 导出全部数据（备份）</button>
                             <button class="btn btn-outline" style="flex:1" onclick="importAllData()">📤 导入数据（恢复）</button>
                         </div>
-                        <button id="btn-purge-issues" class="btn btn-outline btn-danger" onclick="openPurgeIssuesModal()">🗑️ 清空问题台账（管理员专用）</button>
+                        <button id="btn-purge-issues" class="btn btn-outline btn-danger" style="border-color:#f5c2c7;color:#842029;background:#fff5f5" onclick="openPurgeIssuesModal()">🗑️ 清空问题台账（管理员专用）</button>
                         <button class="btn btn-outline" onclick="clearAllData()">🗑️ 清空演示数据（重置）</button>
                         <div style="display:flex;gap:10px;margin-top:2px">
                             <button class="btn btn-outline" style="flex:1" onclick="localBackup.choose()">📁 选择本地备份文件夹（每次保存自动备份）</button>
@@ -2879,17 +2712,19 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                         <div id="local-backup-status" style="font-size:12px;color:#9aa0a6;line-height:1.7;margin-top:2px">⚪ 未开启：点上面按钮，选择 Z:\00 公共文件夹\08 AI管理系统\QRQC管理系统\备份，之后每次点侧边栏「💾保存」都会自动备份到该文件夹。</div>
                     </div>
                     <!-- 台账最后修改时间 + 修改人（显式持久化，满足审计需求）-->
-                    <div id="settings-ledger-modified" style="margin-top:14px;padding:11px 14px;background:rgba(0,212,255,.08);border:1px solid var(--border);border-radius:8px;font-size:12.5px;line-height:1.8">
-                        <div style="font-weight:600;color:var(--primary);margin-bottom:2px">📌 台账最后修改记录（实时同步）</div>
-                        <div>最后修改时间：<span id="ledger-modified-at" style="font-family:monospace;color:var(--text);font-weight:600">-</span></div>
-                        <div>最后修改人：<span id="ledger-modified-by" style="color:var(--text);font-weight:600">-</span></div>
+                    <div id="settings-ledger-modified" style="margin-top:14px;padding:11px 14px;background:#eef2ff;border:1px solid #c7d2fe;border-radius:8px;font-size:12.5px;line-height:1.8">
+                        <div style="font-weight:600;color:#3730a3;margin-bottom:2px">📌 台账最后修改记录（CUD 实时同步）</div>
+                        <div>最后修改时间：<span id="ledger-modified-at" style="font-family:monospace;color:#334155;font-weight:600">-</span></div>
+                        <div>最后修改人：<span id="ledger-modified-by" style="color:#334155;font-weight:600">-</span></div>
                     </div>
-                    <div style="margin-top:16px;padding:12px;background:rgba(245,158,11,.08);border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text-secondary);line-height:1.8">
-                        <strong style="color:var(--text)">💡 云端同步与备份说明：</strong><br>
-                        系统数据已接入云端 KV 存储，<b>所有电脑/浏览器登录同一账号即可自动读取云端最新数据，无需手动迁移</b>。<br>
-                        • 日常使用：打开系统自动拉取云端最新数据；改动后点击侧边栏「💾 保存」上传云端并写入网络盘备份<br>
-                        • 离线归档：仍可使用「📥 导出全部数据 / 📤 导入数据」进行本地备份或恢复<br>
-                        <span style="color:var(--warning)">⚠️ 建议定期导出备份归档，满足审计与灾备要求</span>
+                    <div style="margin-top:16px;padding:12px;background:#fff8e1;border:1px solid #ffe69c;border-radius:6px;font-size:12px;color:#664d03;line-height:1.8">
+                        <strong>💡 跨设备数据迁移说明：</strong><br>
+                        系统数据存储在浏览器 localStorage 中，<b>不同电脑/浏览器之间数据不共享</b>。请按以下步骤迁移：<br>
+                        1. 在原设备点击「📥 导出全部数据」，生成 JSON 备份文件<br>
+                        2. 将备份文件复制到新设备（U盘/邮件/网盘等）<br>
+                        3. 在新设备打开系统 → 进入「系统设置」→ 点击「📤 导入数据」选择备份文件<br>
+                        4. 系统将自动恢复全部问题记录、预警、审计日志等数据<br>
+                        <span style="color:#842029">⚠️ 建议每次重要操作后导出备份，防止数据丢失</span>
                     </div>
                 </div>
             </div>
@@ -2901,7 +2736,7 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                         <div class="detail-item"><span class="detail-label">系统名称</span><span class="detail-value">QRQC快速反应管理系统</span></div>
                         <div class="detail-item"><span class="detail-label">版本</span><span class="detail-value">v1.0</span></div>
                         <div class="detail-item"><span class="detail-label">架构层级</span><span class="detail-value">四层标准化架构</span></div>
-                        <div class="detail-item"><span class="detail-label">数据存储</span><span class="detail-value">云端KV同步 + 本地缓存 + 永久留痕</span></div>
+                        <div class="detail-item"><span class="detail-label">数据存储</span><span class="detail-value">localStorage + 永久留痕</span></div>
                         <div class="detail-item"><span class="detail-label">所属公司</span><span class="detail-value">宁波方卓科技有限公司</span></div>
                     </div>
                 </div>
@@ -3063,8 +2898,8 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                 <div id="issue-form-files-status" style="margin-top:6px;font-size:12px;color:var(--text-tertiary)"></div>
             </div>
 
-            <div class="detail-section" id="create-form-deadline-tip" style="background:rgba(245,158,11,.1);border:1px solid var(--border);margin-top:16px">
-                <div style="font-size:12px;color:var(--text-secondary)">
+            <div class="detail-section" id="create-form-deadline-tip" style="background:#fff3cd;border:1px solid #ffe69c;margin-top:16px">
+                <div style="font-size:12px;color:#664d03">
                     <strong>⚠️ 时效提醒：</strong>提交后系统将自动：<br>
                     1. 启动第一阶段（临时措施）1天倒计时<br>
                     2. 启动10天总闭环倒计时<br>
@@ -3090,7 +2925,7 @@ function refreshTrackingLevelHint(lv) {
     // hint 信息框已移除，仅 tip（时效提醒）仍需更新
     if (hint) {
         const stageList = getStagesOfTracking(lv).map((s, idx) =>
-            `<span style="display:inline-flex;align-items:center;gap:4px;margin:2px 6px 2px 0;padding:2px 8px;border-radius:999px;background:var(--cell);border:1px solid var(--border);color:var(--text-secondary);font-size:12px">
+            `<span style="display:inline-flex;align-items:center;gap:4px;margin:2px 6px 2px 0;padding:2px 8px;border-radius:999px;background:#fff;border:1px solid ${lv==='full'?'#c6dafc':'#a8dabc'};color:var(--text-secondary);font-size:12px">
                <span style="font-weight:700;color:var(--primary-dark)">第${idx+1}步</span>${s.shortName}<span style="color:var(--text-tertiary)">(${s.days}天内)</span>
              </span>`).join('');
         hint.innerHTML = `
@@ -3104,11 +2939,11 @@ function refreshTrackingLevelHint(lv) {
         `;
     }
     if (tip) {
-        tip.style.background = lv === 'simple' ? 'rgba(34,197,94,.12)' : 'rgba(245,158,11,.12)';
-        tip.style.border = '1px solid var(--border)';
+        tip.style.background = lv === 'simple' ? '#d4edda' : '#fff3cd';
+        tip.style.border = lv === 'simple' ? '1px solid #a8dabc' : '1px solid #ffe69c';
         const child = tip.firstElementChild;
         if (child) {
-            child.style.color = 'var(--text-secondary)';
+            child.style.color = lv === 'simple' ? '#0f5132' : '#664d03';
             child.innerHTML = lv === 'simple'
                 ? `<strong>✅ 简单跟踪 · 时效说明：</strong>总闭环倒计时不变 10 天，但流程仅 3 阶段：<br>
                    1. 启动第①阶段（临时措施）1 天倒计时<br>
@@ -3283,26 +3118,26 @@ document.addEventListener('DOMContentLoaded', () => {
 <div class="modal-overlay" id="modal-purge-issues" onclick="if(event.target===this) closeModal('modal-purge-issues')">
     <div class="modal" style="max-width:560px" onclick="event.stopPropagation()">
         <div class="modal-header">
-            <span class="modal-title" style="color:var(--danger)">🗑️ 清空 QRQC 问题台账（最终确认）</span>
+            <span class="modal-title" style="color:#842029">🗑️ 清空 QRQC 问题台账（最终确认）</span>
             <button class="modal-close" onclick="closeModal('modal-purge-issues')">✕</button>
         </div>
         <div class="modal-body">
             <!-- 3 条前置校验清单 -->
-            <div id="purge-checklist" style="margin-bottom:18px;padding:14px;border-radius:10px;border:1px solid rgba(239,68,68,.45);background:rgba(239,68,68,.1);font-size:12.5px;line-height:1.8;color:var(--text-secondary)">
-              <div style="font-weight:700;margin-bottom:6px;color:var(--danger);font-size:13px">⚠️ 高危操作：执行前请确认以下 3 项全部已完成</div>
+            <div id="purge-checklist" style="margin-bottom:18px;padding:14px;border-radius:10px;border:1px solid #f5c2c7;background:#fff5f5;font-size:12.5px;line-height:1.8;color:#842029">
+              <div style="font-weight:700;margin-bottom:6px;color:#842029;font-size:13px">⚠️ 高危操作：执行前请确认以下 3 项全部已完成</div>
               <div>☑️ ① 已通过「📥 导出全部数据」按钮完成 <strong>数据备份</strong>（含 ISSUES + RECYCLE_BIN + 提醒/审计 等）</div>
-              <div>☑️ ② 已获得 <strong>相关负责人书面/口头授权</strong>（仅管理员可执行）</div>
+              <div>☑️ ② 已获得 <strong>相关负责人书面/口头授权</strong>（仅系统管理员可执行）</div>
               <div>☑️ ③ 删除范围为：<strong id="purge-scope-label">台账所有问题（ISSUES）+ 回收站全量（RECYCLE_BIN）</strong>，本次将 <strong>彻底清空为 0 条</strong></div>
             </div>
 
             <div class="form-row" style="margin-bottom:10px">
                 <div class="form-group" style="flex:1 1 45%">
                     <label>当前在管/已闭环问题（ISSUES）<span class="required">*</span></label>
-                    <input type="text" id="purge-count-issues" readonly style="background:var(--cell);color:var(--danger);font-weight:700;font-family:monospace;text-align:center">
+                    <input type="text" id="purge-count-issues" readonly style="background:#f8f9fa;color:#842029;font-weight:700;font-family:monospace;text-align:center">
                 </div>
                 <div class="form-group" style="flex:1 1 45%">
                     <label>回收站问题（RECYCLE_BIN）<span class="required">*</span></label>
-                    <input type="text" id="purge-count-recycle" readonly style="background:var(--cell);color:var(--danger);font-weight:700;font-family:monospace;text-align:center">
+                    <input type="text" id="purge-count-recycle" readonly style="background:#f8f9fa;color:#842029;font-weight:700;font-family:monospace;text-align:center">
                 </div>
             </div>
 
@@ -3312,7 +3147,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div style="font-weight:600;color:var(--primary-dark)">① 软删除阶段：</div>
                     先把所有 <span style="font-family:monospace">ISSUES</span> 问题单（含活动日志、阶段数据、附件）完整移入 <span style="font-family:monospace">RECYCLE_BIN</span>，标注 <strong>_deletedAt/_deletedBy</strong>（安全、可追溯）
                     <div style="font-weight:600;color:var(--primary-dark);margin-top:6px">② 物理销毁阶段：</div>
-                    由于您选择了 <strong>"ISSUES + RECYCLE_BIN 全量"</strong>，软移完成后再 <strong style="color:var(--danger)">永久清空整个 RECYCLE_BIN</strong>（包括软移进来的 + 原来的旧记录），最终系统问题单/回收站均为 0 条，<strong style="color:var(--danger)">不可恢复</strong>。
+                    由于您选择了 <strong>"ISSUES + RECYCLE_BIN 全量"</strong>，软移完成后再 <strong style="color:#842029">永久清空整个 RECYCLE_BIN</strong>（包括软移进来的 + 原来的旧记录），最终系统问题单/回收站均为 0 条，<strong style="color:#842029">不可恢复</strong>。
                 </div>
             </div>
 
@@ -3329,8 +3164,8 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
 
             <div class="form-group">
-                <label style="color:var(--danger)">⚠️ 最终确认（必须勾选）</label>
-                <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;padding:10px;border:1px dashed rgba(239,68,68,.45);border-radius:10px;background:rgba(239,68,68,.08);font-size:12.5px;color:var(--text-secondary);line-height:1.7;margin:0">
+                <label style="color:#842029">⚠️ 最终确认（必须勾选）</label>
+                <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;padding:10px;border:1px dashed #f5c2c7;border-radius:10px;background:#fff5f5;font-size:12.5px;color:#842029;line-height:1.7;margin:0">
                     <input type="checkbox" id="purge-final-confirm" style="margin-top:3px">
                     <span>
                         我 <strong id="purge-operator-name" style="text-decoration:underline"></strong>（<span id="purge-operator-role"></span>）已完成以上 3 条前置清单（备份+授权+范围确认），理解本操作会 <strong>永久销毁当前系统中的所有问题台账数据</strong>，后果自负，并同意本次操作及删除理由被永久记入系统审计日志。
@@ -3545,33 +3380,11 @@ function renderSettingsMeta() {
 // 初始化：如果从未打过时间戳，按当前 ISSUES 条数 hash → 立即一个初始值（避免缓存永远不失效）
 if (!getLastModifiedTs()) bumpLastModifiedTs();
 
-/* ===================== 角色与权限控制 ===================== */
-const ROLE_ADMIN  = '管理员';
-const ROLE_EDITOR = '编辑员';
-const ROLE_VIEWER = '查看员';
-const ALL_ROLES   = [ROLE_ADMIN, ROLE_EDITOR, ROLE_VIEWER];
-// 旧角色 → 新角色迁移映射
-const ROLE_MIGRATION = { '系统管理员': ROLE_ADMIN, '质量工程师': ROLE_EDITOR, '生产主管': ROLE_VIEWER };
-// 删除权限：仅管理员
-const ROLES_ALLOW_DELETE = [ROLE_ADMIN];
-// 永久销毁 / 清空回收站：仅管理员
-const ROLES_ALLOW_PURGE = [ROLE_ADMIN];
-// 可编辑（新建 / 处理 / 修改 / 云端保存）：管理员、编辑员
-const ROLES_ALLOW_EDIT = [ROLE_ADMIN, ROLE_EDITOR];
-// 系统设置 / 用户管理：仅管理员
-const ROLES_ALLOW_SETTINGS = [ROLE_ADMIN];
-const ROLES_ALLOW_USER_MGMT = [ROLE_ADMIN];
-
-function getRole() {
-    const u = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
-    return u ? u.role : null;
-}
-function canEditRole() { return ROLES_ALLOW_EDIT.includes(getRole()); }
-function isAdminRole() { return getRole() === ROLE_ADMIN; }
-function requireEditRole() {
-    if (!canEditRole()) { showToast('当前角色为查看员，仅可查看数据，无操作权限', 'error'); return false; }
-    return true;
-}
+/* ===================== 删除权限控制 ===================== */
+// 有删除权限的角色白名单：系统管理员、质量工程师；生产主管不能删除
+const ROLES_ALLOW_DELETE = ['系统管理员', '质量工程师'];
+// 有回收站管理权限的角色（仅管理员可彻底删除）
+const ROLES_ALLOW_PURGE = ['系统管理员'];
 
 /* ===================== 日期归一化工具（看板/台账一致筛选） ===================== */
 /**
@@ -3932,9 +3745,9 @@ function clearLedgerDateRange() {
     // 清空后：回到默认周期「月」，保证统计口径可预期
     dashboardCustomRange.active = false;
     if (currentPeriod === 'custom') {
-        currentPeriod = 'all';
+        currentPeriod = 'month';
         document.querySelectorAll('.period-btn').forEach(b => {
-            b.classList.toggle('active', b.dataset.period === 'all');
+            b.classList.toggle('active', b.dataset.period === 'month');
         });
         updateCustomRangeBtnLabel();
     }
@@ -3951,8 +3764,13 @@ function clearLedgerDateRange() {
 function canDeleteIssue(issue = null) {
     const user = getCurrentUser();
     if (!user) return false;
-    // 仅管理员可删除问题单
-    return ROLES_ALLOW_DELETE.includes(user.role);
+    // 角色白名单
+    if (!ROLES_ALLOW_DELETE.includes(user.role)) return false;
+    // 非管理员（质量工程师）只能删除自己发起或自己负责的问题单
+    if (user.role !== '系统管理员' && issue) {
+        return user.name === issue.createdBy || user.name === issue.owner || user.username === issue.createdBy;
+    }
+    return true;
 }
 /** 是否可以查看/操作回收站（查看、恢复） */
 function canAccessRecycleBin() {
@@ -4019,9 +3837,9 @@ function addAuditLog(type, action, detail = '') {
 
 /* ===================== 用户管理 ===================== */
 const DEFAULT_USERS = [
-    { username: 'admin', password: '88888888aa', name: '管理员', role: ROLE_ADMIN, dept: 'IT部' },
-    { username: 'editor', password: '88888888aa', name: '编辑员', role: ROLE_EDITOR, dept: '质量部' },
-    { username: 'viewer', password: '88888888aa', name: '查看员', role: ROLE_VIEWER, dept: '生产部' }
+    { username: 'admin', password: '88888888aa', name: '管理员', role: '系统管理员', dept: 'IT部' },
+    { username: 'quality', password: '88888888aa', name: '张工', role: '质量工程师', dept: '质量部' },
+    { username: 'production', password: '88888888aa', name: '李主管', role: '生产主管', dept: '生产部' }
 ];
 
 function getCurrentUser() { return loadData(STORAGE_KEYS.USER, null); }
@@ -4308,7 +4126,7 @@ let currentPage = 'dashboard';
 let currentIssueId = null;
 let dashboardCharts = {};
 let reportCharts = {};
-let currentPeriod = 'all';
+let currentPeriod = 'day';
 // 看板周度趋势范围控制：默认展示最近12周，支持自定义起止日期（ISO周）
 let dashboardWeekConfig = { mode: 'recent', recentN: 12, startDate: null, endDate: null };
 // 看板自定义日期范围（period='custom'时使用）
@@ -4390,13 +4208,10 @@ function navigateTo(page, issueId = null) {
     if (page === 'reports') renderReports();
     if (page === 'alerts') renderAlerts();
     if (page === 'audit') renderAuditLog();
-    if (page === 'settings') {
-        if (!ROLES_ALLOW_SETTINGS.includes(getRole())) { navigateTo('dashboard'); return; }
-        renderSettingsMeta(); // 显示台账最后修改时间/修改人
-    }
+    if (page === 'settings') renderSettingsMeta(); // 显示台账最后修改时间/修改人
     if (page === 'users') {
         const _cu = getCurrentUser();
-        if (!_cu || !ROLES_ALLOW_USER_MGMT.includes(_cu.role)) { navigateTo('dashboard'); return; }
+        if (!_cu || _cu.role !== '系统管理员') { navigateTo('dashboard'); return; }
         renderUserTable();
     }
 }
@@ -4613,9 +4428,7 @@ function getFilteredIssuesByPeriod(period) {
     const now = new Date();
     let startDate, endDate = null;
 
-    if (period === 'all') {
-        startDate = null; endDate = null;
-    } else if (period === 'custom' && dashboardCustomRange.active && dashboardCustomRange.startDate) {
+    if (period === 'custom' && dashboardCustomRange.active && dashboardCustomRange.startDate) {
         startDate = dayStart(dashboardCustomRange.startDate);
         // single 模式下 endDate 已经被设置为当天 23:59:59，这里做一层兜底
         endDate = dashboardCustomRange.endDate
@@ -4633,14 +4446,14 @@ function getFilteredIssuesByPeriod(period) {
     }
 
     // 统一过滤（与台账完全共享 applyDateRangeFilter → parseLocalDate → isInDateRange 三段式）
-    const filtered = (period === 'all') ? issues : applyDateRangeFilter(issues, startDate, endDate, 'createdAt');
+    const filtered = applyDateRangeFilter(issues, startDate, endDate, 'createdAt');
 
     return {
         all: issues,
         currentPeriod: filtered,
         startDate, endDate, now,
         // 附带便捷方法：判断任意日期/字段是否落在当前 period（闭环数/预警复用）
-        inRangeFn: (issue, dateField='createdAt') => (period === 'all' ? true : isInDateRange(issue, startDate, endDate, dateField))
+        inRangeFn: (issue, dateField='createdAt') => isInDateRange(issue, startDate, endDate, dateField)
     };
 }
 
@@ -5036,7 +4849,7 @@ function renderDashboardCharts(issues, periodIssues, period, analytics = {}) {
             datasets: [{
                 label: '问题数量',
                 data: sourceHasData ? sourceCounts : new Array(ISSUE_SOURCES.length).fill(0),
-                backgroundColor: ['rgba(0,212,255,.75)', 'rgba(34,197,94,.75)', 'rgba(245,158,11,.75)', 'rgba(239,68,68,.75)', 'rgba(168,85,247,.75)'],
+                backgroundColor: ['#e8f0fe', '#e6f4ea', '#fef7e0', '#fce8e6', '#f3e8fd'],
                 borderColor: ['#1a73e8', '#34a853', '#f9ab00', '#ea4335', '#7c1fa2'],
                 borderWidth: 1.5, borderRadius: 6
             }]
@@ -5261,9 +5074,6 @@ function renderDashboardCharts(issues, periodIssues, period, analytics = {}) {
                 added.push(a); closed.push(c);
             }
             totalActive = labels.map((_,k)=>{ let t=0; for(let j=0;j<=k;j++) t += added[j]-closed[j]; return t; });
-        } else if (period === 'all') {
-            const m12 = aggregateIssuesByRecentMonths(periodIssues, 12);
-            labels = m12.labels; added = m12.added; closed = m12.closed; totalActive = m12.totalActive;
         } else {
             // custom：按 dashboardCustomRange.start/end 生成桶
             const s0 = dashboardCustomRange?.startDate ? dayStart(dashboardCustomRange.startDate) : dayStart(now);
@@ -5674,7 +5484,7 @@ function openCustomDatePicker() {
     }
     dpState = {
         mode,
-        pickTarget: 'start', // 'start' | 'end' | 'both'
+        pickTarget: 'both', // 'start' | 'end' | 'both'
         // 显示月份：范围模式展示"起始月"和"起始月+1月"，单日期模式展示"今日月"
         leftMonth:  new Date(rangeStart.getFullYear(), rangeStart.getMonth(), 1),
         rightMonth: mode === 'range' ? new Date(rangeStart.getFullYear(), rangeStart.getMonth() + 1, 1) : null,
@@ -5851,7 +5661,7 @@ function setDpMode(m) {
         }
         dpState.leftMonth = new Date(dpState.selectedStart.getFullYear(), dpState.selectedStart.getMonth(), 1);
         dpState.rightMonth = new Date(dpState.selectedStart.getFullYear(), dpState.selectedStart.getMonth() + 1, 1);
-        dpState.pickTarget = dpState.pickTarget || 'both';
+        dpState.pickTarget = 'both';
         if (extra) extra.style.display = 'flex';
     }
     // 重置校验状态
@@ -6158,7 +5968,7 @@ function renderCustomDatePicker() {
         buildMonthTable('dp-calendar-right', dpState.rightMonth);
     }
 
-    // 当前已选提示（仅 pickTarget='both' 或 模式=single 时自动显示；start/end 独立模式下提示交给 setDpPickTarget）
+    // 当前已选提示（任何模式 / 任何 pickTarget 都实时刷新，避免残留“（单日）”等旧文案）
     const hint = document.getElementById('dp-selected-hint');
     if (dpState.mode === 'single') {
         hint.innerHTML = dpState.selectedStart
@@ -6173,6 +5983,14 @@ function renderCustomDatePicker() {
         } else {
             hint.innerHTML = '🔗 联动选择：请先点击日历选择起点日期，再选择终点日期';
         }
+    } else if (dpState.pickTarget === 'start') {
+        hint.innerHTML = dpState.selectedStart
+            ? `独立选开始：当前起点 <b>${formatDate(dpState.selectedStart)}</b>（点“🔗联动”可选完整范围）`
+            : '独立选开始：请点击日历设置起点日期';
+    } else {
+        hint.innerHTML = dpState.selectedEnd
+            ? `独立选结束：当前终点 <b>${formatDate(dpState.selectedEnd)}</b>（点“🔗联动”可选完整范围）`
+            : '独立选结束：请点击日历设置终点日期';
     }
 }
 function applyCustomDateRange() {
@@ -6320,7 +6138,6 @@ function hideDashboardLoading() {
 let issueFormFiles = []; // 附件文件缓存（名称+大小信息，模拟上传）
 
 function openIssueForm() {
-    if (!requireEditRole()) return;
     // 清空表单（含新增加的跟踪等级、上报日期字段）
     ['title','source','product','category','risk','owner','dept','batch','desc'].forEach(k => {
         const el = document.getElementById('issue-form-' + k);
@@ -6522,7 +6339,6 @@ function validateIssueForm() {
 }
 
 function submitIssueForm() {
-    if (!requireEditRole()) return;
     if (!validateIssueForm()) return;
     
     const trackingLevel = document.getElementById('issue-form-tracking-level').value;
@@ -6679,7 +6495,7 @@ function renderIssueTable() {
                     ? '<span class="badge badge-warning">临期</span>' 
                     : '<span class="badge badge-primary">处理中</span>'));
 
-        const trackingBadge = `<span class="badge" style="background:${lv==='full'?'rgba(0,212,255,.16)':'rgba(34,197,94,.16)'};color:${lv==='full'?'var(--primary)':'var(--success)'};border:1px solid var(--border);font-weight:600;padding:2px 8px;border-radius:999px;font-size:11.5px">
+        const trackingBadge = `<span class="badge" style="background:${lv==='full'?'#e8f0fe':'#e6f4ea'};color:${lv==='full'?'#1a73e8':'#137333'};border:1px solid ${lv==='full'?'#c6dafc':'#a8dabc'};font-weight:600;padding:2px 8px;border-radius:999px;font-size:11.5px">
             ${lv==='full'?'🛡️ 完整':'⚡ 简单'}
         </span>`;
 
@@ -6708,7 +6524,7 @@ function renderIssueTable() {
             <td>${statusBadge}</td>
             <td>
                 <button class="btn btn-outline btn-sm" onclick="openIssueDetail('${i.id}')">查看</button>
-                ${(!i.closed && canEditRole()) ? `<button class="btn btn-primary btn-sm" onclick="openStageForm('${i.id}')">处理</button>` : ''}
+                ${!i.closed ? `<button class="btn btn-primary btn-sm" onclick="openStageForm('${i.id}')">处理</button>` : ''}
                 ${delBtn}
             </td>
         </tr>`;
@@ -6732,13 +6548,13 @@ function requestDeleteIssue(id) {
     }
     // 再次拦截（和行按钮一致），避免绕过UI直接调用
     if (!canDeleteIssue(issue)) {
-        showToast('无权限删除该记录（仅管理员可删除问题单）', 'error');
+        showToast('无权限删除该记录（质量工程师仅能删除本人负责/发起的问题单）', 'error');
         return;
     }
     _pendingDeleteIssueId = id;
     const meta = document.getElementById('del-confirm-meta');
     const closedWarn = issue.closed
-        ? `<div style="margin-top:10px;padding:10px 12px;background:rgba(245,158,11,.1);border:1px solid var(--border);border-radius:8px;color:var(--warning);font-size:12px;font-weight:600">
+        ? `<div style="margin-top:10px;padding:10px 12px;background:#fff7ed;border:1px solid #fdba74;border-radius:8px;color:#9a3412;font-size:12px;font-weight:600">
              ⚠️ 该问题已<b>闭环</b>，包含 6 个阶段完整历史处理数据、阶段附件与活动流水，删除后将完整移入回收站。
            </div>`
         : '';
@@ -6807,7 +6623,7 @@ function confirmDeleteIssue() {
         let msg = '删除失败：' + e.message;
         let type = 'error';
         if (e.message === 'RECORD_NOT_FOUND') { msg = '该记录已被其他用户删除，请刷新后重试'; type = 'warning'; }
-        if (e.message === 'PERMISSION_DENIED') { msg = '您无权限删除该记录（仅管理员可删除）'; }
+        if (e.message === 'PERMISSION_DENIED') { msg = '您无权限删除该记录（仅系统管理员或本人负责/发起人可删除）'; }
         if (e.message === 'DATA_CORRUPTED')  { msg = '删除失败：目标数据已损坏，请联系管理员'; }
         showToast(msg, type);
         addAuditLog('issue', '删除失败', `目标ID：${id}，原因：${e.message}`);
@@ -6847,7 +6663,7 @@ function renderRecycleBin() {
     }
     const canPurge = canPurgeIssue();
     const user = getCurrentUser();
-    const canRestoreAll = user && user.role === ROLE_ADMIN;
+    const canRestoreAll = user && user.role === '系统管理员';
 
     container.innerHTML = `
         <table class="recycle-table">
@@ -6876,7 +6692,7 @@ function renderRecycleBin() {
                         ${closedBadge}
                         <div class="recycle-meta-cell" style="margin-top:3px">阶段${info.stageCount||'-'} · 活动${info.activityCount||'-'}条 · 附件${info.attachmentCount||'-'}个${it.closedAt?` · 闭环${it.closedAt.slice(0,10)}`:''}</div>
                     </td>
-                    <td><span style="font-size:11px;padding:1px 6px;border-radius:4px;background:var(--cell)">${it.category}</span>
+                    <td><span style="font-size:11px;padding:1px 6px;border-radius:4px;background:#f1f5f9">${it.category}</span>
                         <span style="font-size:11px;margin-left:4px" class="risk-${it.risk}">${RISK_LEVELS[it.risk]||it.risk}</span></td>
                     <td>${it.owner||'-'}</td>
                     <td class="recycle-meta-cell">
@@ -6903,7 +6719,7 @@ function restoreIssue(id) {
         const idx = list.findIndex(i => i.id === id);
         if (idx < 0) throw new Error('NOT_FOUND');
         const item = list[idx];
-        const canRestoreAll = user.role === ROLE_ADMIN;
+        const canRestoreAll = user.role === '系统管理员';
         if (!canRestoreAll && item._deletedByUsername !== user.username && item._deletedBy !== user.name) {
             throw new Error('PERMISSION_DENIED');
         }
@@ -6946,7 +6762,7 @@ function restoreIssue(id) {
         let msg = '恢复失败：' + e.message;
         let type = 'error';
         if (e.message === 'NOT_FOUND') { msg = '该记录已被恢复或销毁，请刷新'; type = 'warning'; }
-        if (e.message === 'PERMISSION_DENIED') { msg = '仅管理员可恢复回收站记录'; }
+        if (e.message === 'PERMISSION_DENIED') { msg = '仅允许恢复您自己删除的记录（系统管理员可恢复全部）'; }
         showToast(msg, type);
     } finally {
         renderRecycleBin();
@@ -6956,7 +6772,7 @@ function restoreIssue(id) {
 
 /** 确认彻底删除（物理删除，不可恢复） */
 function requestPermanentDelete(id) {
-    if (!canPurgeIssue()) { showToast('仅管理员可执行永久删除', 'error'); return; }
+    if (!canPurgeIssue()) { showToast('仅系统管理员可执行永久删除', 'error'); return; }
     const list = loadData(STORAGE_KEYS.RECYCLE_BIN, []);
     const target = list.find(i => i.id === id);
     if (!target) { showToast('目标记录不存在，请刷新', 'warning'); renderRecycleBin(); return; }
@@ -6983,7 +6799,7 @@ function requestPermanentDelete(id) {
 
 /** 清空整个回收站 */
 function requestPurgeAll() {
-    if (!canPurgeIssue()) { showToast('仅管理员可清空回收站', 'error'); return; }
+    if (!canPurgeIssue()) { showToast('仅系统管理员可清空回收站', 'error'); return; }
     const list = loadData(STORAGE_KEYS.RECYCLE_BIN, []);
     if (!list.length) { showToast('回收站为空', 'info'); return; }
     const closedCnt = list.filter(i => i.closed).length;
@@ -7015,7 +6831,7 @@ function openPurgeIssuesModal() {
     if (!user) { showToast('登录状态已失效，请重新登录', 'error'); return; }
     // 后端 Service 层拦截（核心权限判断，即使按钮显隐被绕过也无法打开）
     if (!canPurgeIssue()) {
-        showToast('仅管理员可执行「清空问题台账」操作，当前角色无权限', 'error');
+        showToast('仅系统管理员可执行「清空问题台账」操作，当前角色无权限', 'error');
         return;
     }
     const issues  = loadData(STORAGE_KEYS.ISSUES, []);
@@ -7047,7 +6863,7 @@ function confirmPurgeAllIssues() {
     if (!user) { showToast('登录状态已失效，请重新登录', 'error'); return; }
     // 1. 权限：核心拦截（即便绕过 UI，也不能执行）
     if (!canPurgeIssue()) {
-        showToast('仅管理员可执行清空（权限白名单验证失败）', 'error');
+        showToast('仅系统管理员可执行清空（权限白名单验证失败）', 'error');
         return;
     }
     // 2. 删除理由：必填 & 规则校验
@@ -7417,16 +7233,16 @@ function renderDetailAttachments() {
                 ${imageItems.map(f => {
                     const hasReal = f.dataUrl && typeof f.dataUrl === 'string' && f.dataUrl.indexOf('data:') === 0;
                     const tileContent = hasReal
-                        ? `<img src="${f.dataUrl}" alt="${f.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;background:var(--cell)">`
-                        : `<div style="aspect-ratio:1/1;background:linear-gradient(135deg,rgba(0,212,255,.18),var(--card-bg));display:flex;align-items:center;justify-content:center"><div style="font-size:56px">${f.icon}</div></div>`;
+                        ? `<img src="${f.dataUrl}" alt="${f.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;background:#f5f7fb">`
+                        : `<div style="aspect-ratio:1/1;background:linear-gradient(135deg,#eef2ff,#fff);display:flex;align-items:center;justify-content:center"><div style="font-size:56px">${f.icon}</div></div>`;
                     return `
-                    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--card-bg);transition:transform .15s,box-shadow .15s;cursor:pointer" onclick="previewAttachmentImage('${f.id}')" onmouseenter="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 16px rgba(26,115,232,.15)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
+                    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff;transition:transform .15s,box-shadow .15s;cursor:pointer" onclick="previewAttachmentImage('${f.id}')" onmouseenter="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 16px rgba(26,115,232,.15)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
                         <div style="position:relative;${hasReal ? '' : 'aspect-ratio:1/1'}">
                             ${tileContent}
                             <div style="position:absolute;top:6px;right:6px"><span class="badge ${f.sourceBadge}" style="font-size:10px;padding:1px 6px;backdrop-filter:blur(2px)">${f.sourceLabel.split('-')[0]}</span></div>
                             ${hasReal ? `<div style="position:absolute;bottom:0;left:0;right:0;padding:3px 6px;background:linear-gradient(to top,rgba(0,0,0,.55),transparent);color:#fff;font-size:10px;text-align:right">🔍 放大查看</div>` : ''}
                         </div>
-                        <div style="padding:8px 10px;border-top:1px solid var(--border)">
+                        <div style="padding:8px 10px;border-top:1px solid #f0f0f0">
                             <div class="file-item-name" style="font-size:12px;color:var(--text-primary)" title="${f.name}">${f.name}</div>
                             <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;font-size:11px;color:var(--text-tertiary)">
                                 <span>${f.size ? (f.size/1024).toFixed(1)+'KB' : '--'}</span>
@@ -7517,13 +7333,13 @@ function previewAttachmentImage(id) {
         img.src = `data:image/svg+xml;utf8,` + encodeURIComponent(
             `<svg xmlns='http://www.w3.org/2000/svg' width='800' height='600' viewBox='0 0 800 600'>
                 <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
-                    <stop offset='0%' stop-color='#0d1f3c'/><stop offset='100%' stop-color='#1a3a5c'/>
+                    <stop offset='0%' stop-color='#f8fafc'/><stop offset='100%' stop-color='#cbd5e1'/>
                 </linearGradient></defs>
                 <rect width='800' height='600' fill='url(#g)'/>
                 <text x='50%' y='44%' text-anchor='middle' font-size='160'>${f.icon}</text>
-                <text x='50%' y='62%' text-anchor='middle' font-size='26' font-family='Arial' fill='#e8f1fb' font-weight='bold'>${escName}</text>
-                <text x='50%' y='72%' text-anchor='middle' font-size='16' font-family='Arial' fill='#9db8d2'>当前未保存原始像素数据（演示模式/历史数据）</text>
-                <text x='50%' y='78%' text-anchor='middle' font-size='15' font-family='Arial' fill='#9db8d2'>来源：${f.sourceLabel} · 格式：${(f.ext||'').toUpperCase()}</text>
+                <text x='50%' y='62%' text-anchor='middle' font-size='26' font-family='Arial' fill='#334155' font-weight='bold'>${escName}</text>
+                <text x='50%' y='72%' text-anchor='middle' font-size='16' font-family='Arial' fill='#64748b'>当前未保存原始像素数据（演示模式/历史数据）</text>
+                <text x='50%' y='78%' text-anchor='middle' font-size='15' font-family='Arial' fill='#94a3b8'>来源：${f.sourceLabel} · 格式：${(f.ext||'').toUpperCase()}</text>
                 <text x='50%' y='86%' text-anchor='middle' font-size='14' font-family='Arial' fill='#0ea5e9'>在“新增问题单”中重新上传该图片即可获得原图预览</text>
             </svg>`);
     }
@@ -7611,17 +7427,17 @@ function renderDetailStages(issue) {
         const headerRight = isCurrent
             ? `<div style="display:flex;align-items:center;gap:10px">
                 ${sc ? `<span class="countdown ${sc.overdue ? 'danger' : sc.warning ? 'warning' : 'safe'}">${sc.text}</span>` : ''}
-                ${(!issue.closed && canEditRole()) ? `<button class="btn btn-primary btn-sm" onclick="openStageForm('${issue.id}', ${s.num})">✍️ 填写本阶段</button>` : ''}
+                ${!issue.closed ? `<button class="btn btn-primary btn-sm" onclick="openStageForm('${issue.id}', ${s.num})">✍️ 填写本阶段</button>` : ''}
               </div>`
             : (sc && isCurrent ? `<span class="countdown ${sc.overdue ? 'danger' : 'warning'}">${sc.text}</span>` : '');
         
         const bgColors = {
-            1: 'background:linear-gradient(135deg,rgba(0,212,255,.22),var(--card-bg))',
-            2: 'background:linear-gradient(135deg,rgba(34,197,94,.22),var(--card-bg))',
-            3: 'background:linear-gradient(135deg,rgba(245,158,11,.22),var(--card-bg))',
-            4: 'background:linear-gradient(135deg,rgba(239,68,68,.22),var(--card-bg))',
-            5: 'background:linear-gradient(135deg,rgba(168,85,247,.22),var(--card-bg))',
-            6: 'background:linear-gradient(135deg,rgba(20,184,166,.22),var(--card-bg))'
+            1: 'background:linear-gradient(135deg,#e8f0fe,#fff)',
+            2: 'background:linear-gradient(135deg,#e6f4ea,#fff)',
+            3: 'background:linear-gradient(135deg,#fef7e0,#fff)',
+            4: 'background:linear-gradient(135deg,#fce8e6,#fff)',
+            5: 'background:linear-gradient(135deg,#f3e8fd,#fff)',
+            6: 'background:linear-gradient(135deg,#e0f2f1,#fff)'
         };
 
         const stepNumDisplay = stepIdx + 1; // 当前流程中"第几步"，显示 1..3（simple）或 1..6（full）
@@ -7661,7 +7477,6 @@ function renderDetailActivity(issue) {
 
 /* ============ 阶段处理表单 ============ */
 function openStageForm(issueId, stageNum = null) {
-    if (!requireEditRole()) return;
     const issues = loadData(STORAGE_KEYS.ISSUES, []);
     const issue = issues.find(i => i.id === issueId);
     if (!issue || issue.closed) return;
@@ -7747,7 +7562,7 @@ function openStageForm(issueId, stageNum = null) {
     
     // 添加永久留痕声明
     formHtml += `
-        <div style="margin-top:20px;padding:12px;background:var(--cell);border-radius:8px;font-size:12px;color:var(--text-secondary);border:1px solid var(--border)">
+        <div style="margin-top:20px;padding:12px;background:#f8f9fa;border-radius:8px;font-size:12px;color:var(--text-secondary);border:1px solid var(--border-light)">
             <strong style="color:var(--danger)">🔒 数据安全声明：</strong>
             本系统执行全程可溯原则，一旦提交：<br>
             1. 所有阶段数据永久留痕，不可删除或篡改<br>
@@ -7792,7 +7607,6 @@ function handleFileDrop(e, key) {
 }
 
 function submitStageForm() {
-    if (!requireEditRole()) return;
     const issueId = document.getElementById('stage-form-issue-id').value;
     const stageNum = parseInt(document.getElementById('stage-form-stage-num').value);
     const issues = loadData(STORAGE_KEYS.ISSUES, []);
@@ -7955,7 +7769,7 @@ function renderKanban() {
                             <div class="kanban-card-title">${i.title}</div>
                             <div class="kanban-card-tags">
                                 <span class="kanban-card-tag">${i.source}</span>
-                                <span class="kanban-card-tag" style="background:${i.risk==='high'?'rgba(239,68,68,.18)':i.risk==='medium'?'rgba(245,158,11,.18)':'rgba(34,197,94,.18)'};color:${i.risk==='high'?'var(--danger)':i.risk==='medium'?'var(--warning)':'var(--success)'}">${RISK_LEVELS[i.risk]}</span>
+                                <span class="kanban-card-tag" style="background:${i.risk==='high'?'#fce8e6':i.risk==='medium'?'#fef7e0':'#e6f4ea'};color:${i.risk==='high'?'var(--danger)':i.risk==='medium'?'var(--warning)':'var(--success)'}">${RISK_LEVELS[i.risk]}</span>
                             </div>
                             <div class="kanban-card-meta">
                                 <span>${i.owner}</span>
@@ -8496,7 +8310,6 @@ function exportAllData() {
  * 支持跨设备/跨浏览器数据迁移
  */
 function importAllData() {
-    if (!isAdminRole()) { showToast('仅管理员可导入数据', 'error'); return; }
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
@@ -8602,7 +8415,6 @@ function downloadFile(filename, content) {
 }
 
 function clearAllData() {
-    if (!isAdminRole()) { showToast('仅管理员可执行重置', 'error'); return; }
     if (!confirm('⚠️ 确定要清空所有演示数据吗？\n\n此操作将：\n1. 清空问题台账\n2. 清空预警记录\n3. 清空审计日志\n\n（注意：系统将自动重新生成演示数据）')) return;
     
     localStorage.removeItem(STORAGE_KEYS.ISSUES);
@@ -9033,10 +8845,49 @@ const CLOUD_SYNC_FIELDS = [
 function _isCloudSyncStorageKey(key) {
     return CLOUD_SYNC_FIELDS.some(function (f) { return f.key === key; });
 }
+// 附件 base64 剥离/回填：图片 base64 体积巨大，不进 KV（仅保留元数据），本机与网络盘备份仍保留原图
+function _stripAttDataUrl(att) {
+    const c = Object.assign({}, att);
+    if (c.dataUrl) { c.dataUrl = ''; c._imgStripped = true; }
+    return c;
+}
+function _stripIssueImages(issue) {
+    if (!issue || !Array.isArray(issue.attachments)) return issue;
+    const c = Object.assign({}, issue);
+    c.attachments = issue.attachments.map(_stripAttDataUrl);
+    return c;
+}
+function _restoreAttDataUrl(remoteAtt, localAtt) {
+    if (!localAtt) return remoteAtt;
+    if ((!remoteAtt.dataUrl) && localAtt.dataUrl &&
+        (remoteAtt.name === localAtt.name || remoteAtt.size === localAtt.size)) {
+        remoteAtt.dataUrl = localAtt.dataUrl;
+        delete remoteAtt._imgStripped;
+    }
+    return remoteAtt;
+}
+function _mergeIssueImages(remoteIssue, localIssue) {
+    if (!remoteIssue || !Array.isArray(remoteIssue.attachments)) return remoteIssue;
+    const localAtts = (localIssue && Array.isArray(localIssue.attachments)) ? localIssue.attachments : [];
+    remoteIssue.attachments = remoteIssue.attachments.map(function (ra, i) {
+        let la = localAtts[i];
+        if (!la || la.name !== ra.name) la = localAtts.find(function (x) { return x.name === ra.name; });
+        return _restoreAttDataUrl(ra, la);
+    });
+    return remoteIssue;
+}
 // 把分散的多个 localStorage key 聚合成一个云端 db 对象（与导出备份同口径）
-function buildCloudDB() {
+// options.stripImages=true：剥离附件 base64（仅用于 KV 推送，避免每次全量重传大图导致保存很慢）
+function buildCloudDB(options) {
+    const strip = !!(options && options.stripImages);
     const db = { _meta: { system: 'QRQC快速反应管理系统', version: 'v1.0', syncedAt: formatDateTime(new Date()) } };
-    CLOUD_SYNC_FIELDS.forEach(function (f) { db[f.field] = loadData(f.key, f.def); });
+    CLOUD_SYNC_FIELDS.forEach(function (f) {
+        let val = loadData(f.key, f.def);
+        if (strip && (f.field === 'issues' || f.field === 'recycleBin') && Array.isArray(val)) {
+            val = val.map(_stripIssueImages);
+        }
+        db[f.field] = val;
+    });
     db.lastModifiedTs = localStorage.getItem(STORAGE_KEYS.LAST_MODIFIED_TS) || '0';
     db._localModifiedAt = getLastModifiedTs() || Date.now();
     return db;
@@ -9047,34 +8898,21 @@ function applyRemoteDB(remote) {
     if (!remote) return;
     _applyingCloud = true;
     try {
+        // 云端 KV 不存附件 base64；写回本机前按 id 合并本机原图，避免空 dataUrl 清空本机图片
+        const _localIssues = loadData(STORAGE_KEYS.ISSUES, []);
+        const _localBin = loadData(STORAGE_KEYS.RECYCLE_BIN, []);
+        const _mergeById = function (arr, localArr) {
+            if (!Array.isArray(arr)) return arr;
+            return arr.map(function (ri) {
+                const li = localArr.find(function (x) { return x && x.id === ri.id; });
+                return _mergeIssueImages(ri, li);
+            });
+        };
+        if (Array.isArray(remote.issues)) remote.issues = _mergeById(remote.issues, _localIssues);
+        if (Array.isArray(remote.recycleBin)) remote.recycleBin = _mergeById(remote.recycleBin, _localBin);
         CLOUD_SYNC_FIELDS.forEach(function (f) {
             if (remote[f.field] !== undefined) saveData(f.key, remote[f.field]);
         });
-        // 云端数据可能仍是旧角色体系：落地后立即迁移旧角色、补齐内置账号
-        if (remote.users !== undefined) {
-            try {
-                const roleMigrated = ensureDefaultUsers();
-                if (roleMigrated && canEditRole()) {
-                    cloud.pending = true;
-                    setTimeout(function () {
-                        try { setCloudStatus('pending', '角色体系已更新，点击「💾」上传'); } catch (e) {}
-                        showToast('用户角色已升级为「管理员/编辑员/查看员」，请点侧边栏「💾 保存」同步云端', 'info');
-                    }, 400);
-                }
-            } catch (e) {}
-        }
-        try {
-            const _cu = getCurrentUser();
-            if (_cu) {
-                const dn = document.getElementById('user-display-name');
-                const dr = document.getElementById('user-display-role');
-                const da = document.getElementById('user-avatar');
-                if (dn) dn.textContent = _cu.name;
-                if (dr) dr.textContent = _cu.role;
-                if (da) da.textContent = _cu.name.charAt(0);
-            }
-            toggleUsersNav();
-        } catch (e) {}
         if (remote.lastModifiedTs !== undefined) {
             localStorage.setItem(STORAGE_KEYS.LAST_MODIFIED_TS, String(remote.lastModifiedTs || '0'));
         }
@@ -9102,10 +8940,6 @@ function isCloudConfigured() {
     return /^https?:\/\//.test(CLOUD_CONFIG.apiBase);
 }
 function setCloudStatus(status, msg) {
-    // 查看员只读：不展示「点击💾保存」类操作引导
-    if (status === 'pending') {
-        try { if (!canEditRole()) { status = 'synced'; msg = '只读模式 · 云端数据已同步'; cloud.pending = false; } } catch (e) {}
-    }
     cloud.status = status;
     const dot = document.getElementById('cloud-dot');
     const text = document.getElementById('cloud-text');
@@ -9133,7 +8967,7 @@ function _cloudSavedBy() {
 function pushCloudDB() {
     if (!cloud.ready) return Promise.resolve(false);
     cloud.pending = false;
-    const body = JSON.stringify({ db: buildCloudDB(), savedBy: _cloudSavedBy() });
+    const body = JSON.stringify({ db: buildCloudDB({ stripImages: true }), savedBy: _cloudSavedBy() });
     return fetch(CLOUD_CONFIG.apiBase + '/api/db', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'If-Version': String(cloud.version) },
@@ -9167,7 +9001,6 @@ function pushCloudDB() {
 }
 // 手动保存：先拉最新版本号，再推送，成功后写本地/网络盘备份
 function manualSave() {
-    if (!canEditRole()) { showToast('当前角色无云端保存权限', 'error'); return; }
     if (!cloud.ready) { showToast('⚠️ 云端未连接，无法保存', 'warning'); return; }
     setCloudStatus('loading', '正在保存到云端…');
     pullCloudDB().then(function () { return pushCloudDB(); }).then(function (success) {
@@ -9394,16 +9227,10 @@ window.localBackup = localBackup;
 function getUsers() { return loadData(STORAGE_KEYS.USERS, []); }
 
 function ensureDefaultUsers() {
-    let users = loadData(STORAGE_KEYS.USERS, []);
-    let usersChanged = false;
-    // 1) 存量用户旧角色迁移
-    users.forEach(u => {
-        if (ROLE_MIGRATION[u.role]) { u.role = ROLE_MIGRATION[u.role]; usersChanged = true; }
-    });
-    // 2) 内置账号补齐；内置账号角色强制校正
+    const users = loadData(STORAGE_KEYS.USERS, []);
+    let changed = false;
     DEFAULT_USERS.forEach((du, i) => {
-        const existing = users.find(x => x.username === du.username);
-        if (!existing) {
+        if (!users.find(x => x.username === du.username)) {
             users.push({
                 id: 'u_def_' + (i + 1),
                 username: du.username,
@@ -9414,37 +9241,17 @@ function ensureDefaultUsers() {
                 createdAt: formatDate(new Date()),
                 lastLogin: null
             });
-            usersChanged = true;
-        } else if (existing.role !== du.role) {
-            existing.role = du.role; usersChanged = true;
+            changed = true;
         }
     });
-    if (usersChanged) saveData(STORAGE_KEYS.USERS, users);
-    // 3) 当前登录会话角色同步（旧角色迁移 / 管理员调整后）
-    const sess = loadData(STORAGE_KEYS.USER, null);
-    if (sess) {
-        const managed = users.find(x => x.username === sess.username);
-        const targetRole = managed ? managed.role : (ROLE_MIGRATION[sess.role] || sess.role);
-        if (sess.role !== targetRole) {
-            sess.role = targetRole;
-            saveData(STORAGE_KEYS.USER, sess);
-        }
-    }
-    return usersChanged;
+    if (changed) saveData(STORAGE_KEYS.USERS, users);
+    return users;
 }
 
 function toggleUsersNav() {
-    const role = getRole();
-    const navUsers = document.getElementById('nav-users');
-    if (navUsers) navUsers.style.display = role === ROLE_ADMIN ? '' : 'none';
-    const navSettings = document.getElementById('nav-settings');
-    if (navSettings) navSettings.style.display = role === ROLE_ADMIN ? '' : 'none';
-    // 云端「💾 保存」：查看员不可见（「↻ 刷新」保留）
-    const saveBtn = document.getElementById('cloud-save-btn');
-    if (saveBtn) saveBtn.style.display = ROLES_ALLOW_EDIT.includes(role) ? '' : 'none';
-    // 「➕ 新建问题单」：查看员不可见
-    const newBtn = document.getElementById('btn-new-issue');
-    if (newBtn) newBtn.style.display = ROLES_ALLOW_EDIT.includes(role) ? '' : 'none';
+    const cu = getCurrentUser();
+    const navEl = document.getElementById('nav-users');
+    if (navEl) navEl.style.display = (cu && cu.role === '系统管理员') ? '' : 'none';
 }
 
 function renderUserTable() {
@@ -9483,7 +9290,7 @@ function openUserForm(id) {
     document.getElementById('user-username').value = '';
     document.getElementById('user-name').value = '';
     document.getElementById('user-dept').value = '';
-    document.getElementById('user-role').value = ROLE_VIEWER;
+    document.getElementById('user-role').value = '生产主管';
     document.getElementById('user-password').value = '';
     document.getElementById('user-password-group').style.display = '';
     document.getElementById('user-modal-title').textContent = '➕ 新增用户';
@@ -9503,7 +9310,6 @@ function openUserForm(id) {
 function editUser(id) { openUserForm(id); }
 
 function saveUser() {
-    if (!isAdminRole()) { showToast('仅管理员可管理用户', 'error'); return; }
     const id = document.getElementById('user-id').value;
     const username = document.getElementById('user-username').value.trim();
     const name = document.getElementById('user-name').value.trim();
@@ -9554,7 +9360,6 @@ function resetPassword(id) {
 }
 
 function deleteUser(id) {
-    if (!isAdminRole()) { showToast('仅管理员可删除用户', 'error'); return; }
     const u = getUsers().find(x => x.id === id);
     if (!u) return;
     if (u.username === 'admin') { showToast('❌ 内置管理员不可删除', 'error'); return; }
@@ -9604,9 +9409,9 @@ function showUserConfirm(title, message, onOk) {
             <div class="form-row">
                 <label>角色</label>
                 <select id="user-role">
-                    <option value="管理员">管理员</option>
-                    <option value="编辑员">编辑员</option>
-                    <option value="查看员">查看员</option>
+                    <option value="系统管理员">系统管理员</option>
+                    <option value="质量工程师">质量工程师</option>
+                    <option value="生产主管">生产主管</option>
                 </select>
             </div>
             <div class="form-row" id="user-password-group">
