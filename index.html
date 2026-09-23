@@ -9050,6 +9050,31 @@ function applyRemoteDB(remote) {
         CLOUD_SYNC_FIELDS.forEach(function (f) {
             if (remote[f.field] !== undefined) saveData(f.key, remote[f.field]);
         });
+        // 云端数据可能仍是旧角色体系：落地后立即迁移旧角色、补齐内置账号
+        if (remote.users !== undefined) {
+            try {
+                const roleMigrated = ensureDefaultUsers();
+                if (roleMigrated && canEditRole()) {
+                    cloud.pending = true;
+                    setTimeout(function () {
+                        try { setCloudStatus('pending', '角色体系已更新，点击「💾」上传'); } catch (e) {}
+                        showToast('用户角色已升级为「管理员/编辑员/查看员」，请点侧边栏「💾 保存」同步云端', 'info');
+                    }, 400);
+                }
+            } catch (e) {}
+        }
+        try {
+            const _cu = getCurrentUser();
+            if (_cu) {
+                const dn = document.getElementById('user-display-name');
+                const dr = document.getElementById('user-display-role');
+                const da = document.getElementById('user-avatar');
+                if (dn) dn.textContent = _cu.name;
+                if (dr) dr.textContent = _cu.role;
+                if (da) da.textContent = _cu.name.charAt(0);
+            }
+            toggleUsersNav();
+        } catch (e) {}
         if (remote.lastModifiedTs !== undefined) {
             localStorage.setItem(STORAGE_KEYS.LAST_MODIFIED_TS, String(remote.lastModifiedTs || '0'));
         }
@@ -9401,7 +9426,7 @@ function ensureDefaultUsers() {
             saveData(STORAGE_KEYS.USER, sess);
         }
     }
-    return users;
+    return usersChanged;
 }
 
 function toggleUsersNav() {
