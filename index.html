@@ -9102,6 +9102,10 @@ function isCloudConfigured() {
     return /^https?:\/\//.test(CLOUD_CONFIG.apiBase);
 }
 function setCloudStatus(status, msg) {
+    // 查看员只读：不展示「点击💾保存」类操作引导
+    if (status === 'pending') {
+        try { if (!canEditRole()) { status = 'synced'; msg = '只读模式 · 云端数据已同步'; cloud.pending = false; } } catch (e) {}
+    }
     cloud.status = status;
     const dot = document.getElementById('cloud-dot');
     const text = document.getElementById('cloud-text');
