@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QRQC快速反应管理系统</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+    (function(){
+      if(!window.Chart){return;}
+      Chart.defaults.color='#9db8d2';
+      Chart.defaults.borderColor='rgba(157,184,210,0.18)';
+      Chart.defaults.font.family="'Microsoft YaHei','PingFang SC',sans-serif";
+    })();
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         /* ===== Reset & Base ===== */
@@ -120,6 +128,168 @@
         .sidebar-cloud .cloud-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .sidebar-cloud .cloud-refresh { background: none; border: 1px solid #334155; color: #94a3b8; border-radius: 4px; cursor: pointer; font-size: 14px; padding: 1px 7px; line-height: 1.4; }
         .sidebar-cloud .cloud-refresh:hover { color: #fff; border-color: #64748b; }
+/* ===== dark-theme-override: QRQC 统一深色藏青主题（与生产管理系统一致；删除本块即可回退） ===== */
+:root {
+    color-scheme: dark;
+    --primary: #00d4ff;
+    --primary-dark: #0891b2;
+    --primary-light: rgba(0, 212, 255, 0.14);
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --purple: #a855f7;
+    --text: #e8f1fb;
+    --text-secondary: #9db8d2;
+    --text-tertiary: #6d87a3;
+    --bg: #060e1f;
+    --card-bg: #0d1f3c;
+    --cell: #132744;
+    --input-bg: #0a1930;
+    --hover: rgba(0, 212, 255, 0.08);
+    --border: #1a3a5c;
+    --border-light: #132744;
+    --shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+    --shadow-hover: 0 6px 20px rgba(0, 0, 0, 0.55);
+}
+body {
+    color: var(--text);
+    background: radial-gradient(ellipse at 50% 0%, rgba(0,140,255,0.10) 0%, rgba(0,140,255,0) 55%), var(--bg);
+    background-attachment: fixed;
+}
+.main, .topbar { background: transparent; }
+
+/* 滚动条 */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: #26435f; border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: #33577a; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* 卡片/面板/弹窗 */
+.panel, .stat-card { background: var(--card-bg); border: 1px solid var(--border); }
+.modal { background: var(--card-bg); border: 1px solid var(--border); box-shadow: 0 12px 44px rgba(0,0,0,.6); }
+.modal-overlay { background: rgba(2,8,20,.62); }
+.modal-header { background: var(--card-bg); border-bottom: 1px solid var(--border); }
+.modal-footer { background: var(--card-bg); border-top: 1px solid var(--border); }
+.modal-close { color: var(--text-tertiary); }
+.modal-close:hover { background: rgba(255,255,255,.08); color: var(--text); }
+.table-empty, .empty-state { color: var(--text-tertiary); }
+
+/* 表格 */
+table th { background: var(--cell); border-bottom-color: var(--border); color: var(--text-secondary); }
+table td { border-bottom-color: var(--border); }
+table tbody tr:hover { background: var(--hover); }
+
+/* 表单 */
+input:not([type=checkbox]):not([type=radio]):not([type=file]),
+select, textarea {
+    background-color: var(--input-bg); color: var(--text);
+    border: 1px solid var(--border);
+}
+input:not([type=checkbox]):not([type=radio]):not([type=file]):focus,
+select:focus, textarea:focus {
+    border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,212,255,.15);
+}
+input::placeholder, textarea::placeholder { color: var(--text-tertiary); }
+select option { background: #0d1f3c; color: #e8f1fb; }
+input[type=checkbox], input[type=radio] { accent-color: var(--primary); }
+input[type=date]::-webkit-calendar-picker-indicator,
+input[type=time]::-webkit-calendar-picker-indicator,
+input[type=datetime-local]::-webkit-calendar-picker-indicator { filter: invert(.8); cursor: pointer; }
+
+/* 按钮 */
+.btn-outline { background: transparent; color: var(--text-secondary); border-color: var(--border); }
+.btn-outline:hover { background: rgba(0,212,255,.10); border-color: var(--primary); color: var(--primary); }
+.btn-icon { background: transparent; color: var(--text-secondary); border-color: var(--border); }
+.btn-icon:hover { background: rgba(255,255,255,.06); color: var(--text); }
+.btn-primary, .btn-success { color: #04121f; }
+
+/* 统计图标 */
+.stat-icon.blue { background: rgba(0,212,255,.16); color: #22d3ee; }
+.stat-icon.green { background: rgba(34,197,94,.16); color: #4ade80; }
+.stat-icon.yellow { background: rgba(245,158,11,.16); color: #fbbf24; }
+.stat-icon.red { background: rgba(239,68,68,.16); color: #f87171; }
+.stat-icon.purple { background: rgba(168,85,247,.17); color: #c084fc; }
+
+/* 通用徽章 */
+.badge-normal, .badge-success { background: rgba(34,197,94,.16); color: #4ade80; }
+.badge-warning { background: rgba(245,158,11,.16); color: #fbbf24; }
+.badge-danger, .badge-error { background: rgba(239,68,68,.16); color: #f87171; }
+.badge-primary, .badge-info { background: rgba(0,212,255,.15); color: #22d3ee; }
+.badge-secondary { background: rgba(148,163,184,.16); color: #94a3b8; }
+.badge-purple { background: rgba(168,85,247,.17); color: #c084fc; }
+
+/* 阶段徽章 */
+.stage-1 { background: rgba(0,212,255,.15); color: #22d3ee; }
+.stage-2, .stage-closed { background: rgba(34,197,94,.16); color: #4ade80; }
+.stage-3 { background: rgba(245,158,11,.16); color: #fbbf24; }
+.stage-4, .stage-overdue { background: rgba(239,68,68,.16); color: #f87171; }
+.stage-5 { background: rgba(168,85,247,.17); color: #c084fc; }
+.stage-6 { background: rgba(20,184,166,.16); color: #5eead4; }
+
+/* 看板卡片 */
+.kanban-card { background: var(--card-bg); }
+.kanban-card.overdue { border-left-color: var(--danger); background: rgba(239,68,68,.10); }
+
+/* 报表周期切换 / 趋势面板分段控件 */
+.report-period-tabs, .panel-tools .seg { background: var(--input-bg); }
+.report-period-tab.active { background: var(--cell); color: #22d3ee; box-shadow: none; }
+.panel-tools .seg button.active { background: var(--cell); color: #22d3ee; box-shadow: none; }
+.panel-tools input[type="number"] { background: var(--input-bg); color: var(--text); }
+
+/* 明细标签 */
+.detail-label { color: var(--text-tertiary); }
+
+/* 登录页 */
+.login-page {
+    background: radial-gradient(ellipse at 50% 0%, rgba(0,140,255,.12) 0%, rgba(0,140,255,0) 55%), #060e1f !important;
+}
+.login-page::before {
+    background-image: radial-gradient(circle at 20% 30%, rgba(0,212,255,.10) 0%, transparent 42%),
+        radial-gradient(circle at 80% 70%, rgba(168,85,247,.10) 0%, transparent 42%) !important;
+}
+.login-card { background: var(--card-bg); border: 1px solid var(--border); box-shadow: 0 24px 64px rgba(0,0,0,.55); }
+.login-logo h2 { color: var(--text); }
+.login-logo p { color: var(--text-secondary); }
+.login-form label { color: var(--text-secondary); }
+.login-form input { background-color: var(--input-bg) !important; color: var(--text) !important; border: 1px solid var(--border) !important; }
+.login-form input:focus { background-color: var(--input-bg) !important; border-color: var(--primary) !important; box-shadow: 0 0 0 3px rgba(0,212,255,.15) !important; }
+.login-form input::placeholder { color: var(--text-tertiary); }
+.password-toggle { background: transparent !important; color: var(--text-tertiary) !important; }
+.password-toggle:hover { background: rgba(0,212,255,.12) !important; color: var(--primary) !important; }
+.login-btn { background: linear-gradient(135deg, #00d4ff, #0891b2); color: #04121f; border: none; }
+.login-btn:hover { background: linear-gradient(135deg, #22d3ee, #0e7490); }
+.login-error { background: rgba(239,68,68,.14); border: 1px solid rgba(239,68,68,.40); color: #f87171; }
+.login-hint { color: var(--text-tertiary); }
+.login-features { border-top-color: var(--border); }
+.login-feature { color: var(--text-tertiary); }
+.login-brand-logo .brand-cn { color: #eaf4ff !important; }
+.login-brand-logo .brand-en { color: var(--text-secondary) !important; }
+
+/* ===== patch2：内联浅色残留（徽章/横幅/按钮） ===== */
+span[style*="#e6f4ea"], span[style*="#d9f0dd"] { background: rgba(34,197,94,.16) !important; color: #4ade80 !important; }
+span[style*="#fce8e6"], span[style*="#fbd7d3"], span[style*="#fef2f2"] { background: rgba(239,68,68,.16) !important; color: #f87171 !important; }
+span[style*="#fef7e0"], span[style*="#fdecc8"] { background: rgba(245,158,11,.16) !important; color: #fbbf24 !important; }
+span[style*="#e8f0fe"] { background: rgba(0,212,255,.16) !important; color: #22d3ee !important; }
+[style*="#f8f9fa"], [style*="#f5f5f5"], [style*="#f1f3f4"] { background: var(--cell) !important; color: var(--text-secondary) !important; }
+[style*="#f0fdf4"] { background: rgba(34,197,94,.12) !important; border-color: rgba(34,197,94,.4) !important; color: var(--text) !important; }
+[style*="#fff8e1"], [style*="#fef3c7"], [style*="#fef9c3"], [style*="#fffbeb"] { background: rgba(245,158,11,.12) !important; border-color: rgba(245,158,11,.4) !important; color: var(--text) !important; }
+[style*="#eef2ff"] { background: rgba(0,212,255,.10) !important; border-color: rgba(0,212,255,.3) !important; color: var(--text) !important; }
+[style*="#374151"], [style*="#334155"] { color: var(--text) !important; }
+[style*="#5f6368"], [style*="#6b7280"] { color: var(--text-secondary) !important; }
+[style*="#9aa0a6"], [style*="#9ca3af"] { color: var(--text-tertiary) !important; }
+[style*="#166534"], [style*="#137333"] { color: #4ade80 !important; }
+[style*="#e5e7eb"], [style*="#e0e0e0"], [style*="#f3f4f6"], [style*="solid #ddd"], [style*="solid #dddddd"] { border-color: var(--border) !important; }
+#lb-restore-btn { background: var(--input-bg) !important; color: #fbbf24 !important; border: 1px solid rgba(245,158,11,.5) !important; }
+button[onclick="localBackup.choose()"] { background: var(--input-bg) !important; color: var(--text) !important; border: 1px solid var(--border) !important; }
+button[onclick="localBackup.choose()"]:hover { background: rgba(0,212,255,.12) !important; color: var(--primary) !important; border-color: var(--primary) !important; }
+input[type=file]::file-selector-button { background: var(--cell); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 4px 12px; margin-right: 10px; cursor: pointer; }
+input[type=file]::file-selector-button:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
+
+/* ===== patch3：内联深色文字残留 ===== */
+[style*="color:#1f1f1f"], [style*="color:#1f2937"], [style*="color:#3c4043"] { color: var(--text) !important; }
+[style*="color:#666"], [style*="color:#6b7280"] { color: var(--text-secondary) !important; }
+[style*="color:#999"], [style*="color:#9ca3af"] { color: var(--text-tertiary) !important; }
+/* ===== end dark-theme-override ===== */
 
         .main { flex: 1; margin-left: var(--sidebar-w); padding: 24px; min-width: 0; }
 
@@ -1513,7 +1683,7 @@
             padding-top: 20px;
             border-top: 1px solid #f3f4f6;
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 8px;
         }
         .login-feature {
@@ -1902,12 +2072,8 @@
                 <div class="login-feature-icon">🔒</div>
                 <div>全程追溯</div>
             </div>
-            <div class="login-feature">
-                <div class="login-feature-icon">🤖</div>
-                <div>AI驱动</div>
-            </div>
         </div>
-        <div class="login-hint">默认账号: admin / 123456 &nbsp;·&nbsp; v1.0</div>
+        <div class="login-hint">已同步云端最新数据，用户访问自动读取云端最新数据</div>
     </div>
 </div>
 
@@ -1944,6 +2110,9 @@
             <div class="nav-item" data-page="audit">
                 <span class="icon">📝</span><span>审计日志</span>
             </div>
+            <div class="nav-item" data-page="users" id="nav-users" style="display:none">
+                <span class="icon">👥</span><span>用户管理</span>
+            </div>
             <div class="nav-item" data-page="settings">
                 <span class="icon">⚙️</span><span>系统设置</span>
             </div>
@@ -1970,19 +2139,6 @@
     <!-- ===== Main Content ===== -->
     <main class="main">
         <button class="btn btn-outline mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰ 菜单</button>
-
-        <!-- AI Agent Status Bar -->
-        <div class="ai-agent-bar" id="ai-agent-bar" style="display:none">
-            <div class="ai-icon">🤖</div>
-            <div class="ai-status">
-                <div class="ai-status-title">AI Agent 自动化引擎运行中</div>
-                <div class="ai-status-desc" id="ai-agent-desc">系统运行正常 · 上次巡检: --</div>
-            </div>
-            <div class="ai-actions">
-                <button class="btn btn-outline btn-sm" onclick="runAIPatrol()">🔄 立即巡检</button>
-                <button class="btn btn-primary btn-sm" onclick="navigateTo('alerts')">📢 查看预警</button>
-            </div>
-        </div>
 
         <!-- ============ Dashboard Page ============ -->
         <div class="page active" id="page-dashboard">
@@ -2508,45 +2664,6 @@
             </div>
 
             <div class="panel" style="max-width:700px">
-                <div class="panel-header"><span class="panel-title">🤖 AI Agent 配置</span></div>
-                <div class="panel-body">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>24小时自动巡检</label>
-                            <select id="setting-ai-patrol">
-                                <option value="on">已启用（每小时执行一次）</option>
-                                <option value="off">已禁用</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>超时自动升级</label>
-                            <select id="setting-auto-upgrade">
-                                <option value="on">已启用（超时即升级预警）</option>
-                                <option value="off">已禁用</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>月度系统优化建议</label>
-                            <select id="setting-monthly-report">
-                                <option value="on">已启用</option>
-                                <option value="off">已禁用</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>督办机制</label>
-                            <select id="setting-supervision" disabled>
-                                <option value="on" selected>已启用（持续督办至闭环）</option>
-                            </select>
-                            <div class="form-hint">🔒 此为刚性约束，不可关闭</div>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary" onclick="saveSettings()">💾 保存设置</button>
-                </div>
-            </div>
-
-            <div class="panel" style="max-width:700px">
                 <div class="panel-header"><span class="panel-title">📅 阶段时限配置（刚性约束）</span></div>
                 <div class="panel-body">
                     <table style="font-size:13px">
@@ -2619,10 +2736,30 @@
                         <div class="detail-item"><span class="detail-label">系统名称</span><span class="detail-value">QRQC快速反应管理系统</span></div>
                         <div class="detail-item"><span class="detail-label">版本</span><span class="detail-value">v1.0</span></div>
                         <div class="detail-item"><span class="detail-label">架构层级</span><span class="detail-value">四层标准化架构</span></div>
-                        <div class="detail-item"><span class="detail-label">AI引擎</span><span class="detail-value">QRQC AI Agent v1.0</span></div>
                         <div class="detail-item"><span class="detail-label">数据存储</span><span class="detail-value">localStorage + 永久留痕</span></div>
                         <div class="detail-item"><span class="detail-label">所属公司</span><span class="detail-value">宁波方卓科技有限公司</span></div>
                     </div>
+                </div>
+            </div>
+        </div>
+        <!-- ============ Users Page ============ -->
+        <div class="page" id="page-users">
+            <div class="topbar">
+                <div>
+                    <div class="breadcrumb">
+                        <span>首页</span><span class="sep">/</span><span class="current">用户管理</span>
+                    </div>
+                    <h1>👥 用户管理</h1>
+                </div>
+            </div>
+
+            <div class="panel" style="max-width:1100px">
+                <div class="panel-header">
+                    <span class="panel-title">账号列表</span>
+                    <button class="btn btn-primary btn-sm" onclick="openUserForm()">➕ 新增用户</button>
+                </div>
+                <div class="panel-body">
+                    <table id="user-table"></table>
                 </div>
             </div>
         </div>
@@ -3188,7 +3325,8 @@ const STORAGE_KEYS = {
     LAST_PATROL: 'qrqc_last_patrol',
     // 看板动态分析缓存 & 版本戳（5 需求：缓存机制 + 时效保证）
     LAST_MODIFIED_TS: 'qrqc_last_modified_ts',
-    DASHBOARD_CACHE: 'qrqc_dashboard_cache_v1'
+    DASHBOARD_CACHE: 'qrqc_dashboard_cache_v1',
+    USERS: 'qrqc_users'
 };
 
 /* ---------- 缓存时效工具（LAST_MODIFIED_TS）+ 台账最后修改记录（显式 SETTINGS 字段，满足审计需求）---------- */
@@ -3699,9 +3837,9 @@ function addAuditLog(type, action, detail = '') {
 
 /* ===================== 用户管理 ===================== */
 const DEFAULT_USERS = [
-    { username: 'admin', password: '123456', name: '管理员', role: '系统管理员', dept: 'IT部' },
-    { username: 'quality', password: '123456', name: '张工', role: '质量工程师', dept: '质量部' },
-    { username: 'production', password: '123456', name: '李主管', role: '生产主管', dept: '生产部' }
+    { username: 'admin', password: '88888888aa', name: '管理员', role: '系统管理员', dept: 'IT部' },
+    { username: 'quality', password: '88888888aa', name: '张工', role: '质量工程师', dept: '质量部' },
+    { username: 'production', password: '88888888aa', name: '李主管', role: '生产主管', dept: '生产部' }
 ];
 
 function getCurrentUser() { return loadData(STORAGE_KEYS.USER, null); }
@@ -3717,13 +3855,19 @@ function handleLogin() {
         return;
     }
     
-    const user = DEFAULT_USERS.find(u => u.username === username && u.password === password);
+    ensureDefaultUsers();
+    const managed = loadData(STORAGE_KEYS.USERS, []);
+    let user = managed.find(u => u.username === username && u.password === password);
+    if (!user) user = DEFAULT_USERS.find(u => u.username === username && u.password === password);
     if (user) {
+        const all = loadData(STORAGE_KEYS.USERS, []);
+        const rec = all.find(x => x.username === user.username);
+        if (rec) { rec.lastLogin = formatDateTime(new Date()); saveData(STORAGE_KEYS.USERS, all); }
         saveData(STORAGE_KEYS.USER, { username: user.username, name: user.name, role: user.role, dept: user.dept });
         addAuditLog('login', '用户登录', `${user.name} 登录系统`);
         enterSystem();
     } else {
-        errorEl.textContent = '用户名或密码错误（默认：admin / 123456）';
+        errorEl.textContent = '用户名或密码错误';
         errorEl.classList.add('show');
     }
 }
@@ -3734,7 +3878,6 @@ function handleLogout() {
     localStorage.removeItem(STORAGE_KEYS.USER);
     document.getElementById('login-page').style.display = 'flex';
     document.querySelector('.app').style.display = 'none';
-    document.getElementById('ai-agent-bar').style.display = 'none';
 }
 
 function togglePassword() {
@@ -4066,6 +4209,11 @@ function navigateTo(page, issueId = null) {
     if (page === 'alerts') renderAlerts();
     if (page === 'audit') renderAuditLog();
     if (page === 'settings') renderSettingsMeta(); // 显示台账最后修改时间/修改人
+    if (page === 'users') {
+        const _cu = getCurrentUser();
+        if (!_cu || _cu.role !== '系统管理员') { navigateTo('dashboard'); return; }
+        renderUserTable();
+    }
 }
 
 /* ===================== AI Agent 自动化引擎 ===================== */
@@ -4164,59 +4312,13 @@ function runAIPatrol() {
     saveData(STORAGE_KEYS.LAST_PATROL, formatDateTime(now));
     updateAIAgentBar(overdueCount, warningCount, newAlerts.length);
     renderDashboardQuick();
-    
-    // Show notice
-    if (newAlerts.length > 0) {
-        const msg = newAlerts.length > 0 ? `AI巡检完成：发现${newAlerts.length}条新预警！` : 'AI巡检完成，系统运行正常';
-        alert('🤖 ' + msg);
-    } else {
-        alert('🤖 AI巡检完成：系统运行正常，0个异常问题');
-    }
 }
 
-function updateAIAgentBar(overdue = 0, warning = 0, newAlerts = 0) {
-    const lastPatrol = loadData(STORAGE_KEYS.LAST_PATROL, '--');
-    const desc = `上次巡检: ${lastPatrol} | 当前${overdue}个超时 · ${warning}个临期`;
-    document.getElementById('ai-agent-desc').textContent = desc;
+function updateAIAgentBar(overdue, warning, newAlerts) {
+    // AI 自动化引擎栏已移除，保留空函数避免调用点报错
 }
 
-// 定时AI巡检（模拟）
-setInterval(() => {
-    if (!getCurrentUser()) return;
-    const last = loadData(STORAGE_KEYS.LAST_PATROL, '');
-    // 如果超过1小时没巡检，自动执行
-    if (!last || (Date.now() - new Date(last).getTime() > 60 * 60 * 1000)) {
-        // 静默巡检
-        const issues = loadData(STORAGE_KEYS.ISSUES, []);
-        const now = new Date();
-        let modified = false;
-        const alerts = loadData(STORAGE_KEYS.ALERTS, []);
-        let alertCount = 0;
-
-        issues.forEach(issue => {
-            if (issue.closed) return;
-            const created = new Date(issue.createdAt);
-            const currentStage = STAGES.find(s => s.num === issue.currentStage);
-            if (currentStage) {
-                const stageDeadline = addDays(created, currentStage.days);
-                if (now > stageDeadline && !issue.stageOverdue) {
-                    issue.stageOverdue = true; modified = true;
-                    alerts.unshift({ id: 'ALT' + Date.now() + alertCount++, issueId: issue.id, type: 'danger', title: `⚠️ 阶段超时：${issue.id}`, desc: `「${issue.title}」第${currentStage.num}阶段超时`, time: formatDateTime(now), timestamp: Date.now(), read: false });
-                }
-            }
-            const totalDeadline = addDays(created, 10);
-            if (now > totalDeadline && !issue.totalOverdue) {
-                issue.totalOverdue = true; modified = true;
-                alerts.unshift({ id: 'ALT' + Date.now() + alertCount++, issueId: issue.id, type: 'danger', title: `🚨 总超时：${issue.id}`, desc: `「${issue.title}」超过10天总时限`, time: formatDateTime(now), timestamp: Date.now(), read: false });
-            }
-        });
-        if (modified) saveData(STORAGE_KEYS.ISSUES, issues);
-        if (modified) bumpLedgerModified(); // 后台每5分钟巡检修改了过期标记
-        if (alertCount > 0) saveData(STORAGE_KEYS.ALERTS, alerts);
-        saveData(STORAGE_KEYS.LAST_PATROL, formatDateTime(now));
-        updateAIAgentBar();
-    }
-}, 5 * 60 * 1000); // 每5分钟检查一次
+// 定时后台巡检已停用（进入预警中心仍会按需静默巡检）
 
 /* ===================== 倒计时计算 ===================== */
 function calculateCountdown(issue) {
@@ -7957,16 +8059,7 @@ function renderAlerts() {
  */
 let _alertValidationTimer = null;
 function startAlertValidationScheduler() {
-    if (_alertValidationTimer) clearInterval(_alertValidationTimer);
-    _alertValidationTimer = setInterval(() => {
-        const v = validateAlertLedgerConsistency();
-        if (!v.pass) {
-            // 发现不一致时，自动调用 AI 巡检补齐预警消息，并记录审计日志
-            addAuditLog('system', '预警自动校验', `发现${v.diffs.length}处不一致，自动执行AI巡检重建。差异：${v.diffs.slice(0,3).join('；')}${v.diffs.length>3?'…':''}`);
-            runAIPatrol();
-            if (document.getElementById('page-alerts').classList.contains('active')) renderAlerts();
-        }
-    }, 5 * 60 * 1000);  // 5 分钟
+    // 定时自动校验已停用；进入预警中心时仍会按需静默巡检与一致性校验
 }
 
 function handleAlertClick(issueId, alertId) {
@@ -8041,15 +8134,17 @@ function renderAuditLog() {
 
 /* ============ 系统设置 & 导入导出 ============ */
 function saveSettings() {
-    const settings = {
-        aiPatrol: document.getElementById('setting-ai-patrol').value,
-        autoUpgrade: document.getElementById('setting-auto-upgrade').value,
-        monthlyReport: document.getElementById('setting-monthly-report').value,
+    const prev = loadData(STORAGE_KEYS.SETTINGS, {});
+    const get = id => { const el = document.getElementById(id); return el ? el.value : undefined; };
+    const settings = Object.assign({}, prev, {
+        aiPatrol: get('setting-ai-patrol') || prev.aiPatrol || 'off',
+        autoUpgrade: get('setting-auto-upgrade') || prev.autoUpgrade || 'off',
+        monthlyReport: get('setting-monthly-report') || prev.monthlyReport || 'off',
         supervision: 'on'
-    };
+    });
     saveData(STORAGE_KEYS.SETTINGS, settings);
-    addAuditLog('update', '修改系统设置', 'AI配置已更新');
-    alert('✅ 设置已保存！');
+    addAuditLog('update', '修改系统设置', '系统设置已更新');
+    showToast('✅ 设置已保存');
 }
 
 function exportIssuesExcel() {
@@ -8587,7 +8682,7 @@ function initDemoData() {
     // 初始化一些审计日志
     const baseLogs = [
         { type:'login', action:'系统启动', detail:'QRQC快速反应管理系统 v1.0 初始化完成' },
-        { type:'system', action:'AI引擎启动', detail:'QRQC AI Agent 自动化引擎已加载，巡检机制已启用' },
+        { type:'system', action:'系统初始化', detail:'QRQC快速反应管理系统模块已加载完成' },
         { type:'system', action:'初始化演示数据', detail:`生成${issues.length}条演示问题，${alerts.length}条预警` }
     ];
     const logs = baseLogs.map((l, i) => ({
@@ -8610,6 +8705,7 @@ function refreshAll() {
     else if (currentPage === 'reports') renderReports();
     else if (currentPage === 'alerts') renderAlerts();
     else if (currentPage === 'audit') renderAuditLog();
+    else if (currentPage === 'users') renderUserTable();
 }
 
 /* ============ 进入系统 ============ */
@@ -8619,7 +8715,6 @@ function enterSystem() {
 
     document.getElementById('login-page').style.display = 'none';
     document.querySelector('.app').style.display = 'flex';
-    document.getElementById('ai-agent-bar').style.display = 'flex';
 
     // User info
     document.getElementById('sidebar-user').style.display = 'flex';
@@ -8632,6 +8727,8 @@ function enterSystem() {
     if (btnRecycle) btnRecycle.style.display = canAccessRecycleBin() ? 'inline-flex' : 'none';
     const btnPurge = document.getElementById('btn-purge-issues');
     if (btnPurge) btnPurge.style.display = canPurgeIssue() ? 'inline-flex' : 'none';
+    // 用户管理导航仅系统管理员可见
+    try { toggleUsersNav(); } catch (e) {}
 
     // 进入系统默认激活数据看板：同步启用 main 的紧凑内边距（与 navigateTo('dashboard') 保持一致）
     const mainEl = document.querySelector('main.main');
@@ -8678,9 +8775,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // 初始化设置
     const settings = loadData(STORAGE_KEYS.SETTINGS, null);
     if (settings) {
-        document.getElementById('setting-ai-patrol').value = settings.aiPatrol;
-        document.getElementById('setting-auto-upgrade').value = settings.autoUpgrade;
-        document.getElementById('setting-monthly-report').value = settings.monthlyReport;
+        const _setSel = (id, v) => { const el = document.getElementById(id); if (el && v != null) el.value = v; };
+        _setSel('setting-ai-patrol', settings.aiPatrol);
+        _setSel('setting-auto-upgrade', settings.autoUpgrade);
+        _setSel('setting-monthly-report', settings.monthlyReport);
     }
     
     // 检查登录态
@@ -8690,7 +8788,6 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         document.getElementById('login-page').style.display = 'flex';
         document.querySelector('.app').style.display = 'none';
-        document.getElementById('ai-agent-bar').style.display = 'none';
     }
     
     // 每秒刷新倒计时
@@ -8732,7 +8829,8 @@ const CLOUD_SYNC_FIELDS = [
     { field: 'alerts',     key: STORAGE_KEYS.ALERTS,      def: [] },
     { field: 'auditLog',   key: STORAGE_KEYS.AUDIT_LOG,   def: [] },
     { field: 'settings',   key: STORAGE_KEYS.SETTINGS,    def: {} },
-    { field: 'lastPatrol', key: STORAGE_KEYS.LAST_PATROL, def: '' }
+    { field: 'lastPatrol', key: STORAGE_KEYS.LAST_PATROL, def: '' },
+    { field: 'users',      key: STORAGE_KEYS.USERS,       def: [] }
 ];
 function _isCloudSyncStorageKey(key) {
     return CLOUD_SYNC_FIELDS.some(function (f) { return f.key === key; });
@@ -9051,19 +9149,237 @@ const localBackup = {
         if (this.dirHandle) {
             const at = this.lastBackupAt ? new Date(this.lastBackupAt).toLocaleString('zh-CN') : '本次开启';
             el.innerHTML = '✅ <b>已开启</b>：每次点「💾保存」自动写 <b>latest.json</b>，并在「历史备份」子文件夹每天留存一份。上次写入：' + at;
-            el.style.color = '#166534';
+            el.style.color = '#4ade80';
         } else if (this.pendingHandle) {
-            el.innerHTML = '⚠️ 本地备份待恢复：<button id="lb-restore-btn" type="button" style="margin:0 4px;padding:2px 10px;border:1px solid #b45309;background:#ffffff;color:#b45309;border-radius:5px;cursor:pointer;font-size:12px;">🔓 点此恢复本地备份</button>' + (typeof extraMsg === 'string' && extraMsg ? '<br><span>' + extraMsg + '</span>' : '<span>（无需重新选择文件夹）</span>');
-            el.style.color = '#b45309';
+            el.innerHTML = '⚠️ 本地备份待恢复：<button id="lb-restore-btn" type="button" style="margin:0 4px;padding:2px 10px;border:1px solid rgba(245,158,11,.5);background:var(--input-bg);color:#fbbf24;border-radius:5px;cursor:pointer;font-size:12px;">🔓 点此恢复本地备份</button>' + (typeof extraMsg === 'string' && extraMsg ? '<br><span>' + extraMsg + '</span>' : '<span>（无需重新选择文件夹）</span>');
+            el.style.color = '#fbbf24';
             const lbBtn = document.getElementById('lb-restore-btn');
             if (lbBtn) lbBtn.onclick = function (ev) { ev.preventDefault(); ev.stopPropagation(); self._restoreOnce(); };
         } else {
             el.innerHTML = '⚪ 未开启：点上面按钮，选择 Z:\\00 公共文件夹\\08 AI管理系统\\QRQC管理系统\\备份，之后每次点「💾保存」自动备份到该文件夹。';
-            el.style.color = '#9aa0a6';
+            el.style.color = 'var(--text-tertiary)';
         }
     }
 };
 window.localBackup = localBackup;
+/* ===== 用户管理模块（参照生产管理系统） ===== */
+function getUsers() { return loadData(STORAGE_KEYS.USERS, []); }
+
+function ensureDefaultUsers() {
+    const users = loadData(STORAGE_KEYS.USERS, []);
+    let changed = false;
+    DEFAULT_USERS.forEach((du, i) => {
+        if (!users.find(x => x.username === du.username)) {
+            users.push({
+                id: 'u_def_' + (i + 1),
+                username: du.username,
+                password: '88888888aa',
+                name: du.name,
+                role: du.role,
+                dept: du.dept,
+                createdAt: formatDate(new Date()),
+                lastLogin: null
+            });
+            changed = true;
+        }
+    });
+    if (changed) saveData(STORAGE_KEYS.USERS, users);
+    return users;
+}
+
+function toggleUsersNav() {
+    const cu = getCurrentUser();
+    const navEl = document.getElementById('nav-users');
+    if (navEl) navEl.style.display = (cu && cu.role === '系统管理员') ? '' : 'none';
+}
+
+function renderUserTable() {
+    const users = getUsers();
+    let bodyHtml;
+    if (!users.length) {
+        bodyHtml = '<tr><td colspan="6" style="text-align:center;color:var(--text-tertiary);padding:30px;">暂无用户，点击右上角「新增用户」</td></tr>';
+    } else {
+        bodyHtml = users.map(u => {
+            const ops = u.username === 'admin'
+                ? '<span style="color:var(--text-tertiary);font-size:12px;">内置管理员不可删</span>'
+                : '<button class="btn btn-icon btn-sm" type="button" title="删除" onclick="deleteUser(\'' + u.id + '\')">🗑️</button>';
+            return ''
+                + '<tr>'
+                + '<td><b>' + u.username + '</b></td>'
+                + '<td>' + (u.name || '') + '</td>'
+                + '<td><span class="badge badge-primary">' + u.role + '</span></td>'
+                + '<td>' + (u.lastLogin ? formatDateTime(u.lastLogin) : '—') + '</td>'
+                + '<td>' + (u.createdAt ? formatDate(u.createdAt) : '—') + '</td>'
+                + '<td style="white-space:nowrap;">'
+                +   '<button class="btn btn-icon btn-sm" type="button" title="编辑" onclick="editUser(\'' + u.id + '\')">✏️</button> '
+                +   '<button class="btn btn-outline btn-sm" type="button" onclick="resetPassword(\'' + u.id + '\')">🔑 重置密码</button> '
+                +   ops
+                + '</td>'
+                + '</tr>';
+        }).join('');
+    }
+    document.getElementById('user-table').innerHTML =
+        '<thead><tr>'
+        + '<th>用户名</th><th>姓名</th><th>角色</th><th>最后登录</th><th>创建时间</th><th>操作</th>'
+        + '</tr></thead><tbody>' + bodyHtml + '</tbody>';
+}
+
+function openUserForm(id) {
+    document.getElementById('user-id').value = '';
+    document.getElementById('user-username').value = '';
+    document.getElementById('user-name').value = '';
+    document.getElementById('user-dept').value = '';
+    document.getElementById('user-role').value = '生产主管';
+    document.getElementById('user-password').value = '';
+    document.getElementById('user-password-group').style.display = '';
+    document.getElementById('user-modal-title').textContent = '➕ 新增用户';
+    if (id) {
+        const u = getUsers().find(x => x.id === id);
+        if (!u) return;
+        document.getElementById('user-id').value = u.id;
+        document.getElementById('user-username').value = u.username;
+        document.getElementById('user-name').value = u.name;
+        document.getElementById('user-dept').value = u.dept || '';
+        document.getElementById('user-role').value = u.role;
+        document.getElementById('user-password-group').style.display = 'none';
+        document.getElementById('user-modal-title').textContent = '✏️ 编辑用户';
+    }
+    showModal('modal-user');
+}
+function editUser(id) { openUserForm(id); }
+
+function saveUser() {
+    const id = document.getElementById('user-id').value;
+    const username = document.getElementById('user-username').value.trim();
+    const name = document.getElementById('user-name').value.trim();
+    const dept = document.getElementById('user-dept').value.trim();
+    const role = document.getElementById('user-role').value;
+    const password = document.getElementById('user-password').value;
+    if (!username || !name) { showToast('❌ 登录账号和姓名必填', 'error'); return; }
+    const users = getUsers();
+    if (id) {
+        const u = users.find(x => x.id === id);
+        if (!u) { closeModal('modal-user'); return; }
+        if (users.some(x => x.username === username && x.id !== id)) { showToast('❌ 登录账号已存在', 'error'); return; }
+        u.username = username; u.name = name; u.role = role;
+        if (dept) u.dept = dept;
+        saveData(STORAGE_KEYS.USERS, users);
+        addAuditLog('update', '编辑用户', username + '（' + name + '）');
+        showToast('✅ 用户信息已更新');
+    } else {
+        if (!password || password.length < 6) { showToast('❌ 密码至少 6 位', 'error'); return; }
+        if (users.some(x => x.username === username)) { showToast('❌ 登录账号已存在', 'error'); return; }
+        users.push({
+            id: 'u_' + Date.now(), username, name, role,
+            dept: dept || '', password,
+            createdAt: formatDate(new Date()), lastLogin: null
+        });
+        saveData(STORAGE_KEYS.USERS, users);
+        addAuditLog('create', '新增用户', username + '（' + name + '）');
+        showToast('✅ 用户创建成功');
+    }
+    closeModal('modal-user');
+    renderUserTable();
+}
+
+function resetPassword(id) {
+    const u = getUsers().find(x => x.id === id);
+    if (!u) return;
+    showUserConfirm('🔑 重置密码', '确定将「' + u.username + '」的密码重置为「88888888aa」吗？', function () {
+        const users = getUsers();
+        const rec = users.find(x => x.id === id);
+        if (rec) {
+            rec.password = '88888888aa';
+            saveData(STORAGE_KEYS.USERS, users);
+            addAuditLog('update', '重置密码', rec.username);
+            showToast('✅ 密码已重置为 88888888aa');
+            renderUserTable();
+        }
+    });
+}
+
+function deleteUser(id) {
+    const u = getUsers().find(x => x.id === id);
+    if (!u) return;
+    if (u.username === 'admin') { showToast('❌ 内置管理员不可删除', 'error'); return; }
+    showUserConfirm('🗑️ 删除用户', '确定删除用户「' + u.username + '（' + u.name + '）」吗？此操作不可撤销。', function () {
+        const users = getUsers().filter(x => x.id !== id);
+        saveData(STORAGE_KEYS.USERS, users);
+        addAuditLog('delete', '删除用户', u.username + '（' + u.name + '）');
+        showToast('✅ 用户已删除');
+        renderUserTable();
+    });
+}
+
+function showUserConfirm(title, message, onOk) {
+    document.getElementById('user-confirm-title').textContent = title;
+    document.getElementById('user-confirm-message').textContent = message;
+    const btn = document.getElementById('user-confirm-ok-btn');
+    const fresh = btn.cloneNode(true);
+    btn.parentNode.replaceChild(fresh, btn);
+    fresh.addEventListener('click', function () {
+        closeModal('modal-user-confirm');
+        if (onOk) onOk();
+    });
+    showModal('modal-user-confirm');
+}
+
 </script>
+<div class="modal-overlay" id="modal-user" onclick="if(event.target===this) closeModal('modal-user')">
+    <div class="modal" style="max-width:520px" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <span class="modal-title" id="user-modal-title">➕ 新增用户</span>
+            <button class="modal-close" onclick="closeModal('modal-user')">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="user-id">
+            <div class="form-row">
+                <label>登录账号</label>
+                <input type="text" id="user-username" placeholder="请输入登录账号">
+            </div>
+            <div class="form-row">
+                <label>真实姓名</label>
+                <input type="text" id="user-name" placeholder="请输入真实姓名">
+            </div>
+            <div class="form-row">
+                <label>部门</label>
+                <input type="text" id="user-dept" placeholder="选填，如：质量部">
+            </div>
+            <div class="form-row">
+                <label>角色</label>
+                <select id="user-role">
+                    <option value="系统管理员">系统管理员</option>
+                    <option value="质量工程师">质量工程师</option>
+                    <option value="生产主管">生产主管</option>
+                </select>
+            </div>
+            <div class="form-row" id="user-password-group">
+                <label>登录密码</label>
+                <input type="password" id="user-password" placeholder="至少 6 位">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('modal-user')">取消</button>
+            <button class="btn btn-primary" onclick="saveUser()">💾 保存</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal-user-confirm" onclick="if(event.target===this) closeModal('modal-user-confirm')">
+    <div class="modal" style="max-width:420px" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <span class="modal-title" id="user-confirm-title">操作确认</span>
+            <button class="modal-close" onclick="closeModal('modal-user-confirm')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div id="user-confirm-message" style="line-height:1.7;font-size:14px;">确定执行此操作吗？</div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('modal-user-confirm')">取消</button>
+            <button class="btn btn-primary" id="user-confirm-ok-btn">确定</button>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
