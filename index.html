@@ -8727,6 +8727,8 @@ function enterSystem() {
     if (btnRecycle) btnRecycle.style.display = canAccessRecycleBin() ? 'inline-flex' : 'none';
     const btnPurge = document.getElementById('btn-purge-issues');
     if (btnPurge) btnPurge.style.display = canPurgeIssue() ? 'inline-flex' : 'none';
+    // 内置账号种子化（持久化会话也需保证用户表存在）
+    try { ensureDefaultUsers(); } catch (e) {}
     // 用户管理导航仅系统管理员可见
     try { toggleUsersNav(); } catch (e) {}
 
