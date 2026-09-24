@@ -4080,28 +4080,52 @@ function handleLogin() {
     const username = document.getElementById('login-username').value.trim();
     const password = document.getElementById('login-password').value;
     const errorEl = document.getElementById('login-error');
-    
+
     if (!username || !password) {
         errorEl.textContent = '请输入用户名和密码';
         errorEl.classList.add('show');
         return;
     }
-    
+
     ensureDefaultUsers();
-    const managed = loadData(STORAGE_KEYS.USERS, []);
-    let user = managed.find(u => u.username === username && u.password === password);
-    if (!user) user = DEFAULT_USERS.find(u => u.username === username && u.password === password);
-    if (user) {
-        const all = loadData(STORAGE_KEYS.USERS, []);
-        const rec = all.find(x => x.username === user.username);
-        if (rec) { rec.lastLogin = formatDateTime(new Date()); saveData(STORAGE_KEYS.USERS, all); }
-        saveData(STORAGE_KEYS.USER, { username: user.username, name: user.name, role: user.role, dept: user.dept });
-        addAuditLog('login', '用户登录', `${user.name} 登录系统`);
-        enterSystem();
+    const tryAuth = () => {
+        const managed = loadData(STORAGE_KEYS.USERS, []);
+        let u = managed.find(x => x.username === username && x.password === password);
+        if (!u) u = DEFAULT_USERS.find(x => x.username === username && x.password === password);
+        return u;
+    };
+    const existing = tryAuth();
+    if (existing) { finishLogin(existing); return; }
+
+    // 本地无此账号：实时拉取云端用户后再校验（新设备/网络慢兜底）
+    if (isCloudConfigured()) {
+        const btn = document.getElementById('login-btn');
+        errorEl.classList.remove('show');
+        btn.disabled = true; btn.textContent = '登录中…';
+        pullCloudDB().then(function (db) {
+            if (db && Array.isArray(db.users)) mergeCloudUsers(db.users);
+        }).catch(function () {}).then(function () {
+            btn.disabled = false; btn.textContent = '登 录';
+            const u2 = tryAuth();
+            if (u2) finishLogin(u2);
+            else {
+                errorEl.textContent = '用户名或密码错误';
+                errorEl.classList.add('show');
+            }
+        });
     } else {
         errorEl.textContent = '用户名或密码错误';
         errorEl.classList.add('show');
     }
+}
+
+function finishLogin(user) {
+    const all = loadData(STORAGE_KEYS.USERS, []);
+    const rec = all.find(x => x.username === user.username);
+    if (rec) { rec.lastLogin = formatDateTime(new Date()); saveData(STORAGE_KEYS.USERS, all); }
+    saveData(STORAGE_KEYS.USER, { username: user.username, name: user.name, role: user.role, dept: user.dept });
+    addAuditLog('login', '用户登录', `${user.name} 登录系统`);
+    enterSystem();
 }
 
 function handleLogout() {
@@ -9110,6 +9134,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         document.getElementById('login-page').style.display = 'flex';
         document.querySelector('.app').style.display = 'none';
+        try { preloadCloudUsersForLogin(); } catch (e) {}
     }
     
     // 每秒刷新倒计时
@@ -9290,6 +9315,26 @@ function setCloudStatus(status, msg) {
 function getCloudMeta() { try { return JSON.parse(localStorage.getItem(QRQC_CLOUD_META_KEY)) || {}; } catch (e) { return {}; } }
 function setCloudMeta(m) { try { localStorage.setItem(QRQC_CLOUD_META_KEY, JSON.stringify(m)); } catch (e) {} }
 
+// 登录页预加载：新设备本地无云端用户，先拉取用户列表，避免邮箱账号无法登录
+let _cloudUsersPreloaded = false;
+function mergeCloudUsers(remoteUsers) {
+    try {
+        const local = loadData(STORAGE_KEYS.USERS, []);
+        remoteUsers.forEach(function (ru) {
+            const i = local.findIndex(function (u) { return u.username === ru.username; });
+            if (i >= 0) local[i] = Object.assign({}, local[i], ru);
+            else local.push(Object.assign({}, ru));
+        });
+        saveData(STORAGE_KEYS.USERS, local);
+    } catch (e) {}
+}
+function preloadCloudUsersForLogin() {
+    if (_cloudUsersPreloaded || !isCloudConfigured()) return Promise.resolve();
+    _cloudUsersPreloaded = true;
+    return pullCloudDB().then(function (db) {
+        if (db && Array.isArray(db.users) && db.users.length) mergeCloudUsers(db.users);
+    }).catch(function () {});
+}
 // 拉取云端最新数据
 function pullCloudDB() {
     return fetch(CLOUD_CONFIG.apiBase + '/api/db', { method: 'GET' })
