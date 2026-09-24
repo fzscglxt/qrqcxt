@@ -9134,8 +9134,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 检查登录态
     let user = getCurrentUser();
-    // 大屏 Kiosk：无登录态时自动以只读查看员身份进入
-    if (!user && isKioskMode()) {
+    // 大屏 Kiosk：检测到 kiosk 参数即无条件以只读查看员身份进入（覆盖任何残留/历史会话，保证大屏永远只读）
+    if (isKioskMode()) {
         user = { username: 'kiosk_viewer', name: '大屏看板', role: ROLE_VIEWER, dept: '生产部', kiosk: true };
         saveData(STORAGE_KEYS.USER, user);
     }
