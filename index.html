@@ -120,6 +120,8 @@
             transition: all 0.2s;
         }
         .sidebar-user .logout-btn:hover { color: var(--danger); background: rgba(234,67,53,0.1); }
+        /* ===== 大屏看板（Kiosk）只读模式：隐藏保存按钮与用户区 ===== */
+        body.kiosk-mode #cloud-save-btn, body.kiosk-mode #sidebar-user { display: none !important; }
         .sidebar-cloud { padding: 10px 16px; border-top: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; gap: 8px; font-size: 12px; color: #94a3b8; }
         .sidebar-cloud .cloud-dot { width: 8px; height: 8px; border-radius: 50%; background: #64748b; flex-shrink: 0; }
         .sidebar-cloud .cloud-dot.ok { background: #34a853; }
@@ -4075,6 +4077,9 @@ const DEFAULT_USERS = [
 ];
 
 function getCurrentUser() { return loadData(STORAGE_KEYS.USER, null); }
+function isKioskMode() {
+    try { return new URLSearchParams(location.search).has('kiosk'); } catch (e) { return false; }
+}
 
 function handleLogin() {
     const username = document.getElementById('login-username').value.trim();
@@ -9128,7 +9133,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // 检查登录态
-    const user = getCurrentUser();
+    let user = getCurrentUser();
+    // 大屏 Kiosk：无登录态时自动以只读查看员身份进入
+    if (!user && isKioskMode()) {
+        user = { username: 'kiosk_viewer', name: '大屏看板', role: ROLE_VIEWER, dept: '生产部', kiosk: true };
+        saveData(STORAGE_KEYS.USER, user);
+    }
+    if (isKioskMode()) document.body.classList.add('kiosk-mode');
     if (user) {
         enterSystem();
     } else {
