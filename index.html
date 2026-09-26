@@ -9335,6 +9335,7 @@ function openQcForm(type, id) {
   showModal('modal-qc-form');
 }
 function submitQcForm() {
+  if (!canEditRole()) { showToast('当前角色为只读，无法保存检验记录', 'error'); return; }
   const supplier = document.getElementById('qc-form-supplier').value;
   const date = document.getElementById('qc-form-date').value;
   if (!supplier) { showToast('请选择供应商', 'error'); return; }
