@@ -2301,6 +2301,12 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                 <span class="icon">📌</span><span>跟踪看板管理</span>
             </div>
             <div class="nav-section">系统功能</div>
+            <div class="nav-item" data-page="incoming-qc">
+                <span class="icon">📥</span><span>来料检验记录</span>
+            </div>
+            <div class="nav-item" data-page="stock-qc">
+                <span class="icon">📦</span><span>入库检验记录</span>
+            </div>
             <div class="nav-item" data-page="reports">
                 <span class="icon">📈</span><span>报表中心</span>
             </div>
@@ -2872,6 +2878,122 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
         </div>
 
         <!-- ============ Settings Page ============ -->
+        <!-- ============ 来料检验记录 Page ============ -->
+        <div class="page" id="page-incoming-qc">
+            <div class="topbar">
+                <div>
+                    <div class="breadcrumb">
+                        <span>首页</span><span class="sep">/</span><span class="current">来料检验记录</span>
+                    </div>
+                    <h1>📥 来料检验记录</h1>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn btn-outline" onclick="importQcExcel('incoming-qc')">📂 导入</button>
+                    <button class="btn btn-outline" onclick="exportQcExcel('incoming-qc')">📤 导出</button>
+                    <button class="btn btn-primary" id="btn-incoming-new" onclick="openQcForm('incoming-qc')">➕ 新增检验记录</button>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="panel-body">
+                    <div class="filter-bar">
+                        <div class="ledger-date-wrap" title="按检验日期范围筛选">
+                            <label class="date-label">📅 检验日期：</label>
+                            <input type="date" id="incoming-date-start" onchange="renderQcTable('incoming-qc')">
+                            <span class="date-sep">~</span>
+                            <input type="date" id="incoming-date-end" onchange="renderQcTable('incoming-qc')">
+                            <button type="button" class="btn btn-outline btn-sm" onclick="clearQcFilter('incoming-qc')" title="清除筛选">✕ 清除</button>
+                        </div>
+                        <select id="incoming-supplier" onchange="renderQcTable('incoming-qc')">
+                            <option value="">全部供应商</option>
+                            <option value="理实">理实</option>
+                            <option value="均胜">均胜</option>
+                            <option value="乐威">乐威</option>
+                            <option value="万金">万金</option>
+                            <option value="瑞博">瑞博</option>
+                            <option value="奥峰">奥峰</option>
+                        </select>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <th>检验日期</th>
+                                    <th>批次号</th>
+                                    <th style="text-align:left">产品名称</th>
+                                    <th>零件号</th>
+                                    <th>不良类型</th>
+                                    <th>数量</th>
+                                    <th>去向</th>
+                                    <th>检验员</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="incoming-qc-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ 入库检验记录 Page ============ -->
+        <div class="page" id="page-stock-qc">
+            <div class="topbar">
+                <div>
+                    <div class="breadcrumb">
+                        <span>首页</span><span class="sep">/</span><span class="current">入库检验记录</span>
+                    </div>
+                    <h1>📦 入库检验记录</h1>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn btn-outline" onclick="importQcExcel('stock-qc')">📂 导入</button>
+                    <button class="btn btn-outline" onclick="exportQcExcel('stock-qc')">📤 导出</button>
+                    <button class="btn btn-primary" id="btn-stock-new" onclick="openQcForm('stock-qc')">➕ 新增检验记录</button>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="panel-body">
+                    <div class="filter-bar">
+                        <div class="ledger-date-wrap" title="按检验日期范围筛选">
+                            <label class="date-label">📅 检验日期：</label>
+                            <input type="date" id="stock-date-start" onchange="renderQcTable('stock-qc')">
+                            <span class="date-sep">~</span>
+                            <input type="date" id="stock-date-end" onchange="renderQcTable('stock-qc')">
+                            <button type="button" class="btn btn-outline btn-sm" onclick="clearQcFilter('stock-qc')" title="清除筛选">✕ 清除</button>
+                        </div>
+                        <select id="stock-supplier" onchange="renderQcTable('stock-qc')">
+                            <option value="">全部供应商</option>
+                            <option value="理实">理实</option>
+                            <option value="均胜">均胜</option>
+                            <option value="乐威">乐威</option>
+                            <option value="万金">万金</option>
+                            <option value="瑞博">瑞博</option>
+                            <option value="奥峰">奥峰</option>
+                        </select>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <th>检验日期</th>
+                                    <th>批次号</th>
+                                    <th style="text-align:left">产品名称</th>
+                                    <th>零件号</th>
+                                    <th>不良类型</th>
+                                    <th>数量</th>
+                                    <th>去向</th>
+                                    <th>检验员</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stock-qc-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="page" id="page-settings">
             <div class="topbar">
                 <div>
@@ -3182,6 +3304,73 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <!-- ===== Modal: Custom Date Picker (Dashboard) ===== -->
+<div class="modal-overlay" id="modal-qc-form">
+    <div class="modal lg">
+        <div class="modal-header">
+            <span class="modal-title" id="qc-form-title">➕ 新增检验记录</span>
+            <button class="modal-close" onclick="closeModal('modal-qc-form')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;column-gap:18px;">
+                <div class="form-group">
+                    <label>供应商<span class="required">*</span></label>
+                    <select id="qc-form-supplier">
+                        <option value="">-- 请选择供应商 --</option>
+                        <option>理实</option>
+                        <option>均胜</option>
+                        <option>乐威</option>
+                        <option>万金</option>
+                        <option>瑞博</option>
+                        <option>奥峰</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>检验日期<span class="required">*</span></label>
+                    <input type="date" id="qc-form-date">
+                </div>
+                <div class="form-group">
+                    <label>批次号</label>
+                    <input type="text" id="qc-form-batch" placeholder="请输入批次号">
+                </div>
+                <div class="form-group">
+                    <label>产品名称</label>
+                    <input type="text" id="qc-form-product" placeholder="请输入产品名称">
+                </div>
+                <div class="form-group">
+                    <label>零件号</label>
+                    <input type="text" id="qc-form-part" placeholder="请输入零件号/图号">
+                </div>
+                <div class="form-group">
+                    <label>不良类型</label>
+                    <input type="text" id="qc-form-defect" placeholder="如：缺料/飞边/油污，无不良填“无”">
+                </div>
+                <div class="form-group">
+                    <label>数量</label>
+                    <input type="number" id="qc-form-qty" min="0" step="1" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>去向</label>
+                    <select id="qc-form-destination">
+                        <option value="">-- 请选择去向 --</option>
+                        <option>合格入库</option>
+                        <option>退货</option>
+                        <option>返工/挑选</option>
+                        <option>报废</option>
+                        <option>让步接收</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>检验员</label>
+                    <input type="text" id="qc-form-inspector" placeholder="请输入检验员姓名">
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('modal-qc-form')">取消</button>
+            <button class="btn btn-primary" onclick="submitQcForm()">💾 保存记录</button>
+        </div>
+    </div>
+</div>
 <div class="modal-overlay" id="modal-custom-datepicker" onclick="if(event.target===this) closeCustomDatePicker()">
     <div class="modal xl" onclick="event.stopPropagation()">
         <div class="modal-header">
@@ -3543,7 +3732,10 @@ const STORAGE_KEYS = {
     // 看板动态分析缓存 & 版本戳（5 需求：缓存机制 + 时效保证）
     LAST_MODIFIED_TS: 'qrqc_last_modified_ts',
     DASHBOARD_CACHE: 'qrqc_dashboard_cache_v1',
-    USERS: 'qrqc_users'
+    USERS: 'qrqc_users',
+    // 来料检验记录 & 入库检验记录（质量检验台账）
+    INCOMING_QC: 'qrqc_incoming_qc',
+    STOCK_QC: 'qrqc_stock_qc'
 };
 
 /* ---------- 缓存时效工具（LAST_MODIFIED_TS）+ 台账最后修改记录（显式 SETTINGS 字段，满足审计需求）---------- */
@@ -4423,6 +4615,10 @@ function navigateTo(page, issueId = null) {
                             || (document.getElementById('ledger-date-end')?.value   || '');
         if (hasLedgerDate) syncLedgerRangeToDashboard();
     }
+
+    // ===== 来料 / 入库检验记录：进入页面即按最新数据与筛选重渲染 =====
+    if (page === 'incoming-qc') renderQcTable('incoming-qc');
+    if (page === 'stock-qc') renderQcTable('stock-qc');
 
     // ===== 预警中心专属：进入时先执行一次静默巡检（如超过阈值）+ 一致性校验，保证所见即最新 =====
     if (page === 'alerts') {
@@ -9037,6 +9233,256 @@ function initDemoData() {
 }
 
 /* ============ 全局刷新 ============ */
+/* ===================== 来料 / 入库检验记录模块 ===================== */
+const QC_SUPPLIERS = ['理实','均胜','乐威','万金','瑞博','奥峰'];
+const QC_DEF = {
+  'incoming-qc': { storage: STORAGE_KEYS.INCOMING_QC, label: '来料检验', tbody: 'incoming-qc-tbody', dStart: 'incoming-date-start', dEnd: 'incoming-date-end', supplier: 'incoming-supplier' },
+  'stock-qc':    { storage: STORAGE_KEYS.STOCK_QC,    label: '入库检验', tbody: 'stock-qc-tbody',    dStart: 'stock-date-start',    dEnd: 'stock-date-end',    supplier: 'stock-supplier' }
+};
+function _qcEsc(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function _qcToday() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function _qcNormDate(s) {
+  s = String(s == null ? '' : s).trim().replace(/[\/.]/g,'-');
+  const m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (m) return m[1] + '-' + m[2].padStart(2,'0') + '-' + m[3].padStart(2,'0');
+  return s;
+}
+function _qcGet(type) { return loadData(QC_DEF[type].storage, []) || []; }
+function getFilteredQc(type) {
+  const c = QC_DEF[type];
+  let arr = _qcGet(type).slice();
+  const ds = (document.getElementById(c.dStart) || {}).value || '';
+  const de = (document.getElementById(c.dEnd) || {}).value || '';
+  const sp = (document.getElementById(c.supplier) || {}).value || '';
+  if (sp) arr = arr.filter(r => r.supplier === sp);
+  if (ds) arr = arr.filter(r => (r.inspectDate || '') >= ds);
+  if (de) arr = arr.filter(r => (r.inspectDate || '') <= de);
+  arr.sort((a,b) => (a.inspectDate || '').localeCompare(b.inspectDate || ''));
+  return arr;
+}
+function renderQcTable(type) {
+  const c = QC_DEF[type];
+  const tbody = document.getElementById(c.tbody);
+  if (!tbody) return;
+  const arr = getFilteredQc(type);
+  const canEdit = canEditRole();
+  if (!arr.length) {
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--text-tertiary);padding:28px">暂无检验记录，请点右上角「➕ 新增检验记录」或「📂 导入」</td></tr>';
+    return;
+  }
+  let html = '';
+  arr.forEach((r,i) => {
+    const ops = canEdit
+      ? `<button class="btn btn-outline btn-sm" onclick="openQcForm('${type}','${r.id}')">编辑</button> <button class="btn btn-outline btn-sm" style="color:var(--danger)" onclick="deleteQcRecord('${type}','${r.id}')">删除</button>`
+      : '<span style="color:var(--text-tertiary)">—</span>';
+    html += `<tr>
+      <td>${i+1}</td>
+      <td>${_qcEsc(r.inspectDate)}</td>
+      <td>${_qcEsc(r.batchNo)}</td>
+      <td style="text-align:left">${_qcEsc(r.productName)}</td>
+      <td>${_qcEsc(r.partNo)}</td>
+      <td>${_qcEsc(r.defectType)}</td>
+      <td>${_qcEsc(r.qty)}</td>
+      <td>${_qcEsc(r.destination)}</td>
+      <td>${_qcEsc(r.inspector)}</td>
+      <td>${ops}</td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+}
+function clearQcFilter(type) {
+  const c = QC_DEF[type];
+  document.getElementById(c.dStart).value = '';
+  document.getElementById(c.dEnd).value = '';
+  document.getElementById(c.supplier).value = '';
+  renderQcTable(type);
+}
+let _qcType = 'incoming-qc', _qcEditId = null;
+function _qcSetField(id, val) { const el = document.getElementById(id); if (el) el.value = (val === null || val === undefined) ? '' : val; }
+function openQcForm(type, id) {
+  if (!canEditRole()) { showToast('当前角色为只读，无法新增/编辑检验记录', 'error'); return; }
+  _qcType = type; _qcEditId = id || null;
+  const c = QC_DEF[type];
+  _qcSetField('qc-form-supplier',''); _qcSetField('qc-form-date',''); _qcSetField('qc-form-batch','');
+  _qcSetField('qc-form-product',''); _qcSetField('qc-form-part',''); _qcSetField('qc-form-defect','');
+  _qcSetField('qc-form-qty',''); _qcSetField('qc-form-destination',''); _qcSetField('qc-form-inspector','');
+  const title = document.getElementById('qc-form-title');
+  if (id) {
+    const r = _qcGet(type).find(x => x.id === id);
+    if (r) {
+      title.textContent = `✏️ 编辑${c.label}记录`;
+      _qcSetField('qc-form-supplier', r.supplier || '');
+      _qcSetField('qc-form-date', r.inspectDate || '');
+      _qcSetField('qc-form-batch', r.batchNo || '');
+      _qcSetField('qc-form-product', r.productName || '');
+      _qcSetField('qc-form-part', r.partNo || '');
+      _qcSetField('qc-form-defect', r.defectType || '');
+      _qcSetField('qc-form-qty', r.qty === undefined || r.qty === null ? '' : r.qty);
+      _qcSetField('qc-form-destination', r.destination || '');
+      _qcSetField('qc-form-inspector', r.inspector || '');
+    }
+  } else {
+    title.textContent = `➕ 新增${c.label}记录`;
+    _qcSetField('qc-form-date', _qcToday());
+    try { const u = getCurrentUser(); if (u) _qcSetField('qc-form-inspector', u.name || ''); } catch (e) {}
+  }
+  showModal('modal-qc-form');
+}
+function submitQcForm() {
+  const supplier = document.getElementById('qc-form-supplier').value;
+  const date = document.getElementById('qc-form-date').value;
+  if (!supplier) { showToast('请选择供应商', 'error'); return; }
+  if (!date) { showToast('请选择检验日期', 'error'); return; }
+  const rec = {
+    id: _qcEditId || ('QC' + Date.now() + Math.floor(Math.random()*1000)),
+    supplier: supplier,
+    inspectDate: date,
+    batchNo: document.getElementById('qc-form-batch').value.trim(),
+    productName: document.getElementById('qc-form-product').value.trim(),
+    partNo: document.getElementById('qc-form-part').value.trim(),
+    defectType: document.getElementById('qc-form-defect').value.trim(),
+    qty: parseInt(document.getElementById('qc-form-qty').value, 10) || 0,
+    destination: document.getElementById('qc-form-destination').value,
+    inspector: document.getElementById('qc-form-inspector').value.trim()
+  };
+  const arr = _qcGet(_qcType);
+  if (_qcEditId) {
+    const idx = arr.findIndex(x => x.id === _qcEditId);
+    if (idx > -1) arr[idx] = rec;
+  } else arr.push(rec);
+  saveData(QC_DEF[_qcType].storage, arr);
+  try { bumpLedgerModified(); } catch (e) {}
+  addAuditLog(_qcEditId ? 'edit' : 'create', _qcEditId ? '编辑检验记录' : '新增检验记录', `${QC_DEF[_qcType].label}：${rec.productName || ''} 批次${rec.batchNo || ''} 数量${rec.qty} 供应商${rec.supplier}`);
+  closeModal('modal-qc-form');
+  renderQcTable(_qcType);
+  showToast(`${_qcEditId ? '编辑' : '新增'}检验记录已保存，请点侧边栏「💾」同步云端`, 'success');
+}
+function deleteQcRecord(type, id) {
+  if (!canEditRole()) { showToast('只读角色无法删除', 'error'); return; }
+  const r = _qcGet(type).find(x => x.id === id);
+  const info = r ? `${r.inspectDate || ''} ${r.productName || ''} 批次${r.batchNo || ''}` : id;
+  if (!confirm(`确定删除该检验记录吗？\n${info}`)) return;
+  const arr = _qcGet(type).filter(x => x.id !== id);
+  saveData(QC_DEF[type].storage, arr);
+  try { bumpLedgerModified(); } catch (e) {}
+  addAuditLog('delete', '删除检验记录', `${QC_DEF[type].label}：${info}`);
+  renderQcTable(type);
+  showToast('检验记录已删除', 'success');
+}
+function exportQcExcel(type) {
+  const arr = getFilteredQc(type);
+  const aoa = [['序号','检验日期','批次号','产品名称','零件号','不良类型','数量','去向','检验员','供应商']];
+  arr.forEach((r,i) => aoa.push([i+1, r.inspectDate||'', r.batchNo||'', r.productName||'', r.partNo||'', r.defectType||'', r.qty||0, r.destination||'', r.inspector||'', r.supplier||'']));
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = [{wch:6},{wch:12},{wch:16},{wch:24},{wch:16},{wch:14},{wch:8},{wch:12},{wch:10},{wch:10}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '检验记录');
+  const fn = `${QC_DEF[type].label}记录_${_qcToday()}.xlsx`;
+  XLSX.writeFile(wb, fn);
+  addAuditLog('export', '导出检验记录', `${QC_DEF[type].label}：导出${arr.length}条，文件${fn}`);
+  showToast(`已导出 ${arr.length} 条${QC_DEF[type].label}记录`, 'success');
+}
+function importQcExcel(type) {
+  if (!canEditRole()) { showToast('只读角色无法导入', 'error'); return; }
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.xlsx,.xls,.csv';
+  input.onchange = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      try {
+        const wb = XLSX.read(new Uint8Array(ev.target.result), { type: 'array' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', raw: false });
+        const recs = _parseQcRows(type, rows);
+        if (!recs.length) { showToast('未从文件解析到有效记录，请确认表头或列顺序', 'error'); return; }
+        const arr = _qcGet(type);
+        let added = 0;
+        recs.forEach(rec => {
+          const ex = arr.find(x => (x.batchNo||'') === rec.batchNo && (x.inspectDate||'') === rec.inspectDate && (x.partNo||'') === rec.partNo);
+          if (ex) Object.assign(ex, rec, { id: ex.id });
+          else { arr.push(rec); added++; }
+        });
+        saveData(QC_DEF[type].storage, arr);
+        try { bumpLedgerModified(); } catch (e) {}
+        addAuditLog('import', '导入检验记录', `${QC_DEF[type].label}：从${file.name}解析${recs.length}条，新增${added}条`);
+        renderQcTable(type);
+        showToast(`导入完成：解析${recs.length}条，新增${added}条。请点侧边栏「💾」同步云端`, 'success');
+      } catch (err) {
+        showToast('导入失败：文件解析错误（' + err.message + '）', 'error');
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
+  input.click();
+}
+function _parseQcRows(type, rows) {
+  if (!rows || !rows.length) return [];
+  const MAP = {
+    '检验日期': ['检验日期','日期'],
+    '批次号': ['批次号','批次','批号'],
+    '产品名称': ['产品名称','产品','品名'],
+    '零件号': ['零件号','零件编号','图号','零件号/图号'],
+    '不良类型': ['不良类型','缺陷','不良现象','不良/缺陷'],
+    '数量': ['数量','不良数量'],
+    '去向': ['去向','处理方式','处置'],
+    '检验员': ['检验员','检验人员','质检员'],
+    '供应商': ['供应商','厂商','供方']
+  };
+  const head = (rows[0] || []).map(x => String(x).trim());
+  const colMap = {};
+  let foundHeader = false;
+  Object.keys(MAP).forEach(field => {
+    for (let c = 0; c < head.length; c++) {
+      if (MAP[field].some(k => head[c] === k || head[c].indexOf(k) > -1)) { colMap[field] = c; foundHeader = true; break; }
+    }
+  });
+  let startRow = 0;
+  if (foundHeader) startRow = 1;
+  else {
+    colMap['检验日期']=0; colMap['批次号']=1; colMap['产品名称']=2; colMap['零件号']=3;
+    colMap['不良类型']=4; colMap['数量']=5; colMap['去向']=6; colMap['检验员']=7; colMap['供应商']=8;
+    startRow = 0;
+  }
+  let defaultSupplier = '';
+  try { defaultSupplier = (document.getElementById(QC_DEF[type].supplier) || {}).value || ''; } catch (e) {}
+  const out = [];
+  for (let r = startRow; r < rows.length; r++) {
+    const row = rows[r];
+    if (!row) continue;
+    const g = field => { const c = colMap[field]; return (c === undefined || row[c] === undefined || row[c] === null) ? '' : String(row[c]).trim(); };
+    const date0 = g('检验日期'), product = g('产品名称'), batch = g('批次号');
+    if (!date0 && !product && !batch) continue;
+    let dateStr = _qcNormDate(date0);
+    if (/^\d+(\.\d+)?$/.test(date0)) {
+      const n = parseFloat(date0);
+      if (n > 20000 && n < 80000 && XLSX.SSF) {
+        try { const pc = XLSX.SSF.parse_date_code(n); if (pc) dateStr = pc.y + '-' + String(pc.m).padStart(2,'0') + '-' + String(pc.d).padStart(2,'0'); } catch (e) {}
+      }
+    }
+    out.push({
+      id: 'QC' + Date.now() + '_' + r + '_' + Math.floor(Math.random()*10000),
+      supplier: g('供应商') || defaultSupplier || '',
+      inspectDate: dateStr,
+      batchNo: batch,
+      productName: product,
+      partNo: g('零件号'),
+      defectType: g('不良类型'),
+      qty: parseInt(g('数量'), 10) || 0,
+      destination: g('去向'),
+      inspector: g('检验员')
+    });
+  }
+  return out;
+}
 function refreshAll() {
     updateBadges();
     updateAIAgentBar();
@@ -9048,6 +9494,8 @@ function refreshAll() {
     else if (currentPage === 'alerts') renderAlerts();
     else if (currentPage === 'audit') renderAuditLog();
     else if (currentPage === 'users') renderUserTable();
+    else if (currentPage === 'incoming-qc') renderQcTable('incoming-qc');
+    else if (currentPage === 'stock-qc') renderQcTable('stock-qc');
 }
 
 /* ============ 进入系统 ============ */
@@ -9188,7 +9636,9 @@ const CLOUD_SYNC_FIELDS = [
     { field: 'auditLog',   key: STORAGE_KEYS.AUDIT_LOG,   def: [] },
     { field: 'settings',   key: STORAGE_KEYS.SETTINGS,    def: {} },
     { field: 'lastPatrol', key: STORAGE_KEYS.LAST_PATROL, def: '' },
-    { field: 'users',      key: STORAGE_KEYS.USERS,       def: [] }
+    { field: 'users',      key: STORAGE_KEYS.USERS,       def: [] },
+    { field: 'incomingQc', key: STORAGE_KEYS.INCOMING_QC, def: [] },
+    { field: 'stockQc',    key: STORAGE_KEYS.STOCK_QC,    def: [] }
 ];
 function _isCloudSyncStorageKey(key) {
     return CLOUD_SYNC_FIELDS.some(function (f) { return f.key === key; });
