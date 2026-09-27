@@ -9806,7 +9806,7 @@ function preloadCloudUsersForLogin() {
 }
 // 拉取云端最新数据
 function pullCloudDB() {
-    return fetch(CLOUD_CONFIG.apiBase + '/api/db', { method: 'GET' })
+    return fetch(CLOUD_CONFIG.apiBase + '/api/db?_t=' + Date.now(), { method: 'GET', cache: 'no-store' })
         .then(function (res) { return res.json(); })
         .then(function (data) {
             if (data && data.error) throw new Error(data.message || data.error);
