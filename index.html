@@ -9334,6 +9334,13 @@ function openQcForm(type, id) {
   }
   showModal('modal-qc-form');
 }
+// 检验记录写入本机后立即同步云端（点保存即上云并备份），避免刷新时云端旧数据覆盖尚未上云的记录
+function _qcAutoSync() {
+  try {
+    if (cloud && cloud.ready && isCloudConfigured()) { manualSave(); }
+    else { showToast('记录已保存到本机；当前云端未连接，联网后请点侧边栏「💾」', 'warning'); }
+  } catch (e) {}
+}
 function submitQcForm() {
   if (!canEditRole()) { showToast('当前角色为只读，无法保存检验记录', 'error'); return; }
   const supplier = document.getElementById('qc-form-supplier').value;
@@ -9362,7 +9369,7 @@ function submitQcForm() {
   addAuditLog(_qcEditId ? 'edit' : 'create', _qcEditId ? '编辑检验记录' : '新增检验记录', `${QC_DEF[_qcType].label}：${rec.productName || ''} 批次${rec.batchNo || ''} 数量${rec.qty} 供应商${rec.supplier}`);
   closeModal('modal-qc-form');
   renderQcTable(_qcType);
-  showToast(`${_qcEditId ? '编辑' : '新增'}检验记录已保存，请点侧边栏「💾」同步云端`, 'success');
+  _qcAutoSync();
 }
 function deleteQcRecord(type, id) {
   if (!canEditRole()) { showToast('只读角色无法删除', 'error'); return; }
@@ -9374,7 +9381,7 @@ function deleteQcRecord(type, id) {
   try { bumpLedgerModified(); } catch (e) {}
   addAuditLog('delete', '删除检验记录', `${QC_DEF[type].label}：${info}`);
   renderQcTable(type);
-  showToast('检验记录已删除', 'success');
+  _qcAutoSync();
 }
 function exportQcExcel(type) {
   const arr = getFilteredQc(type);
@@ -9416,7 +9423,7 @@ function importQcExcel(type) {
         try { bumpLedgerModified(); } catch (e) {}
         addAuditLog('import', '导入检验记录', `${QC_DEF[type].label}：从${file.name}解析${recs.length}条，新增${added}条`);
         renderQcTable(type);
-        showToast(`导入完成：解析${recs.length}条，新增${added}条。请点侧边栏「💾」同步云端`, 'success');
+        _qcAutoSync();
       } catch (err) {
         showToast('导入失败：文件解析错误（' + err.message + '）', 'error');
       }
