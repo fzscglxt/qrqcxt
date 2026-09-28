@@ -2307,6 +2307,9 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
             <div class="nav-item" data-page="stock-qc">
                 <span class="icon">📦</span><span>入库检验记录</span>
             </div>
+            <div class="nav-item" data-page="products">
+                <span class="icon">🏷️</span><span>产品信息</span>
+            </div>
             <div class="nav-item" data-page="reports">
                 <span class="icon">📈</span><span>报表中心</span>
             </div>
@@ -2917,16 +2920,18 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                         <table>
                             <thead>
                                 <tr>
-                                    <th>序号</th>
-                                    <th>检验日期</th>
-                                    <th>批次号</th>
+                                    <th style="text-align:center">序号</th>
+                                    <th style="text-align:center">检验日期</th>
+                                    <th style="text-align:center">供应商</th>
+                                    <th style="text-align:center">批次号</th>
                                     <th style="text-align:left">产品名称</th>
-                                    <th>零件号</th>
-                                    <th>不良类型</th>
-                                    <th>数量</th>
-                                    <th>去向</th>
-                                    <th>检验员</th>
-                                    <th>操作</th>
+                                    <th style="text-align:center">零件号</th>
+                                    <th style="text-align:center">检验数量</th>
+                                    <th style="text-align:center">不良类型</th>
+                                    <th style="text-align:center">数量</th>
+                                    <th style="text-align:center">去向</th>
+                                    <th style="text-align:center">检验员</th>
+                                    <th style="text-align:center">操作</th>
                                 </tr>
                             </thead>
                             <tbody id="incoming-qc-tbody"></tbody>
@@ -2962,32 +2967,75 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                             <button type="button" class="btn btn-outline btn-sm" onclick="clearQcFilter('stock-qc')" title="清除筛选">✕ 清除</button>
                         </div>
                         <select id="stock-supplier" onchange="renderQcTable('stock-qc')">
-                            <option value="">全部供应商</option>
-                            <option value="理实">理实</option>
-                            <option value="均胜">均胜</option>
-                            <option value="乐威">乐威</option>
-                            <option value="万金">万金</option>
-                            <option value="瑞博">瑞博</option>
-                            <option value="奥峰">奥峰</option>
+                            <option value="">全部车间</option>
+                            <option value="装配车间">装配车间</option>
+                            <option value="注塑车间">注塑车间</option>
+                            <option value="硅胶车间">硅胶车间</option>
                         </select>
                     </div>
                     <div class="table-wrap">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>序号</th>
-                                    <th>检验日期</th>
-                                    <th>批次号</th>
+                                    <th style="text-align:center">序号</th>
+                                    <th style="text-align:center">检验日期</th>
+                                    <th style="text-align:center">车间</th>
+                                    <th style="text-align:center">批次号</th>
                                     <th style="text-align:left">产品名称</th>
-                                    <th>零件号</th>
-                                    <th>不良类型</th>
-                                    <th>数量</th>
-                                    <th>去向</th>
-                                    <th>检验员</th>
-                                    <th>操作</th>
+                                    <th style="text-align:center">零件号</th>
+                                    <th style="text-align:center">检验数量</th>
+                                    <th style="text-align:center">不良类型</th>
+                                    <th style="text-align:center">数量</th>
+                                    <th style="text-align:center">去向</th>
+                                    <th style="text-align:center">检验员</th>
+                                    <th style="text-align:center">操作</th>
                                 </tr>
                             </thead>
                             <tbody id="stock-qc-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ 产品信息 Page ============ -->
+        <div class="page" id="page-products">
+            <div class="topbar">
+                <div>
+                    <div class="breadcrumb">
+                        <span>首页</span><span class="sep">/</span><span class="current">产品信息</span>
+                    </div>
+                    <h1>🏷️ 产品信息</h1>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn btn-outline" onclick="importProducts()">📂 导入物料清单</button>
+                    <button class="btn btn-primary" id="btn-product-new" onclick="openProductForm()">➕ 新增产品</button>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="panel-body">
+                    <div class="filter-bar">
+                        <div class="ledger-date-wrap" title="按 QAD 号或产品名称搜索">
+                            <label class="date-label">🔍 搜索：</label>
+                            <input type="text" id="product-search" placeholder="输入 QAD 号或产品名称" oninput="renderProducts()" style="min-width:260px">
+                            <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('product-search').value='';renderProducts()">✕ 清除</button>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="text-align:center">序号</th>
+                                    <th style="text-align:center">QAD号</th>
+                                    <th style="text-align:left">产品名称</th>
+                                    <th style="text-align:center">物料类别</th>
+                                    <th style="text-align:center">子类名称</th>
+                                    <th style="text-align:center">计量单位</th>
+                                    <th style="text-align:center">往来单位</th>
+                                    <th style="text-align:center">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="products-tbody"></tbody>
                         </table>
                     </div>
                 </div>
@@ -3313,16 +3361,8 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="modal-body">
             <div style="display:grid;grid-template-columns:1fr 1fr;column-gap:18px;">
                 <div class="form-group">
-                    <label>供应商<span class="required">*</span></label>
-                    <select id="qc-form-supplier">
-                        <option value="">-- 请选择供应商 --</option>
-                        <option>理实</option>
-                        <option>均胜</option>
-                        <option>乐威</option>
-                        <option>万金</option>
-                        <option>瑞博</option>
-                        <option>奥峰</option>
-                    </select>
+                    <label id="qc-form-party-label">供应商<span class="required">*</span></label>
+                    <select id="qc-form-supplier"></select>
                 </div>
                 <div class="form-group">
                     <label>检验日期<span class="required">*</span></label>
@@ -3333,19 +3373,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     <input type="text" id="qc-form-batch" placeholder="请输入批次号">
                 </div>
                 <div class="form-group">
-                    <label>产品名称</label>
-                    <input type="text" id="qc-form-product" placeholder="请输入产品名称">
+                    <label>QAD号（零件号）</label>
+                    <input type="text" id="qc-form-part" placeholder="输入QAD号自动带出产品名称" oninput="_qcAutoFillProduct()">
                 </div>
                 <div class="form-group">
-                    <label>零件号</label>
-                    <input type="text" id="qc-form-part" placeholder="请输入零件号/图号">
+                    <label>产品名称</label>
+                    <input type="text" id="qc-form-product" placeholder="输入QAD号后自动填充，也可手改">
+                </div>
+                <div class="form-group">
+                    <label>检验数量</label>
+                    <input type="number" id="qc-form-inspect-qty" min="0" step="1" placeholder="本次送检/总检数量">
                 </div>
                 <div class="form-group">
                     <label>不良类型</label>
                     <input type="text" id="qc-form-defect" placeholder="如：缺料/飞边/油污，无不良填“无”">
                 </div>
                 <div class="form-group">
-                    <label>数量</label>
+                    <label>不良数量</label>
                     <input type="number" id="qc-form-qty" min="0" step="1" placeholder="0">
                 </div>
                 <div class="form-group">
@@ -3368,6 +3412,44 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="modal-footer">
             <button class="btn btn-outline" onclick="closeModal('modal-qc-form')">取消</button>
             <button class="btn btn-primary" onclick="submitQcForm()">💾 保存记录</button>
+        </div>
+    </div>
+</div>
+<div class="modal-overlay" id="modal-product-form">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="modal-title" id="product-form-title">➕ 新增产品</span>
+            <button class="modal-close" onclick="closeModal('modal-product-form')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>QAD号（方卓零件号）<span class="required">*</span></label>
+                <input type="text" id="product-form-qad" placeholder="如 303014">
+            </div>
+            <div class="form-group">
+                <label>产品名称<span class="required">*</span></label>
+                <input type="text" id="product-form-name" placeholder="请输入产品名称">
+            </div>
+            <div class="form-group">
+                <label>物料类别</label>
+                <input type="text" id="product-form-category">
+            </div>
+            <div class="form-group">
+                <label>子类名称</label>
+                <input type="text" id="product-form-subcategory">
+            </div>
+            <div class="form-group">
+                <label>计量单位</label>
+                <input type="text" id="product-form-unit">
+            </div>
+            <div class="form-group">
+                <label>往来单位</label>
+                <input type="text" id="product-form-partner">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('modal-product-form')">取消</button>
+            <button class="btn btn-primary" onclick="submitProduct()">💾 保存</button>
         </div>
     </div>
 </div>
@@ -3735,7 +3817,9 @@ const STORAGE_KEYS = {
     USERS: 'qrqc_users',
     // 来料检验记录 & 入库检验记录（质量检验台账）
     INCOMING_QC: 'qrqc_incoming_qc',
-    STOCK_QC: 'qrqc_stock_qc'
+    STOCK_QC: 'qrqc_stock_qc',
+    // 产品信息（物料清单导入：QAD号/方卓零件号 → 产品名称）
+    PRODUCTS: 'qrqc_products'
 };
 
 /* ---------- 缓存时效工具（LAST_MODIFIED_TS）+ 台账最后修改记录（显式 SETTINGS 字段，满足审计需求）---------- */
@@ -3981,7 +4065,8 @@ function resetAnalyticalData() {
             STORAGE_KEYS.ISSUES, STORAGE_KEYS.RECYCLE_BIN, STORAGE_KEYS.ALERTS,
             STORAGE_KEYS.AUDIT_LOG, STORAGE_KEYS.USER, STORAGE_KEYS.SETTINGS,
             STORAGE_KEYS.LAST_PATROL, STORAGE_KEYS.LAST_MODIFIED_TS, STORAGE_KEYS.USERS,
-            STORAGE_KEYS.INCOMING_QC, STORAGE_KEYS.STOCK_QC
+            STORAGE_KEYS.INCOMING_QC, STORAGE_KEYS.STOCK_QC,
+            STORAGE_KEYS.PRODUCTS
         ]);
         localStorage.removeItem(STORAGE_KEYS.DASHBOARD_CACHE); // 分析缓存强制清零
         const toRemove = [];
@@ -4620,6 +4705,7 @@ function navigateTo(page, issueId = null) {
     // ===== 来料 / 入库检验记录：进入页面即按最新数据与筛选重渲染 =====
     if (page === 'incoming-qc') renderQcTable('incoming-qc');
     if (page === 'stock-qc') renderQcTable('stock-qc');
+    if (page === 'products') renderProducts();
 
     // ===== 预警中心专属：进入时先执行一次静默巡检（如超过阈值）+ 一致性校验，保证所见即最新 =====
     if (page === 'alerts') {
@@ -9237,8 +9323,18 @@ function initDemoData() {
 /* ===================== 来料 / 入库检验记录模块 ===================== */
 const QC_SUPPLIERS = ['理实','均胜','乐威','万金','瑞博','奥峰'];
 const QC_DEF = {
-  'incoming-qc': { storage: STORAGE_KEYS.INCOMING_QC, label: '来料检验', tbody: 'incoming-qc-tbody', dStart: 'incoming-date-start', dEnd: 'incoming-date-end', supplier: 'incoming-supplier' },
-  'stock-qc':    { storage: STORAGE_KEYS.STOCK_QC,    label: '入库检验', tbody: 'stock-qc-tbody',    dStart: 'stock-date-start',    dEnd: 'stock-date-end',    supplier: 'stock-supplier' }
+  'incoming-qc': {
+    storage: STORAGE_KEYS.INCOMING_QC, label: '来料检验', tbody: 'incoming-qc-tbody',
+    dStart: 'incoming-date-start', dEnd: 'incoming-date-end', partyControl: 'incoming-supplier',
+    partyField: 'supplier', partyLabel: '供应商', partyAll: '全部供应商',
+    partyOptions: ['理实','均胜','乐威','万金','瑞博','奥峰']
+  },
+  'stock-qc': {
+    storage: STORAGE_KEYS.STOCK_QC, label: '入库检验', tbody: 'stock-qc-tbody',
+    dStart: 'stock-date-start', dEnd: 'stock-date-end', partyControl: 'stock-supplier',
+    partyField: 'workshop', partyLabel: '车间', partyAll: '全部车间',
+    partyOptions: ['装配车间','注塑车间','硅胶车间']
+  }
 };
 function _qcEsc(s) {
   if (s === null || s === undefined) return '';
@@ -9260,8 +9356,8 @@ function getFilteredQc(type) {
   let arr = _qcGet(type).slice();
   const ds = (document.getElementById(c.dStart) || {}).value || '';
   const de = (document.getElementById(c.dEnd) || {}).value || '';
-  const sp = (document.getElementById(c.supplier) || {}).value || '';
-  if (sp) arr = arr.filter(r => r.supplier === sp);
+  const pv = (document.getElementById(c.partyControl) || {}).value || '';
+  if (pv) arr = arr.filter(r => (r[c.partyField] || '') === pv);
   if (ds) arr = arr.filter(r => (r.inspectDate || '') >= ds);
   if (de) arr = arr.filter(r => (r.inspectDate || '') <= de);
   arr.sort((a,b) => (a.inspectDate || '').localeCompare(b.inspectDate || ''));
@@ -9274,7 +9370,7 @@ function renderQcTable(type) {
   const arr = getFilteredQc(type);
   const canEdit = canEditRole();
   if (!arr.length) {
-    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--text-tertiary);padding:28px">暂无检验记录，请点右上角「➕ 新增检验记录」或「📂 导入」</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;color:var(--text-tertiary);padding:28px">暂无检验记录，请点右上角「➕ 新增检验记录」或「📂 导入」</td></tr>';
     return;
   }
   let html = '';
@@ -9282,17 +9378,20 @@ function renderQcTable(type) {
     const ops = canEdit
       ? `<button class="btn btn-outline btn-sm" onclick="openQcForm('${type}','${r.id}')">编辑</button> <button class="btn btn-outline btn-sm" style="color:var(--danger)" onclick="deleteQcRecord('${type}','${r.id}')">删除</button>`
       : '<span style="color:var(--text-tertiary)">—</span>';
+    const party = r[c.partyField] || '';
     html += `<tr>
-      <td>${i+1}</td>
-      <td>${_qcEsc(r.inspectDate)}</td>
-      <td>${_qcEsc(r.batchNo)}</td>
+      <td style="text-align:center">${i+1}</td>
+      <td style="text-align:center">${_qcEsc(r.inspectDate)}</td>
+      <td style="text-align:center">${_qcEsc(party)}</td>
+      <td style="text-align:center">${_qcEsc(r.batchNo)}</td>
       <td style="text-align:left">${_qcEsc(r.productName)}</td>
-      <td>${_qcEsc(r.partNo)}</td>
-      <td>${_qcEsc(r.defectType)}</td>
-      <td>${_qcEsc(r.qty)}</td>
-      <td>${_qcEsc(r.destination)}</td>
-      <td>${_qcEsc(r.inspector)}</td>
-      <td>${ops}</td>
+      <td style="text-align:center">${_qcEsc(r.partNo)}</td>
+      <td style="text-align:center">${_qcEsc(r.inspectQty)}</td>
+      <td style="text-align:center">${_qcEsc(r.defectType)}</td>
+      <td style="text-align:center">${_qcEsc(r.qty)}</td>
+      <td style="text-align:center">${_qcEsc(r.destination)}</td>
+      <td style="text-align:center">${_qcEsc(r.inspector)}</td>
+      <td style="text-align:center">${ops}</td>
     </tr>`;
   });
   tbody.innerHTML = html;
@@ -9301,7 +9400,7 @@ function clearQcFilter(type) {
   const c = QC_DEF[type];
   document.getElementById(c.dStart).value = '';
   document.getElementById(c.dEnd).value = '';
-  document.getElementById(c.supplier).value = '';
+  document.getElementById(c.partyControl).value = '';
   renderQcTable(type);
 }
 let _qcType = 'incoming-qc', _qcEditId = null;
@@ -9310,20 +9409,27 @@ function openQcForm(type, id) {
   if (!canEditRole()) { showToast('当前角色为只读，无法新增/编辑检验记录', 'error'); return; }
   _qcType = type; _qcEditId = id || null;
   const c = QC_DEF[type];
+  // 动态 party（供应商/车间）下拉与标签
+  const partySel = document.getElementById('qc-form-supplier');
+  const partyLabel = document.getElementById('qc-form-party-label');
+  partySel.innerHTML = '<option value="">-- 请选择' + c.partyLabel + ' --</option>' +
+    c.partyOptions.map(o => '<option value="' + _qcEsc(o) + '">' + _qcEsc(o) + '</option>').join('');
+  partyLabel.innerHTML = c.partyLabel + '<span class="required">*</span>';
   _qcSetField('qc-form-supplier',''); _qcSetField('qc-form-date',''); _qcSetField('qc-form-batch','');
   _qcSetField('qc-form-product',''); _qcSetField('qc-form-part',''); _qcSetField('qc-form-defect','');
-  _qcSetField('qc-form-qty',''); _qcSetField('qc-form-destination',''); _qcSetField('qc-form-inspector','');
+  _qcSetField('qc-form-qty',''); _qcSetField('qc-form-inspect-qty',''); _qcSetField('qc-form-destination',''); _qcSetField('qc-form-inspector','');
   const title = document.getElementById('qc-form-title');
   if (id) {
     const r = _qcGet(type).find(x => x.id === id);
     if (r) {
       title.textContent = `✏️ 编辑${c.label}记录`;
-      _qcSetField('qc-form-supplier', r.supplier || '');
+      _qcSetField('qc-form-supplier', r[c.partyField] || r.supplier || '');
       _qcSetField('qc-form-date', r.inspectDate || '');
       _qcSetField('qc-form-batch', r.batchNo || '');
       _qcSetField('qc-form-product', r.productName || '');
       _qcSetField('qc-form-part', r.partNo || '');
       _qcSetField('qc-form-defect', r.defectType || '');
+      _qcSetField('qc-form-inspect-qty', r.inspectQty === undefined || r.inspectQty === null ? '' : r.inspectQty);
       _qcSetField('qc-form-qty', r.qty === undefined || r.qty === null ? '' : r.qty);
       _qcSetField('qc-form-destination', r.destination || '');
       _qcSetField('qc-form-inspector', r.inspector || '');
@@ -9344,30 +9450,38 @@ function _qcAutoSync() {
 }
 function submitQcForm() {
   if (!canEditRole()) { showToast('当前角色为只读，无法保存检验记录', 'error'); return; }
-  const supplier = document.getElementById('qc-form-supplier').value;
+  const c = QC_DEF[_qcType];
+  const party = document.getElementById('qc-form-supplier').value;
   const date = document.getElementById('qc-form-date').value;
-  if (!supplier) { showToast('请选择供应商', 'error'); return; }
+  if (!party) { showToast('请选择' + c.partyLabel, 'error'); return; }
   if (!date) { showToast('请选择检验日期', 'error'); return; }
+  const inspectQtyRaw = document.getElementById('qc-form-inspect-qty').value;
   const rec = {
     id: _qcEditId || ('QC' + Date.now() + Math.floor(Math.random()*1000)),
-    supplier: supplier,
     inspectDate: date,
     batchNo: document.getElementById('qc-form-batch').value.trim(),
     productName: document.getElementById('qc-form-product').value.trim(),
     partNo: document.getElementById('qc-form-part').value.trim(),
+    inspectQty: inspectQtyRaw === '' ? '' : (parseInt(inspectQtyRaw, 10) || 0),
     defectType: document.getElementById('qc-form-defect').value.trim(),
     qty: parseInt(document.getElementById('qc-form-qty').value, 10) || 0,
     destination: document.getElementById('qc-form-destination').value,
     inspector: document.getElementById('qc-form-inspector').value.trim()
   };
+  rec[c.partyField] = party;
   const arr = _qcGet(_qcType);
   if (_qcEditId) {
     const idx = arr.findIndex(x => x.id === _qcEditId);
-    if (idx > -1) arr[idx] = rec;
+    if (idx > -1) {
+      const merged = Object.assign({}, arr[idx], rec);
+      if (c.partyField === 'workshop') delete merged.supplier;
+      if (c.partyField === 'supplier') delete merged.workshop;
+      arr[idx] = merged;
+    }
   } else arr.push(rec);
   saveData(QC_DEF[_qcType].storage, arr);
   try { bumpLedgerModified(); } catch (e) {}
-  addAuditLog(_qcEditId ? 'edit' : 'create', _qcEditId ? '编辑检验记录' : '新增检验记录', `${QC_DEF[_qcType].label}：${rec.productName || ''} 批次${rec.batchNo || ''} 数量${rec.qty} 供应商${rec.supplier}`);
+  addAuditLog(_qcEditId ? 'edit' : 'create', _qcEditId ? '编辑检验记录' : '新增检验记录', `${c.label}：${rec.productName || ''} 批次${rec.batchNo || ''} 不良${rec.qty} ${c.partyLabel}${party}`);
   closeModal('modal-qc-form');
   renderQcTable(_qcType);
   _qcAutoSync();
@@ -9385,17 +9499,22 @@ function deleteQcRecord(type, id) {
   _qcAutoSync();
 }
 function exportQcExcel(type) {
+  const c = QC_DEF[type];
   const arr = getFilteredQc(type);
-  const aoa = [['序号','检验日期','批次号','产品名称','零件号','不良类型','数量','去向','检验员','供应商']];
-  arr.forEach((r,i) => aoa.push([i+1, r.inspectDate||'', r.batchNo||'', r.productName||'', r.partNo||'', r.defectType||'', r.qty||0, r.destination||'', r.inspector||'', r.supplier||'']));
+  const head = ['序号','检验日期',c.partyLabel,'批次号','产品名称','零件号','检验数量','不良类型','数量','去向','检验员'];
+  const aoa = [head];
+  arr.forEach((r,i) => aoa.push([
+    i+1, r.inspectDate||'', r[c.partyField]||'', r.batchNo||'', r.productName||'', r.partNo||'',
+    (r.inspectQty===''||r.inspectQty===undefined||r.inspectQty===null)?'':r.inspectQty,
+    r.defectType||'', r.qty||0, r.destination||'', r.inspector||'']));
   const ws = XLSX.utils.aoa_to_sheet(aoa);
-  ws['!cols'] = [{wch:6},{wch:12},{wch:16},{wch:24},{wch:16},{wch:14},{wch:8},{wch:12},{wch:10},{wch:10}];
+  ws['!cols'] = [{wch:6},{wch:12},{wch:10},{wch:16},{wch:26},{wch:16},{wch:10},{wch:14},{wch:8},{wch:12},{wch:10}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, '检验记录');
-  const fn = `${QC_DEF[type].label}记录_${_qcToday()}.xlsx`;
+  const fn = `${c.label}记录_${_qcToday()}.xlsx`;
   XLSX.writeFile(wb, fn);
-  addAuditLog('export', '导出检验记录', `${QC_DEF[type].label}：导出${arr.length}条，文件${fn}`);
-  showToast(`已导出 ${arr.length} 条${QC_DEF[type].label}记录`, 'success');
+  addAuditLog('export', '导出检验记录', `${c.label}：导出${arr.length}条，文件${fn}`);
+  showToast(`已导出 ${arr.length} 条${c.label}记录`, 'success');
 }
 function importQcExcel(type) {
   if (!canEditRole()) { showToast('只读角色无法导入', 'error'); return; }
@@ -9435,16 +9554,18 @@ function importQcExcel(type) {
 }
 function _parseQcRows(type, rows) {
   if (!rows || !rows.length) return [];
+  const cdef = QC_DEF[type];
   const MAP = {
     '检验日期': ['检验日期','日期'],
     '批次号': ['批次号','批次','批号'],
     '产品名称': ['产品名称','产品','品名'],
     '零件号': ['零件号','零件编号','图号','零件号/图号'],
+    '检验数量': ['检验数量','送检数量','总检数量','抽检数量'],
     '不良类型': ['不良类型','缺陷','不良现象','不良/缺陷'],
     '数量': ['数量','不良数量'],
     '去向': ['去向','处理方式','处置'],
     '检验员': ['检验员','检验人员','质检员'],
-    '供应商': ['供应商','厂商','供方']
+    'party': type === 'stock-qc' ? ['车间','生产车间'] : ['供应商','厂商','供方']
   };
   const head = (rows[0] || []).map(x => String(x).trim());
   const colMap = {};
@@ -9457,12 +9578,13 @@ function _parseQcRows(type, rows) {
   let startRow = 0;
   if (foundHeader) startRow = 1;
   else {
-    colMap['检验日期']=0; colMap['批次号']=1; colMap['产品名称']=2; colMap['零件号']=3;
-    colMap['不良类型']=4; colMap['数量']=5; colMap['去向']=6; colMap['检验员']=7; colMap['供应商']=8;
+    colMap['检验日期']=0; colMap['party']=1; colMap['批次号']=2; colMap['产品名称']=3;
+    colMap['零件号']=4; colMap['检验数量']=5; colMap['不良类型']=6; colMap['数量']=7;
+    colMap['去向']=8; colMap['检验员']=9;
     startRow = 0;
   }
-  let defaultSupplier = '';
-  try { defaultSupplier = (document.getElementById(QC_DEF[type].supplier) || {}).value || ''; } catch (e) {}
+  let defaultParty = '';
+  try { defaultParty = (document.getElementById(cdef.partyControl) || {}).value || ''; } catch (e) {}
   const out = [];
   for (let r = startRow; r < rows.length; r++) {
     const row = rows[r];
@@ -9477,20 +9599,181 @@ function _parseQcRows(type, rows) {
         try { const pc = XLSX.SSF.parse_date_code(n); if (pc) dateStr = pc.y + '-' + String(pc.m).padStart(2,'0') + '-' + String(pc.d).padStart(2,'0'); } catch (e) {}
       }
     }
-    out.push({
+    const inspectQtyRaw = g('检验数量');
+    const rec = {
       id: 'QC' + Date.now() + '_' + r + '_' + Math.floor(Math.random()*10000),
-      supplier: g('供应商') || defaultSupplier || '',
       inspectDate: dateStr,
       batchNo: batch,
       productName: product,
       partNo: g('零件号'),
+      inspectQty: inspectQtyRaw === '' ? '' : (parseInt(inspectQtyRaw, 10) || 0),
       defectType: g('不良类型'),
       qty: parseInt(g('数量'), 10) || 0,
       destination: g('去向'),
       inspector: g('检验员')
-    });
+    };
+    rec[cdef.partyField] = g('party') || defaultParty || '';
+    out.push(rec);
   }
   return out;
+}
+/* ================= 产品信息（物料清单） ================= */
+let _productEditId = null;
+function _prodGet() { return loadData(STORAGE_KEYS.PRODUCTS, []) || []; }
+function _prodSave(arr) { saveData(STORAGE_KEYS.PRODUCTS, arr); }
+function _findProductByQad(qad) {
+  qad = String(qad == null ? '' : qad).trim();
+  if (!qad) return null;
+  return _prodGet().find(p => String(p.qad||'').trim() === qad) || null;
+}
+function renderProducts() {
+  const tbody = document.getElementById('products-tbody');
+  if (!tbody) return;
+  let arr = _prodGet().slice();
+  const kw = ((document.getElementById('product-search')||{}).value||'').trim().toLowerCase();
+  if (kw) arr = arr.filter(p => (p.qad||'').toLowerCase().indexOf(kw)>-1 || (p.name||'').toLowerCase().indexOf(kw)>-1);
+  arr.sort((a,b)=>(a.qad||'').localeCompare(b.qad||''));
+  const canEdit = canEditRole();
+  if (!arr.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-tertiary);padding:28px">暂无产品信息，请点右上角「📂 导入物料清单」或「➕ 新增产品」</td></tr>';
+    return;
+  }
+  let html='';
+  arr.forEach((p,i)=>{
+    const ops = canEdit
+      ? `<button class="btn btn-outline btn-sm" onclick="openProductForm('${p.id}')">编辑</button> <button class="btn btn-outline btn-sm" style="color:var(--danger)" onclick="deleteProduct('${p.id}')">删除</button>`
+      : '<span style="color:var(--text-tertiary)">—</span>';
+    html += `<tr>
+      <td style="text-align:center">${i+1}</td>
+      <td style="text-align:center">${_qcEsc(p.qad)}</td>
+      <td style="text-align:left">${_qcEsc(p.name)}</td>
+      <td style="text-align:center">${_qcEsc(p.category)}</td>
+      <td style="text-align:center">${_qcEsc(p.subCategory)}</td>
+      <td style="text-align:center">${_qcEsc(p.unit)}</td>
+      <td style="text-align:center">${_qcEsc(p.partner)}</td>
+      <td style="text-align:center">${ops}</td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+}
+// 检验弹窗输入 QAD 号 -> 自动填充产品名称
+function _qcAutoFillProduct() {
+  const partEl = document.getElementById('qc-form-part');
+  const prodEl = document.getElementById('qc-form-product');
+  if (!partEl || !prodEl) return;
+  const p = _findProductByQad(partEl.value);
+  if (p && p.name) prodEl.value = p.name;
+}
+function openProductForm(id) {
+  if (!canEditRole()) { showToast('当前角色为只读，无法新增/编辑产品', 'error'); return; }
+  _productEditId = id || null;
+  const setF=(el,v)=>{const e=document.getElementById(el); if(e)e.value=v==null?'':v;};
+  ['product-form-qad','product-form-name','product-form-category','product-form-subcategory','product-form-unit','product-form-partner']
+    .forEach(el=>setF(el,''));
+  const title=document.getElementById('product-form-title');
+  if (id) {
+    const p=_prodGet().find(x=>x.id===id);
+    if(!p){showToast('未找到该产品','error');return;}
+    title.textContent='✏️ 编辑产品';
+    setF('product-form-qad',p.qad); setF('product-form-name',p.name); setF('product-form-category',p.category);
+    setF('product-form-subcategory',p.subCategory); setF('product-form-unit',p.unit); setF('product-form-partner',p.partner);
+  } else title.textContent='➕ 新增产品';
+  showModal('modal-product-form');
+}
+function submitProduct() {
+  if (!canEditRole()) { showToast('当前角色为只读，无法保存产品', 'error'); return; }
+  const qad=document.getElementById('product-form-qad').value.trim();
+  const name=document.getElementById('product-form-name').value.trim();
+  if(!qad){showToast('请输入QAD号（方卓零件号）','error');return;}
+  if(!name){showToast('请输入产品名称','error');return;}
+  const info={ qad:qad, name:name,
+    category:document.getElementById('product-form-category').value.trim(),
+    subCategory:document.getElementById('product-form-subcategory').value.trim(),
+    unit:document.getElementById('product-form-unit').value.trim(),
+    partner:document.getElementById('product-form-partner').value.trim() };
+  const arr=_prodGet();
+  if(_productEditId){
+    const idx=arr.findIndex(x=>x.id===_productEditId);
+    if(idx>-1) arr[idx]=Object.assign({},arr[idx],info);
+  } else {
+    const dup=arr.find(p=>String(p.qad||'').trim()===qad);
+    if(dup){showToast('该QAD号已存在，请直接编辑对应记录','error');return;}
+    info.id='P'+Date.now()+Math.floor(Math.random()*1000);
+    arr.push(info);
+  }
+  _prodSave(arr);
+  try{bumpLedgerModified();}catch(e){}
+  addAuditLog(_productEditId?'edit':'create',_productEditId?'编辑产品':'新增产品',`QAD ${qad} ${name}`);
+  closeModal('modal-product-form');
+  renderProducts();
+  _qcAutoSync();
+}
+function deleteProduct(id) {
+  if(!canEditRole()){showToast('只读角色无法删除','error');return;}
+  const p=_prodGet().find(x=>x.id===id);
+  if(!p)return;
+  if(!window.confirm('确定删除产品「'+(p.name||p.qad)+'」吗？'))return;
+  _prodSave(_prodGet().filter(x=>x.id!==id));
+  try{bumpLedgerModified();}catch(e){}
+  addAuditLog('delete','删除产品',`QAD ${p.qad} ${p.name||''}`);
+  renderProducts();
+  _qcAutoSync();
+}
+// 导入物料清单（系统BOM）：自动定位表头，按 QAD 去重合并
+function importProducts() {
+  if (!canEditRole()) { showToast('只读角色无法导入', 'error'); return; }
+  const input=document.createElement('input');
+  input.type='file'; input.accept='.xlsx,.xls,.csv';
+  input.onchange=function(e){
+    const file=e.target.files[0]; if(!file)return;
+    const reader=new FileReader();
+    reader.onload=function(ev){
+      try{
+        const wb=XLSX.read(new Uint8Array(ev.target.result),{type:'array'});
+        const ws=wb.Sheets[wb.SheetNames[0]];
+        const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false});
+        const headIdx=rows.findIndex(r=>r&&r.some(x=>String(x).indexOf('方卓零件号')>-1));
+        const start=headIdx>-1?headIdx+1:2;
+        const head=headIdx>-1?rows[headIdx].map(x=>String(x).trim()):[];
+        const colOf=keys=>{
+          for(let i=0;i<head.length;i++){if(keys.some(k=>head[i]===k||head[i].indexOf(k)>-1))return i;}
+          return -1;
+        };
+        let cQad=colOf(['方卓零件号','QAD号','QAD']);
+        let cName=colOf(['零件名称','产品名称','品名']);
+        let cCat=colOf(['物料名称','物料类别']);
+        let cSub=colOf(['子类名称','子类']);
+        let cUnit=colOf(['计量单位','单位']);
+        let cPartner=colOf(['往来单位','供应商']);
+        if(cQad<0)cQad=6; if(cName<0)cName=4; if(cCat<0)cCat=2;
+        if(cSub<0)cSub=3; if(cUnit<0)cUnit=9; if(cPartner<0)cPartner=10;
+        const arr=_prodGet();
+        let added=0,updated=0;
+        for(let r=start;r<rows.length;r++){
+          const row=rows[r]; if(!row)continue;
+          const cell=i=>(row[i]===undefined||row[i]===null)?'':String(row[i]).trim();
+          const qad=cell(cQad),name=cell(cName);
+          if(!qad&&!name)continue;
+          const info={qad:qad,name:name,category:cell(cCat),subCategory:cell(cSub),unit:cell(cUnit),partner:cell(cPartner)};
+          if(qad){
+            const ex=arr.find(p=>String(p.qad||'').trim()===qad);
+            if(ex){Object.assign(ex,info);updated++;continue;}
+          }
+          info.id='P'+Date.now()+'_'+r+'_'+Math.floor(Math.random()*10000);
+          arr.push(info); added++;
+        }
+        if(!added&&!updated){showToast('未从文件解析到有效产品，请确认是“物料清单/系统BOM”格式','error');return;}
+        _prodSave(arr);
+        try{bumpLedgerModified();}catch(e){}
+        addAuditLog('import','导入产品信息',`从${file.name}新增${added}条、更新${updated}条`);
+        renderProducts();
+        _qcAutoSync();
+        showToast(`产品信息导入完成：新增${added}条、更新${updated}条`,'success');
+      }catch(err){showToast('导入失败：'+err.message,'error');}
+    };
+    reader.readAsArrayBuffer(file);
+  };
+  input.click();
 }
 function refreshAll() {
     updateBadges();
@@ -9505,6 +9788,7 @@ function refreshAll() {
     else if (currentPage === 'users') renderUserTable();
     else if (currentPage === 'incoming-qc') renderQcTable('incoming-qc');
     else if (currentPage === 'stock-qc') renderQcTable('stock-qc');
+    else if (currentPage === 'products') renderProducts();
 }
 
 /* ============ 进入系统 ============ */
@@ -9647,7 +9931,8 @@ const CLOUD_SYNC_FIELDS = [
     { field: 'lastPatrol', key: STORAGE_KEYS.LAST_PATROL, def: '' },
     { field: 'users',      key: STORAGE_KEYS.USERS,       def: [] },
     { field: 'incomingQc', key: STORAGE_KEYS.INCOMING_QC, def: [] },
-    { field: 'stockQc',    key: STORAGE_KEYS.STOCK_QC,    def: [] }
+    { field: 'stockQc',    key: STORAGE_KEYS.STOCK_QC,    def: [] },
+    { field: 'products',   key: STORAGE_KEYS.PRODUCTS,     def: [] }
 ];
 function _isCloudSyncStorageKey(key) {
     return CLOUD_SYNC_FIELDS.some(function (f) { return f.key === key; });
