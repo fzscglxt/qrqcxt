@@ -10393,20 +10393,46 @@ function scheduleCloudSave() {
     setCloudStatus('pending', '有未保存的修改，点击「💾」上传');
 }
 // 进入系统时首次同步：云端有数据则以云端为准；无数据则把本地数据建到云端
+function _localHasData() {
+    try {
+        const iss = loadData(STORAGE_KEYS.ISSUES, []);
+        if (Array.isArray(iss) && iss.length) return true;
+        const prods = loadData(STORAGE_KEYS.PRODUCTS, []);
+        if (Array.isArray(prods) && prods.length) return true;
+        const users = loadData(STORAGE_KEYS.USERS, []);
+        if (Array.isArray(users) && users.length) return true;
+        return false;
+    } catch (e) { return true; }
+}
 function initCloudSync(onDone) {
     if (!isCloudConfigured()) { setCloudStatus('local', '单机模式（未配置云端）'); if (onDone) onDone(); return; }
-    setCloudStatus('loading', '正在同步云端数据…');
+    const hasLocal = _localHasData();
+    setCloudStatus('loading', hasLocal ? '正在连接服务器…' : '正在同步云端数据…');
     pullCloudDB().then(function (db) {
-        if (db) {
-            cloud.ready = true;
-            cloud.cloudSyncedAt = Date.now();
+        cloud.ready = true;
+        cloud.cloudSyncedAt = Date.now();
+        try { setCloudMeta({ cloudVersion: cloud.version || 0, localModifiedAt: getLastModifiedTs() || 0, cloudSyncedAt: Date.now() }); } catch (e) {}
+        if (!db) {
+            if (hasLocal) {
+                setCloudStatus('pending', '本机有数据，点「💾」上传云端');
+            } else {
+                pushCloudDB();
+                setCloudStatus('synced', '已在服务器建立数据');
+            }
+        } else if (!hasLocal) {
             try { applyRemoteDB(db); } catch (e) { console.warn('applyRemoteDB error', e); }
-            try { setCloudMeta({ cloudVersion: cloud.version, localModifiedAt: getLastModifiedTs() || 0, cloudSyncedAt: cloud.cloudSyncedAt }); } catch (e) {}
             setCloudStatus('synced', '已同步服务器最新数据');
         } else {
-            cloud.ready = true;
-            pushCloudDB();
-            setCloudStatus('synced', '已在服务器建立数据');
+            const remoteModified = Number(db._localModifiedAt) || cloud.remoteUpdatedAt || 0;
+            const localModified = getLastModifiedTs() || 0;
+            if (remoteModified > localModified) {
+                setCloudStatus('warn', '云端有新数据，点「↻」获取');
+                setTimeout(function () { showToast('🔄 云端有其他电脑更新的数据，点侧边栏 ↻ 获取最新（不会自动覆盖本机）', 'info'); }, 500);
+            } else if (cloud.pending) {
+                setCloudStatus('pending', '有未保存的修改，点「💾」上传');
+            } else {
+                setCloudStatus('synced', '本机已是最新');
+            }
         }
         if (onDone) onDone();
     }).catch(function (err) {
@@ -10418,6 +10444,7 @@ function initCloudSync(onDone) {
 // 手动从云端刷新（永远以云端为准）
 function reloadDataFromCloud() {
     if (!isCloudConfigured()) { showToast('未配置云端，当前为单机模式', 'info'); return; }
+    if (cloud.pending && !window.confirm('本机有尚未保存到云端的修改，刷新将用云端数据替换这些改动。\n\n建议先点「💾 保存」；确定仍要放弃本机改动、刷新为云端数据吗？')) return;
     setCloudStatus('loading', '正在刷新云端数据…');
     pullCloudDB().then(function (db) {
         if (!db) { setCloudStatus('synced', '云端暂无数据'); showToast('云端暂无数据', 'info'); return; }
