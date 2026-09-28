@@ -7460,6 +7460,8 @@ function requestPermanentDelete(id) {
         if (idx < 0) throw new Error('NOT_FOUND');
         list.splice(idx, 1);
         saveData(STORAGE_KEYS.RECYCLE_BIN, list);
+        // 同步清理 IndexedDB 附件 blob，避免永久删除后残留
+        try { (target.attachments || []).forEach(function (a) { if (a.attId) AttDB.del(a.attId); }); } catch (e) {}
         bumpLedgerModified(user);
         addAuditLog('issue', '永久销毁', `操作人：${user.name}(${user.role})，销毁记录ID：${target.id}，标题：${target.title}，原删除人：${target._deletedBy||'-'}，状态：${target.closed?'已闭环':'处理中'}`);
         showToast(`记录「${id}」已被永久销毁（物理删除）`, 'success');
@@ -10180,8 +10182,14 @@ function _stripIssueImages(issue) {
 }
 function _restoreAttDataUrl(remoteAtt, localAtt) {
     if (!localAtt) return remoteAtt;
-    if ((!remoteAtt.dataUrl) && localAtt.dataUrl &&
-        (remoteAtt.name === localAtt.name || remoteAtt.size === localAtt.size)) {
+    const sameName = (remoteAtt.name === localAtt.name || remoteAtt.size === localAtt.size);
+    // 新模型（IndexedDB）：云端缺 attId 时恢复本机 attId，避免 blob 关联断裂
+    if (!remoteAtt.attId && localAtt.attId && sameName) {
+        remoteAtt.attId = localAtt.attId;
+        delete remoteAtt._imgStripped;
+    }
+    // 旧模型（base64）兼容：恢复本机原图
+    if ((!remoteAtt.dataUrl) && localAtt.dataUrl && sameName) {
         remoteAtt.dataUrl = localAtt.dataUrl;
         delete remoteAtt._imgStripped;
     }
