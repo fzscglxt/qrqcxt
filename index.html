@@ -2927,6 +2927,7 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                                     <th style="text-align:center">批次号</th>
                                     <th style="text-align:left">产品名称</th>
                                     <th style="text-align:center">零件号</th>
+                                    <th style="text-align:center">来料数量</th>
                                     <th style="text-align:center">检验数量</th>
                                     <th style="text-align:center">不良类型</th>
                                     <th style="text-align:center">数量</th>
@@ -2984,6 +2985,7 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                                     <th style="text-align:center">批次号</th>
                                     <th style="text-align:left">产品名称</th>
                                     <th style="text-align:center">零件号</th>
+                                    <th style="text-align:center">入库数量</th>
                                     <th style="text-align:center">检验数量</th>
                                     <th style="text-align:center">不良类型</th>
                                     <th style="text-align:center">数量</th>
@@ -3387,6 +3389,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="form-group">
                     <label>产品名称</label>
                     <input type="text" id="qc-form-product" placeholder="输入QAD号后自动填充，也可手改">
+                </div>
+                <div class="form-group">
+                    <label id="qc-form-amount-label">来料数量</label>
+                    <input type="number" id="qc-form-amount" min="0" step="1" placeholder="本次来料/入库总数量">
                 </div>
                 <div class="form-group">
                     <label>检验数量</label>
@@ -9427,13 +9433,15 @@ const QC_DEF = {
     storage: STORAGE_KEYS.INCOMING_QC, label: '来料检验', tbody: 'incoming-qc-tbody',
     dStart: 'incoming-date-start', dEnd: 'incoming-date-end', partyControl: 'incoming-supplier',
     partyField: 'supplier', partyLabel: '供应商', partyAll: '全部供应商',
-    partyOptions: ['理实','均胜','乐威','万金','瑞博','奥峰']
+    partyOptions: ['理实','均胜','乐威','万金','瑞博','奥峰'],
+    amountField: 'incomingQty', amountLabel: '来料数量'
   },
   'stock-qc': {
     storage: STORAGE_KEYS.STOCK_QC, label: '入库检验', tbody: 'stock-qc-tbody',
     dStart: 'stock-date-start', dEnd: 'stock-date-end', partyControl: 'stock-supplier',
     partyField: 'workshop', partyLabel: '车间', partyAll: '全部车间',
-    partyOptions: ['装配车间','注塑车间','硅胶车间']
+    partyOptions: ['装配车间','注塑车间','硅胶车间'],
+    amountField: 'stockQty', amountLabel: '入库数量'
   }
 };
 function _qcEsc(s) {
@@ -9470,7 +9478,7 @@ function renderQcTable(type) {
   const arr = getFilteredQc(type);
   const canEdit = canEditRole();
   if (!arr.length) {
-    tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;color:var(--text-tertiary);padding:28px">暂无检验记录，请点右上角「➕ 新增检验记录」或「📂 导入」</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;color:var(--text-tertiary);padding:28px">暂无检验记录，请点右上角「➕ 新增检验记录」或「📂 导入」</td></tr>';
     return;
   }
   let html = '';
@@ -9486,6 +9494,7 @@ function renderQcTable(type) {
       <td style="text-align:center">${_qcEsc(r.batchNo)}</td>
       <td style="text-align:left">${_qcEsc(r.productName)}</td>
       <td style="text-align:center">${_qcEsc(r.partNo)}</td>
+      <td style="text-align:center">${_qcEsc(r[c.amountField])}</td>
       <td style="text-align:center">${_qcEsc(r.inspectQty)}</td>
       <td style="text-align:center">${_qcEsc(r.defectType)}</td>
       <td style="text-align:center">${_qcEsc(r.qty)}</td>
@@ -9517,7 +9526,9 @@ function openQcForm(type, id) {
   partyLabel.innerHTML = c.partyLabel + '<span class="required">*</span>';
   _qcSetField('qc-form-supplier',''); _qcSetField('qc-form-date',''); _qcSetField('qc-form-batch','');
   _qcSetField('qc-form-product',''); _qcSetField('qc-form-part',''); _qcSetField('qc-form-defect','');
-  _qcSetField('qc-form-qty',''); _qcSetField('qc-form-inspect-qty',''); _qcSetField('qc-form-destination',''); _qcSetField('qc-form-inspector','');
+  _qcSetField('qc-form-amount',''); _qcSetField('qc-form-qty',''); _qcSetField('qc-form-inspect-qty',''); _qcSetField('qc-form-destination',''); _qcSetField('qc-form-inspector','');
+  const _amountLabelEl = document.getElementById('qc-form-amount-label');
+  if (_amountLabelEl) _amountLabelEl.textContent = c.amountLabel;
   const title = document.getElementById('qc-form-title');
   if (id) {
     const r = _qcGet(type).find(x => x.id === id);
@@ -9529,6 +9540,7 @@ function openQcForm(type, id) {
       _qcSetField('qc-form-product', r.productName || '');
       _qcSetField('qc-form-part', r.partNo || '');
       _qcSetField('qc-form-defect', r.defectType || '');
+      _qcSetField('qc-form-amount', r[c.amountField] === undefined || r[c.amountField] === null ? '' : r[c.amountField]);
       _qcSetField('qc-form-inspect-qty', r.inspectQty === undefined || r.inspectQty === null ? '' : r.inspectQty);
       _qcSetField('qc-form-qty', r.qty === undefined || r.qty === null ? '' : r.qty);
       _qcSetField('qc-form-destination', r.destination || '');
@@ -9556,6 +9568,7 @@ function submitQcForm() {
   if (!party) { showToast('请选择' + c.partyLabel, 'error'); return; }
   if (!date) { showToast('请选择检验日期', 'error'); return; }
   const inspectQtyRaw = document.getElementById('qc-form-inspect-qty').value;
+  const amountRaw = document.getElementById('qc-form-amount').value;
   const rec = {
     id: _qcEditId || ('QC' + Date.now() + Math.floor(Math.random()*1000)),
     inspectDate: date,
@@ -9569,6 +9582,7 @@ function submitQcForm() {
     inspector: document.getElementById('qc-form-inspector').value.trim()
   };
   rec[c.partyField] = party;
+  rec[c.amountField] = amountRaw === '' ? '' : (parseInt(amountRaw, 10) || 0);
   const arr = _qcGet(_qcType);
   if (_qcEditId) {
     const idx = arr.findIndex(x => x.id === _qcEditId);
@@ -9601,14 +9615,15 @@ function deleteQcRecord(type, id) {
 function exportQcExcel(type) {
   const c = QC_DEF[type];
   const arr = getFilteredQc(type);
-  const head = ['序号','检验日期',c.partyLabel,'批次号','产品名称','零件号','检验数量','不良类型','数量','去向','检验员'];
+  const head = ['序号','检验日期',c.partyLabel,'批次号','产品名称','零件号',c.amountLabel,'检验数量','不良类型','数量','去向','检验员'];
   const aoa = [head];
   arr.forEach((r,i) => aoa.push([
     i+1, r.inspectDate||'', r[c.partyField]||'', r.batchNo||'', r.productName||'', r.partNo||'',
+    (r[c.amountField]===''||r[c.amountField]===undefined||r[c.amountField]===null)?'':r[c.amountField],
     (r.inspectQty===''||r.inspectQty===undefined||r.inspectQty===null)?'':r.inspectQty,
     r.defectType||'', r.qty||0, r.destination||'', r.inspector||'']));
   const ws = XLSX.utils.aoa_to_sheet(aoa);
-  ws['!cols'] = [{wch:6},{wch:12},{wch:10},{wch:16},{wch:26},{wch:16},{wch:10},{wch:14},{wch:8},{wch:12},{wch:10}];
+  ws['!cols'] = [{wch:6},{wch:12},{wch:10},{wch:16},{wch:26},{wch:16},{wch:10},{wch:10},{wch:14},{wch:8},{wch:12},{wch:10}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, '检验记录');
   const fn = `${c.label}记录_${_qcToday()}.xlsx`;
@@ -9660,6 +9675,7 @@ function _parseQcRows(type, rows) {
     '批次号': ['批次号','批次','批号'],
     '产品名称': ['产品名称','产品','品名'],
     '零件号': ['零件号','零件编号','图号','零件号/图号'],
+    'amount': type === 'stock-qc' ? ['入库数量','入库总数','收货数量'] : ['来料数量','到货数量','来货数量','收货数量'],
     '检验数量': ['检验数量','送检数量','总检数量','抽检数量'],
     '不良类型': ['不良类型','缺陷','不良现象','不良/缺陷'],
     '数量': ['数量','不良数量'],
@@ -9679,8 +9695,8 @@ function _parseQcRows(type, rows) {
   if (foundHeader) startRow = 1;
   else {
     colMap['检验日期']=0; colMap['party']=1; colMap['批次号']=2; colMap['产品名称']=3;
-    colMap['零件号']=4; colMap['检验数量']=5; colMap['不良类型']=6; colMap['数量']=7;
-    colMap['去向']=8; colMap['检验员']=9;
+    colMap['零件号']=4; colMap['amount']=5; colMap['检验数量']=6; colMap['不良类型']=7; colMap['数量']=8;
+    colMap['去向']=9; colMap['检验员']=10;
     startRow = 0;
   }
   let defaultParty = '';
@@ -9700,6 +9716,7 @@ function _parseQcRows(type, rows) {
       }
     }
     const inspectQtyRaw = g('检验数量');
+    const amountRaw = g('amount');
     const rec = {
       id: 'QC' + Date.now() + '_' + r + '_' + Math.floor(Math.random()*10000),
       inspectDate: dateStr,
@@ -9713,6 +9730,7 @@ function _parseQcRows(type, rows) {
       inspector: g('检验员')
     };
     rec[cdef.partyField] = g('party') || defaultParty || '';
+    rec[cdef.amountField] = amountRaw === '' ? '' : (parseInt(amountRaw, 10) || 0);
     out.push(rec);
   }
   return out;
