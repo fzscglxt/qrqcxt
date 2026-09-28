@@ -2915,6 +2915,7 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                             <option value="万金">万金</option>
                             <option value="瑞博">瑞博</option>
                             <option value="奥峰">奥峰</option>
+                            <option value="昕耀">昕耀</option>
                         </select>
                     </div>
                     <div class="table-wrap">
@@ -2930,7 +2931,8 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                                     <th style="text-align:center">来料数量</th>
                                     <th style="text-align:center">检验数量</th>
                                     <th style="text-align:center">不良类型</th>
-                                    <th style="text-align:center">数量</th>
+                                    <th style="text-align:center">不良数量</th>
+                                    <th style="text-align:center">合格率</th>
                                     <th style="text-align:center">去向</th>
                                     <th style="text-align:center">检验员</th>
                                     <th style="text-align:center">操作</th>
@@ -2988,7 +2990,8 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                                     <th style="text-align:center">入库数量</th>
                                     <th style="text-align:center">检验数量</th>
                                     <th style="text-align:center">不良类型</th>
-                                    <th style="text-align:center">数量</th>
+                                    <th style="text-align:center">不良数量</th>
+                                    <th style="text-align:center">合格率</th>
                                     <th style="text-align:center">去向</th>
                                     <th style="text-align:center">检验员</th>
                                     <th style="text-align:center">操作</th>
@@ -9427,13 +9430,13 @@ function initDemoData() {
 
 /* ============ 全局刷新 ============ */
 /* ===================== 来料 / 入库检验记录模块 ===================== */
-const QC_SUPPLIERS = ['理实','均胜','乐威','万金','瑞博','奥峰'];
+const QC_SUPPLIERS = ['理实','均胜','乐威','万金','瑞博','奥峰','昕耀'];
 const QC_DEF = {
   'incoming-qc': {
     storage: STORAGE_KEYS.INCOMING_QC, label: '来料检验', tbody: 'incoming-qc-tbody',
     dStart: 'incoming-date-start', dEnd: 'incoming-date-end', partyControl: 'incoming-supplier',
     partyField: 'supplier', partyLabel: '供应商', partyAll: '全部供应商',
-    partyOptions: ['理实','均胜','乐威','万金','瑞博','奥峰'],
+    partyOptions: ['理实','均胜','乐威','万金','瑞博','奥峰','昕耀'],
     amountField: 'incomingQty', amountLabel: '来料数量'
   },
   'stock-qc': {
@@ -9447,6 +9450,13 @@ const QC_DEF = {
 function _qcEsc(s) {
   if (s === null || s === undefined) return '';
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+// 合格率 =（检验数量 - 不良数量）/ 检验数量
+function _qcPassRate(r) {
+  const q = parseFloat(r.inspectQty);
+  const bad = parseFloat(r.qty) || 0;
+  if (!(q > 0)) return '';
+  return ((q - bad) / q * 100).toFixed(1) + '%';
 }
 function _qcToday() {
   const d = new Date();
@@ -9478,7 +9488,7 @@ function renderQcTable(type) {
   const arr = getFilteredQc(type);
   const canEdit = canEditRole();
   if (!arr.length) {
-    tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;color:var(--text-tertiary);padding:28px">暂无检验记录，请点右上角「➕ 新增检验记录」或「📂 导入」</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="14" style="text-align:center;color:var(--text-tertiary);padding:28px">暂无检验记录，请点右上角「➕ 新增检验记录」或「📂 导入」</td></tr>';
     return;
   }
   let html = '';
@@ -9498,6 +9508,7 @@ function renderQcTable(type) {
       <td style="text-align:center">${_qcEsc(r.inspectQty)}</td>
       <td style="text-align:center">${_qcEsc(r.defectType)}</td>
       <td style="text-align:center">${_qcEsc(r.qty)}</td>
+      <td style="text-align:center">${_qcPassRate(r)}</td>
       <td style="text-align:center">${_qcEsc(r.destination)}</td>
       <td style="text-align:center">${_qcEsc(r.inspector)}</td>
       <td style="text-align:center">${ops}</td>
@@ -9615,15 +9626,15 @@ function deleteQcRecord(type, id) {
 function exportQcExcel(type) {
   const c = QC_DEF[type];
   const arr = getFilteredQc(type);
-  const head = ['序号','检验日期',c.partyLabel,'批次号','产品名称','零件号',c.amountLabel,'检验数量','不良类型','数量','去向','检验员'];
+  const head = ['序号','检验日期',c.partyLabel,'批次号','产品名称','零件号',c.amountLabel,'检验数量','不良类型','不良数量','合格率','去向','检验员'];
   const aoa = [head];
   arr.forEach((r,i) => aoa.push([
     i+1, r.inspectDate||'', r[c.partyField]||'', r.batchNo||'', r.productName||'', r.partNo||'',
     (r[c.amountField]===''||r[c.amountField]===undefined||r[c.amountField]===null)?'':r[c.amountField],
     (r.inspectQty===''||r.inspectQty===undefined||r.inspectQty===null)?'':r.inspectQty,
-    r.defectType||'', r.qty||0, r.destination||'', r.inspector||'']));
+    r.defectType||'', r.qty||0, _qcPassRate(r), r.destination||'', r.inspector||'']));
   const ws = XLSX.utils.aoa_to_sheet(aoa);
-  ws['!cols'] = [{wch:6},{wch:12},{wch:10},{wch:16},{wch:26},{wch:16},{wch:10},{wch:10},{wch:14},{wch:8},{wch:12},{wch:10}];
+  ws['!cols'] = [{wch:6},{wch:12},{wch:10},{wch:16},{wch:26},{wch:16},{wch:10},{wch:10},{wch:14},{wch:8},{wch:9},{wch:12},{wch:10}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, '检验记录');
   const fn = `${c.label}记录_${_qcToday()}.xlsx`;
