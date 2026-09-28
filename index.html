@@ -9753,7 +9753,7 @@ function importProducts() {
           const row=rows[r]; if(!row)continue;
           const cell=i=>(row[i]===undefined||row[i]===null)?'':String(row[i]).trim();
           const qad=cell(cQad),name=cell(cName);
-          if(!qad&&!name)continue;
+          if(!qad)continue; // 仅导入带 QAD（方卓零件号）的物料，跳过审核/日期等说明行
           const info={qad:qad,name:name,category:cell(cCat),subCategory:cell(cSub),unit:cell(cUnit),partner:cell(cPartner)};
           if(qad){
             const ex=arr.find(p=>String(p.qad||'').trim()===qad);
