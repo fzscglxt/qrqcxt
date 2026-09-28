@@ -2558,6 +2558,7 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                             <option value="overdue">已超时</option>
                             <option value="warning">临期预警</option>
                             <option value="normal">正常</option>
+                            <option value="unclosed">未闭环</option>
                         </select>
                     </div>
                     <div class="table-wrap">
@@ -4324,7 +4325,26 @@ function showToast(message, type = 'success') {
 }
 
 function saveData(key, data) {
-    localStorage.setItem(key, JSON.stringify(data));
+    const _doSet = () => { localStorage.setItem(key, JSON.stringify(data)); };
+    try {
+        _doSet();
+    } catch (e) {
+        // 本地配额超限（多由历史附件 base64 占满）：先清理可再生缓存后重试一次
+        try {
+            Object.keys(localStorage).forEach(k => {
+                if (k.indexOf('dashboard_cache') !== -1 || k === 'client_device_info') {
+                    try { localStorage.removeItem(k); } catch (_) {}
+                }
+            });
+        } catch (_) {}
+        try {
+            _doSet();
+        } catch (e2) {
+            console.error('saveData quota failed:', key, e2);
+            try { showToast('本地存储空间已满，附件请在录入设备查看；请稍后重试或联系管理员', 'error'); } catch (_) {}
+            throw e2;
+        }
+    }
     if (typeof _applyingCloud !== 'undefined' && !_applyingCloud && typeof _isCloudSyncStorageKey === 'function' && _isCloudSyncStorageKey(key)) {
         try { scheduleCloudSave(); } catch (e) {}
     }
@@ -6801,7 +6821,11 @@ function openIssueForm() {
         refreshTrackingLevelHint(TRACKING_LEVEL_DEFAULT);
     }
     document.querySelectorAll('.form-error').forEach(e => e.classList.remove('show'));
-    // 清空附件列表
+    // 清空附件列表（释放上一次未提交残留的对象 URL 与 IndexedDB 孤儿）
+    (issueFormFiles || []).forEach(f => {
+        try { if (f._previewUrl) URL.revokeObjectURL(f._previewUrl); } catch (_) {}
+        try { if (f.attId) AttDB.del(f.attId); } catch (_) {}
+    });
     issueFormFiles = [];
     renderIssueFormFiles();
     showModal('modal-issue-form');
@@ -6818,10 +6842,10 @@ function renderIssueFormFiles() {
     listEl.innerHTML = issueFormFiles.map((f, idx) => `
         <div class="file-item">
             <div class="file-item-info">
-                <span>${f.icon}</span>
+                ${(f.category === 'image' && f._previewUrl) ? `<img src="${f._previewUrl}" style="width:30px;height:30px;object-fit:cover;border-radius:6px;border:1px solid var(--border)">` : `<span>${f.icon}</span>`}
                 <span class="file-item-name" title="${f.name}">${f.name}</span>
                 <span class="file-item-size">(${(f.size/1024).toFixed(1)}KB)</span>
-                <span class="badge badge-success" style="font-size:10px;padding:1px 6px">${f.status || '上传成功'}</span>
+                <span class="badge badge-${f.status === '上传失败' ? 'danger' : 'success'}" style="font-size:10px;padding:1px 6px">${f.status || '上传成功'}</span>
             </div>
             <button class="btn btn-danger btn-sm" onclick="removeIssueFormFile(${idx})" style="padding:2px 8px;font-size:11px" title="移除">删除</button>
         </div>
@@ -6852,69 +6876,55 @@ function handleIssueFormFileDrop(event) {
     addIssueFormFiles(event.dataTransfer.files);
 }
 
-function addIssueFormFiles(fileList) {
+async function addIssueFormFiles(fileList) {
     const MAX_SIZE = 20 * 1024 * 1024; // 20MB
     const IMAGE_EXTS = ['jpg','jpeg','png','gif','bmp','webp','svg','tif','tiff'];
     const statusEl = document.getElementById('issue-form-files-status');
-    let added = 0, skipped = 0, pendingReads = 0;
+    let skipped = 0;
 
-    const updateStatus = () => {
-        renderIssueFormFiles();
-        if (skipped > 0) {
-            statusEl.textContent = `⚠️ 已添加 ${added} 个文件，${skipped} 个文件因超过20MB被忽略`;
-            statusEl.style.color = 'var(--warning)';
-        } else if (pendingReads > 0) {
-            statusEl.textContent = `⏳ 读取中… 已添加 ${added} 个文件（${pendingReads} 个图片正在解析）`;
-            statusEl.style.color = 'var(--primary)';
-        } else {
-            const totalKB = issueFormFiles.reduce((s, f) => s + f.size, 0) / 1024;
-            statusEl.textContent = `✅ 已添加 ${issueFormFiles.length} 个附件，总计 ${totalKB.toFixed(1)} KB`;
-            statusEl.style.color = '';
-        }
-    };
-
-    Array.from(fileList).forEach(file => {
-        if (file.size > MAX_SIZE) { skipped++; return; }
+    for (const file of Array.from(fileList)) {
+        if (file.size > MAX_SIZE) { skipped++; continue; }
         const ext = (file.name.split('.').pop() || '').toLowerCase();
-        const isImage = file.type && file.type.startsWith('image/') || IMAGE_EXTS.includes(ext);
+        const isImage = (file.type && file.type.startsWith('image/')) || IMAGE_EXTS.includes(ext);
 
         const record = {
+            attId: genAttId(),
             name: file.name,
             size: file.size,
-            type: file.type,
+            type: file.type || '',
             icon: getFileIcon(file.name),
             lastModified: file.lastModified,
-            status: isImage ? '读取中...' : '上传成功',
-            category: isImage ? 'image' : getFileTypeCategory(file.name),
-            dataUrl: null
+            status: '上传中',
+            category: isImage ? 'image' : getFileTypeCategory(file.name)
         };
+        if (isImage) record._previewUrl = URL.createObjectURL(file);
         issueFormFiles.push(record);
-        added++;
-
-        if (isImage) {
-            pendingReads++;
-            updateStatus();
-            const reader = new FileReader();
-            const pushIdx = issueFormFiles.length - 1;
-            reader.onload = (e) => {
-                // 当FileReader完成，更新同一个record对象（已推入数组）的引用字段
-                issueFormFiles[pushIdx].dataUrl = e.target.result;
-                issueFormFiles[pushIdx].status = '上传成功';
-                pendingReads--;
-                updateStatus();
-            };
-            reader.onerror = () => {
-                issueFormFiles[pushIdx].status = '上传成功';
-                pendingReads--;
-                updateStatus();
-            };
-            reader.readAsDataURL(file);
+        renderIssueFormFiles();
+        try {
+            await AttDB.put(record.attId, file, { name: file.name, type: file.type || '' });
+            record.status = '上传成功';
+        } catch (e) {
+            record.status = '上传失败';
         }
-    });
-    updateStatus();
+        renderIssueFormFiles();
+    }
+
+    const totalKB = issueFormFiles.reduce((s, f) => s + f.size, 0) / 1024;
+    if (skipped > 0) {
+        statusEl.textContent = `⚠️ 已添加 ${issueFormFiles.length} 个附件，${skipped} 个因超过20MB被忽略，总计 ${totalKB.toFixed(1)} KB`;
+        statusEl.style.color = 'var(--warning)';
+    } else {
+        statusEl.textContent = `✅ 已添加 ${issueFormFiles.length} 个附件，总计 ${totalKB.toFixed(1)} KB`;
+        statusEl.style.color = '';
+    }
 }
 
 function removeIssueFormFile(idx) {
+    const f = issueFormFiles[idx];
+    if (f) {
+        try { if (f.attId) AttDB.del(f.attId); } catch (_) {}
+        try { if (f._previewUrl) URL.revokeObjectURL(f._previewUrl); } catch (_) {}
+    }
     issueFormFiles.splice(idx, 1);
     renderIssueFormFiles();
 }
@@ -7020,7 +7030,11 @@ function submitIssueForm() {
         dept: document.getElementById('issue-form-dept').value,
         batch: document.getElementById('issue-form-batch').value.trim(),
         description: document.getElementById('issue-form-desc').value.trim(),
-        attachments: JSON.parse(JSON.stringify(issueFormFiles || [])),
+        attachments: (issueFormFiles || []).map(f => ({
+            attId: f.attId, name: f.name, size: f.size, type: f.type,
+            icon: f.icon, lastModified: f.lastModified,
+            status: f.status, category: f.category
+        })),
         reportDate: reportDate,            // 上报日期（YYYY-MM-DD）
         closeDate: closeDate,              // 计划关闭日期（YYYY-MM-DD），倒计时据此计算
         trackingLevel: trackingLevel,      // 跟踪等级（'full' | 'simple'）
@@ -7117,6 +7131,7 @@ function renderIssueTable() {
     if (fOverdue) {
         if (fOverdue === 'overdue') issues = issues.filter(i => !i.closed && (i.stageOverdue || i.totalOverdue));
         else if (fOverdue === 'warning') issues = issues.filter(i => !i.closed && (i.stageWarning || i.totalWarning));
+        else if (fOverdue === 'unclosed') issues = issues.filter(i => !i.closed);
         else issues = issues.filter(i => !i.closed && !i.stageOverdue && !i.totalOverdue);
     }
 
@@ -7700,11 +7715,11 @@ function renderIssueDetail() {
         ? `<div class="file-list" style="margin-top:4px">${issue.attachments.map(f => `
             <div class="file-item">
                 <div class="file-item-info">
-                    <span>${f.icon || '📎'}</span>
+                    <span>${f.category === 'image' ? '🖼️' : (f.icon || '📎')}</span>
                     <span class="file-item-name" title="${f.name}">${f.name}</span>
                     <span class="file-item-size">(${(f.size/1024).toFixed(1)}KB)</span>
                 </div>
-                <span class="badge badge-info" style="font-size:10px;padding:1px 6px">已上传</span>
+                <button type="button" class="btn btn-outline btn-sm" onclick="openStoredAttachment('${f.attId || ''}','${String(f.name||'').replace(/'/g,"\\'")}')" style="padding:2px 10px;font-size:11px">查看</button>
             </div>`).join('')}</div>`
         : '<span class="detail-value" style="color:var(--text-tertiary)">暂无附件</span>';
 
@@ -7803,6 +7818,7 @@ function collectIssueAttachments(issue) {
         issue.attachments.forEach((f, idx) => {
             result.push({
                 id: `create_${idx}`,
+                attId: f.attId || '',
                 name: f.name,
                 size: f.size || 0,
                 icon: f.icon || '📎',
@@ -7823,7 +7839,22 @@ function collectIssueAttachments(issue) {
         (s.fields || []).forEach(f => {
             if (f.type === 'file' && stageData[f.key]) {
                 const val = stageData[f.key];
-                if (typeof val === 'string') {
+                if (val && typeof val === 'object' && !Array.isArray(val) && val.attId) {
+                    result.push({
+                        id: `stage${s.num}_${f.key}_0`,
+                        attId: val.attId,
+                        name: val.name || f.key,
+                        size: val.size || 0,
+                        icon: val.icon || getFileIcon(val.name || f.key),
+                        type: val.type || '',
+                        ext: ((val.name || f.key).split('.').pop() || '').toLowerCase(),
+                        category: getFileTypeCategory(val.name || f.key),
+                        sourceKey: 'stage' + s.num,
+                        sourceLabel: `第${s.num}阶段-${s.shortName}`,
+                        sourceBadge: 'badge-info',
+                        uploadedAt: stageData.completedAt || stageData.submitTime || '-'
+                    });
+                } else if (typeof val === 'string') {
                     result.push({
                         id: `stage${s.num}_${f.key}_0`,
                         name: val,
@@ -7841,6 +7872,7 @@ function collectIssueAttachments(issue) {
                     val.forEach((subF, idx) => {
                         result.push({
                             id: `stage${s.num}_${f.key}_${idx}`,
+                            attId: subF.attId || '',
                             name: subF.name || subF,
                             size: subF.size || 0,
                             icon: subF.icon || getFileIcon(subF.name || subF),
@@ -7892,16 +7924,13 @@ function renderDetailAttachments() {
             html += `<div style="margin-bottom:12px"><div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;padding-left:4px">🖼️ 图片预览（点击可放大）</div>
                 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px">
                 ${imageItems.map(f => {
-                    const hasReal = f.dataUrl && typeof f.dataUrl === 'string' && f.dataUrl.indexOf('data:') === 0;
-                    const tileContent = hasReal
-                        ? `<img src="${f.dataUrl}" alt="${f.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;background:var(--cell)">`
-                        : `<div style="aspect-ratio:1/1;background:linear-gradient(135deg,rgba(0,212,255,.18),var(--card-bg));display:flex;align-items:center;justify-content:center"><div style="font-size:56px">${f.icon}</div></div>`;
+                    const tileContent = `<img data-attid="${f.attId || ''}" alt="${f.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;background:var(--cell)">`;
                     return `
                     <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--card-bg);transition:transform .15s,box-shadow .15s;cursor:pointer" onclick="previewAttachmentImage('${f.id}')" onmouseenter="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 16px rgba(26,115,232,.15)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
-                        <div style="position:relative;${hasReal ? '' : 'aspect-ratio:1/1'}">
+                        <div style="position:relative;aspect-ratio:1/1">
                             ${tileContent}
                             <div style="position:absolute;top:6px;right:6px"><span class="badge ${f.sourceBadge}" style="font-size:10px;padding:1px 6px;backdrop-filter:blur(2px)">${f.sourceLabel.split('-')[0]}</span></div>
-                            ${hasReal ? `<div style="position:absolute;bottom:0;left:0;right:0;padding:3px 6px;background:linear-gradient(to top,rgba(0,0,0,.55),transparent);color:#fff;font-size:10px;text-align:right">🔍 放大查看</div>` : ''}
+                            <div style="position:absolute;bottom:0;left:0;right:0;padding:3px 6px;background:linear-gradient(to top,rgba(0,0,0,.55),transparent);color:#fff;font-size:10px;text-align:right">🔍 放大查看</div>
                         </div>
                         <div style="padding:8px 10px;border-top:1px solid var(--border)">
                             <div class="file-item-name" style="font-size:12px;color:var(--text-primary)" title="${f.name}">${f.name}</div>
@@ -7935,12 +7964,22 @@ function renderDetailAttachments() {
                         </div>
                         <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
                             <span class="badge ${f.sourceBadge}" style="font-size:10px;padding:2px 8px">${f.sourceLabel.split('-')[0]}</span>
-                            <button class="btn btn-outline btn-sm" onclick="alert('文件已归档：${f.name}')" style="padding:4px 10px;font-size:11px">查看</button>
+                            <button class="btn btn-outline btn-sm" onclick="openStoredAttachment('${f.attId || ''}','${String(f.name||'').replace(/'/g,"\\'")}')" style="padding:4px 10px;font-size:11px">查看</button>
                         </div>
                     </div>`).join('')}
                 </div></div>`;
         }
         container.innerHTML = html;
+        // 异步从 IndexedDB 载入图片缩略图
+        setTimeout(() => {
+            container.querySelectorAll('img[data-attid]').forEach(img => {
+                const attId = img.getAttribute('data-attid');
+                if (!attId) return;
+                AttDB.get(attId).then(rec => {
+                    if (rec && rec.blob) img.src = URL.createObjectURL(rec.blob);
+                }).catch(() => {});
+            });
+        }, 30);
     }
 
     // Pagination
@@ -7973,38 +8012,39 @@ function attachmentGotoPage(n) {
     renderDetailAttachments();
 }
 
+function attPlaceholderDataUrl(f) {
+    const escName = String(f.name).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return `data:image/svg+xml;utf8,` + encodeURIComponent(
+        `<svg xmlns='http://www.w3.org/2000/svg' width='800' height='600' viewBox='0 0 800 600'>
+            <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
+                <stop offset='0%' stop-color='#0d1f3c'/><stop offset='100%' stop-color='#1a3a5c'/>
+            </linearGradient></defs>
+            <rect width='800' height='600' fill='url(#g)'/>
+            <text x='50%' y='44%' text-anchor='middle' font-size='160'>${f.icon}</text>
+            <text x='50%' y='62%' text-anchor='middle' font-size='26' font-family='Arial' fill='#e8f1fb' font-weight='bold'>${escName}</text>
+            <text x='50%' y='72%' text-anchor='middle' font-size='16' font-family='Arial' fill='#9db8d2'>原始图片保存在录入设备上，本机暂无该文件</text>
+            <text x='50%' y='78%' text-anchor='middle' font-size='15' font-family='Arial' fill='#9db8d2'>来源：${f.sourceLabel} · 格式：${(f.ext||'').toUpperCase()}</text>
+        </svg>`);
+}
+
 function previewAttachmentImage(id) {
     const f = currentDetailAttachments.find(a => a.id === id);
     if (!f) return;
     document.getElementById('preview-image-caption').textContent =
         `${f.name}  ·  ${f.size ? (f.size/1024).toFixed(1)+' KB' : '--'}  ·  来源：${f.sourceLabel}`;
     const metaEl = document.getElementById('preview-image-meta');
-    metaEl.textContent = '';
+    if (metaEl) metaEl.textContent = '';
     const img = document.getElementById('preview-image-src');
-
-    // 优先使用原始上传图片（FileReader保存的DataURL），保持原始分辨率与比例
-    if (f.dataUrl && typeof f.dataUrl === 'string' && f.dataUrl.indexOf('data:') === 0) {
-        img.src = f.dataUrl;
-    } else if (f.thumbnail && typeof f.thumbnail === 'string' && f.thumbnail.indexOf('data:') === 0) {
-        // 演示数据使用内嵌缩略图
-        img.src = f.thumbnail;
-    } else {
-        // 回退：生成语义化SVG占位信息（当无法获取原始内容时提示）
-        const escName = String(f.name).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        img.src = `data:image/svg+xml;utf8,` + encodeURIComponent(
-            `<svg xmlns='http://www.w3.org/2000/svg' width='800' height='600' viewBox='0 0 800 600'>
-                <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
-                    <stop offset='0%' stop-color='#0d1f3c'/><stop offset='100%' stop-color='#1a3a5c'/>
-                </linearGradient></defs>
-                <rect width='800' height='600' fill='url(#g)'/>
-                <text x='50%' y='44%' text-anchor='middle' font-size='160'>${f.icon}</text>
-                <text x='50%' y='62%' text-anchor='middle' font-size='26' font-family='Arial' fill='#e8f1fb' font-weight='bold'>${escName}</text>
-                <text x='50%' y='72%' text-anchor='middle' font-size='16' font-family='Arial' fill='#9db8d2'>当前未保存原始像素数据（演示模式/历史数据）</text>
-                <text x='50%' y='78%' text-anchor='middle' font-size='15' font-family='Arial' fill='#9db8d2'>来源：${f.sourceLabel} · 格式：${(f.ext||'').toUpperCase()}</text>
-                <text x='50%' y='86%' text-anchor='middle' font-size='14' font-family='Arial' fill='#0ea5e9'>在“新增问题单”中重新上传该图片即可获得原图预览</text>
-            </svg>`);
-    }
+    img.removeAttribute('src');
     showModal('modal-image-preview');
+    if (f.attId) {
+        AttDB.get(f.attId).then(rec => {
+            if (rec && rec.blob) { img.src = URL.createObjectURL(rec.blob); }
+            else { img.src = attPlaceholderDataUrl(f); }
+        }).catch(() => { img.src = attPlaceholderDataUrl(f); });
+    } else {
+        img.src = attPlaceholderDataUrl(f);
+    }
 }
 
 function renderDetailTimeline(issue) {
@@ -8073,7 +8113,14 @@ function renderDetailStages(issue) {
             fieldsHtml = '<div class="detail-grid">' + s.fields.map(f => {
                 let val = stageData[f.key] || '-';
                 if (f.type === 'file') {
-                    val = val ? `<a href="#" onclick="alert('文件：${val}');return false;" style="color:var(--primary)">📎 ${val}</a>` : '未上传';
+                    const _fv = stageData[f.key];
+                    if (_fv && typeof _fv === 'object' && _fv.attId) {
+                        val = `<a href="#" onclick="openStoredAttachment('${_fv.attId}','${String(_fv.name||'').replace(/'/g,"\\'")}');return false;" style="color:var(--primary)">📎 ${_fv.name}</a>`;
+                    } else if (_fv) {
+                        val = `<span style="color:var(--text-secondary)">📎 ${_fv}</span>`;
+                    } else {
+                        val = '未上传';
+                    }
                 }
                 return `<div class="detail-item"><span class="detail-label">${f.label.replace(/<[^>]+>/g,'')}</span><span class="detail-value">${val}</span></div>`;
             }).join('') + '</div>';
@@ -8233,39 +8280,38 @@ function openStageForm(issueId, stageNum = null) {
         </div>
     `;
     
+    window._stageFormFiles = {};
     document.getElementById('stage-form-content').innerHTML = formHtml;
     showModal('modal-stage-form');
 }
 
 function handleFileSelect(e, key) {
     const file = e.target.files[0];
-    if (file) {
-        document.getElementById('stage-field-' + key + '-name').value = file.name;
-        document.getElementById('file-list-' + key).innerHTML = `
-            <div class="file-item">
-                <div class="file-item-info">
-                    <span>📎</span>
-                    <span class="file-item-name">${file.name}</span>
-                    <span class="file-item-size">(${(file.size/1024).toFixed(1)}KB)</span>
-                </div>
-            </div>`;
-    }
+    if (file) stageFilePicked(file, key);
+    try { e.target.value = ''; } catch (_) {}
 }
 
 function handleFileDrop(e, key) {
     e.currentTarget.classList.remove('dragover');
     const file = e.dataTransfer.files[0];
-    if (file) {
-        document.getElementById('stage-field-' + key + '-name').value = file.name;
-        document.getElementById('file-list-' + key).innerHTML = `
-            <div class="file-item">
-                <div class="file-item-info">
-                    <span>📎</span>
-                    <span class="file-item-name">${file.name}</span>
-                    <span class="file-item-size">(${(file.size/1024).toFixed(1)}KB)</span>
-                </div>
-            </div>`;
-    }
+    if (file) stageFilePicked(file, key);
+}
+
+async function stageFilePicked(file, key) {
+    const attId = genAttId();
+    if (!window._stageFormFiles) window._stageFormFiles = {};
+    window._stageFormFiles[key] = { attId: attId, name: file.name, size: file.size, type: file.type || '' };
+    const isImg = getFileTypeCategory(file.name) === 'image';
+    document.getElementById('stage-field-' + key + '-name').value = file.name;
+    document.getElementById('file-list-' + key).innerHTML = `
+        <div class="file-item">
+            <div class="file-item-info">
+                <span>${isImg ? '🖼️' : '📎'}</span>
+                <span class="file-item-name">${file.name}</span>
+                <span class="file-item-size">(${(file.size/1024).toFixed(1)}KB)</span>
+            </div>
+        </div>`;
+    try { await AttDB.put(attId, file, { name: file.name, type: file.type || '' }); } catch (e) {}
 }
 
 function submitStageForm() {
@@ -8292,7 +8338,10 @@ function submitStageForm() {
     stage.fields.forEach(f => {
         let val;
         if (f.type === 'file') {
-            val = document.getElementById('stage-field-' + f.key + '-name').value;
+            const _fm = (window._stageFormFiles && window._stageFormFiles[f.key]) || null;
+            val = _fm
+                ? { attId: _fm.attId, name: _fm.name, size: _fm.size, type: _fm.type }
+                : (document.getElementById('stage-field-' + f.key + '-name').value || '');
         } else {
             val = document.getElementById('stage-field-' + f.key)?.value?.trim() || '';
         }
@@ -8332,7 +8381,7 @@ function submitStageForm() {
             type: 'success',
             time: formatDateTime(new Date()),
             text: trackingLevel === 'full'
-                ? `✅ 【闭环】完整跟踪所有 6 阶段已完成，问题正式闭环！上传文档：${data.pptFile || '(无)'}`
+                ? `✅ 【闭环】完整跟踪所有 6 阶段已完成，问题正式闭环！上传文档：${(data.pptFile && data.pptFile.name) ? data.pptFile.name : (data.pptFile || '(无)')}`
                 : `✅ 【闭环】简单跟踪 3 阶段（临时措施→纠正措施→验证措施）全部完成，问题自动闭环！`
         });
         addAuditLog('close', '问题闭环', `问题 ${issue.id}（${lvLabel}）完成所有阶段闭环处理`);
@@ -9956,6 +10005,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         updateBadges();
     }, 30000);
+
+    // 启动后自动迁移历史附件 base64 到 IndexedDB（幂等，释放 localStorage 配额）
+    setTimeout(function () {
+        migrateAttachmentsToIDB().then(function (r) {
+            if (r && !r.skipped && r.moved) {
+                try { showToast('已迁移 ' + r.moved + ' 个历史附件到本机对象库', 'success'); } catch (_) {}
+            }
+        }).catch(function () {});
+    }, 1800);
 });
 
 // Nav clicks
@@ -9969,6 +10027,128 @@ document.addEventListener('click', e => {
 // ============================================================
 const CLOUD_CONFIG = { apiBase: '' }; // 空串 = 走同源接口 /api/db
 const QRQC_CLOUD_META_KEY = 'qrqc_cloud_meta_v1';
+
+// ============================================================
+// 附件对象存储（IndexedDB）：附件原始 Blob 不再塞进 localStorage，
+// 避免 base64 撑爆 5MB 配额导致新建/删除失败；问题单仅保留元数据 + attId
+// ============================================================
+function genAttId(){
+    return 'att_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,9);
+}
+function dataURLtoBlob(dataUrl){
+    const parts = String(dataUrl).split(',');
+    const head = parts[0] || '';
+    const rest = parts.slice(1).join(',') || '';
+    const mime = /data:([^;]+)/.test(head) ? head.match(/data:([^;]+)/)[1] : 'application/octet-stream';
+    let bytes;
+    if (/;base64/i.test(head)){
+        const bin = atob(rest);
+        bytes = new Uint8Array(bin.length);
+        for (let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+    } else {
+        const txt = decodeURIComponent(rest);
+        bytes = new Uint8Array(txt.length);
+        for (let i=0;i<txt.length;i++) bytes[i] = txt.charCodeAt(i);
+    }
+    return new Blob([bytes], { type: mime || 'application/octet-stream' });
+}
+const AttDB = (function(){
+    let _dbp = null;
+    function openDB(){
+        if (_dbp) return _dbp;
+        _dbp = new Promise(function(resolve,reject){
+            const req = indexedDB.open('qrqc_attachments', 1);
+            req.onupgradeneeded = function(e){
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('blobs')) db.createObjectStore('blobs', { keyPath:'attId' });
+            };
+            req.onsuccess = function(){ resolve(req.result); };
+            req.onerror = function(){ reject(req.error); };
+        });
+        return _dbp;
+    }
+    function put(attId, blob, meta){
+        return openDB().then(function(db){ return new Promise(function(resolve,reject){
+            const rec = Object.assign({ attId:attId, blob:blob, savedAt:Date.now() }, meta||{});
+            const r = db.transaction('blobs','readwrite').objectStore('blobs').put(rec);
+            r.onsuccess = function(){ resolve(attId); };
+            r.onerror = function(){ reject(r.error); };
+        });});
+    }
+    function get(attId){
+        return openDB().then(function(db){ return new Promise(function(resolve,reject){
+            const r = db.transaction('blobs').objectStore('blobs').get(attId);
+            r.onsuccess = function(){ resolve(r.result||null); };
+            r.onerror = function(){ reject(r.error); };
+        });});
+    }
+    function del(attId){
+        return openDB().then(function(db){ return new Promise(function(resolve,reject){
+            const r = db.transaction('blobs','readwrite').objectStore('blobs').delete(attId);
+            r.onsuccess = function(){ resolve(attId); };
+            r.onerror = function(){ reject(r.error); };
+        });});
+    }
+    return { open:openDB, put:put, get:get, del:del };
+})();
+function downloadBlob(blob, filename){
+    try {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = filename || 'download';
+        document.body.appendChild(a); a.click();
+        setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 1500);
+    } catch(e){ try { showToast('下载失败：'+e.message,'error'); }catch(_){ } }
+}
+async function openStoredAttachment(attId, name){
+    if (!attId){ try{ showToast('该附件原始文件未保存（历史/演示数据）','warning'); }catch(_){} return; }
+    let rec = null;
+    try { rec = await AttDB.get(attId); } catch(e){}
+    if (!rec || !rec.blob){ try{ showToast('附件保存在录入该记录的设备上，本机无原始文件','warning'); }catch(_){} return; }
+    const blob = rec.blob;
+    const isImg = (blob.type && blob.type.indexOf('image/')===0) || /\.(jpe?g|png|gif|bmp|webp|svg|tiff?)$/i.test(name||'');
+    if (isImg){
+        const url = URL.createObjectURL(blob);
+        const img = document.getElementById('preview-image-src');
+        img.src = url;
+        document.getElementById('preview-image-caption').textContent = (name||'图片')+'  ·  '+(blob.size/1024).toFixed(1)+' KB';
+        const metaEl = document.getElementById('preview-image-meta'); if (metaEl) metaEl.textContent='';
+        showModal('modal-image-preview');
+    } else {
+        downloadBlob(blob, name);
+    }
+}
+// 一次性迁移：历史附件 dataUrl(base64) -> IndexedDB Blob，并从 localStorage 删除以释放配额（幂等）
+async function migrateAttachmentsToIDB(){
+    const FLAG = 'qrqc_att_migrated_v1';
+    if (localStorage.getItem(FLAG) === '1') return { skipped:true, moved:0 };
+    let moved = 0, stripped = 0;
+    async function walk(issue){
+        if (!issue || !Array.isArray(issue.attachments)) return;
+        for (const a of issue.attachments){
+            const url = a.dataUrl || null;
+            if (url && url.indexOf('data:')===0){
+                try {
+                    const attId = a.attId || genAttId();
+                    const blob = dataURLtoBlob(url);
+                    await AttDB.put(attId, blob, { name:a.name, type:a.type||blob.type });
+                    a.attId = attId; moved++;
+                } catch(e){}
+            }
+            if ('dataUrl' in a){ delete a.dataUrl; stripped++; }
+            if ('thumbnail' in a) delete a.thumbnail;
+            if ('_imgStripped' in a) delete a._imgStripped;
+        }
+    }
+    const issues = loadData(STORAGE_KEYS.ISSUES, []);
+    for (const i of issues) await walk(i);
+    saveData(STORAGE_KEYS.ISSUES, issues);
+    const bin = loadData(STORAGE_KEYS.RECYCLE_BIN, []);
+    for (const b of bin) await walk(b);
+    saveData(STORAGE_KEYS.RECYCLE_BIN, bin);
+    localStorage.setItem(FLAG,'1');
+    return { skipped:false, moved:moved, stripped:stripped };
+}
 
 // 纳入云端同步的业务数据（不含登录态 currentUser、不含可再生的看板缓存）
 const CLOUD_SYNC_FIELDS = [
