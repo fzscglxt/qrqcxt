@@ -2160,6 +2160,14 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
         ::-webkit-scrollbar-thumb { background: #26435f; border-radius: 6px; }
         ::-webkit-scrollbar-thumb:hover { background: #33577a; }
         ::-webkit-scrollbar-track { background: transparent; }
+        /* QC batch ops */
+        .qc-batch-bar {
+            display: none; align-items: center; gap: 12px;
+            margin-bottom: 10px; padding: 8px 12px;
+            background: var(--cell); border: 1px solid var(--border); border-radius: 8px;
+        }
+        .qc-batch-info { color: var(--text); font-size: 13px; font-weight: 600; }
+        input[type="checkbox"] { accent-color: var(--primary); width: 15px; height: 15px; cursor: pointer; }
         /* period anchor bar: choose reference day/week/month */
         .period-anchor-bar {
             display: none;
@@ -2918,10 +2926,16 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                             <option value="昕耀">昕耀</option>
                         </select>
                     </div>
+                    <div class="qc-batch-bar" id="incoming-qc-batch-bar">
+                        <span class="qc-batch-info" id="incoming-qc-batch-info">已选 0 条</span>
+                        <button type="button" class="btn btn-outline btn-sm" id="incoming-qc-batch-export" onclick="batchExportQc('incoming-qc')">📤 批量导出</button>
+                        <button type="button" class="btn btn-outline btn-sm" style="color:var(--danger)" id="incoming-qc-batch-del" onclick="batchDeleteQc('incoming-qc')">批量删除</button>
+                    </div>
                     <div class="table-wrap">
                         <table>
                             <thead>
                                 <tr>
+                                    <th style="text-align:center;width:36px"><input type="checkbox" class="qc-select-all" title="全选/取消全选" onclick="toggleQcSelectAll('incoming-qc', this.checked)"></th>
                                     <th style="text-align:center">序号</th>
                                     <th style="text-align:center">检验日期</th>
                                     <th style="text-align:center">供应商</th>
@@ -2978,10 +2992,16 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                             <option value="硅胶车间">硅胶车间</option>
                         </select>
                     </div>
+                    <div class="qc-batch-bar" id="stock-qc-batch-bar">
+                        <span class="qc-batch-info" id="stock-qc-batch-info">已选 0 条</span>
+                        <button type="button" class="btn btn-outline btn-sm" id="stock-qc-batch-export" onclick="batchExportQc('stock-qc')">📤 批量导出</button>
+                        <button type="button" class="btn btn-outline btn-sm" style="color:var(--danger)" id="stock-qc-batch-del" onclick="batchDeleteQc('stock-qc')">批量删除</button>
+                    </div>
                     <div class="table-wrap">
                         <table>
                             <thead>
                                 <tr>
+                                    <th style="text-align:center;width:36px"><input type="checkbox" class="qc-select-all" title="全选/取消全选" onclick="toggleQcSelectAll('stock-qc', this.checked)"></th>
                                     <th style="text-align:center">序号</th>
                                     <th style="text-align:center">检验日期</th>
                                     <th style="text-align:center">车间</th>
@@ -9497,7 +9517,8 @@ function renderQcTable(type) {
   const arr = getFilteredQc(type);
   const canEdit = canEditRole();
   if (!arr.length) {
-    tbody.innerHTML = '<tr><td colspan="15" style="text-align:center;color:var(--text-tertiary);padding:28px">暂无检验记录，请点右上角「➕ 新增检验记录」或「📂 导入」</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="16" style="text-align:center;color:var(--text-tertiary);padding:28px">暂无检验记录，请点右上角「➕ 新增检验记录」或「📂 导入」</td></tr>';
+    updateQcBatchBar(type);
     return;
   }
   let html = '';
@@ -9507,6 +9528,7 @@ function renderQcTable(type) {
       : '<span style="color:var(--text-tertiary)">—</span>';
     const party = r[c.partyField] || '';
     html += `<tr>
+      <td style="text-align:center"><input type="checkbox" class="qc-row-check" value="${_qcEsc(r.id)}" onchange="onQcRowCheck('${type}')"></td>
       <td style="text-align:center">${i+1}</td>
       <td style="text-align:center">${_qcEsc(r.inspectDate)}</td>
       <td style="text-align:center">${_qcEsc(party)}</td>
@@ -9525,6 +9547,7 @@ function renderQcTable(type) {
     </tr>`;
   });
   tbody.innerHTML = html;
+  updateQcBatchBar(type);
 }
 function clearQcFilter(type) {
   const c = QC_DEF[type];
@@ -9633,9 +9656,8 @@ function deleteQcRecord(type, id) {
   renderQcTable(type);
   _qcAutoSync();
 }
-function exportQcExcel(type) {
+function _writeQcExcel(type, arr) {
   const c = QC_DEF[type];
-  const arr = getFilteredQc(type);
   const head = ['序号','检验日期',c.partyLabel,'批次号','产品名称','零件号',c.amountLabel,'检验数量','合格数量','不良类型','不良数量','合格率','去向','检验员'];
   const aoa = [head];
   arr.forEach((r,i) => aoa.push([
@@ -9652,6 +9674,69 @@ function exportQcExcel(type) {
   XLSX.writeFile(wb, fn);
   addAuditLog('export', '导出检验记录', `${c.label}：导出${arr.length}条，文件${fn}`);
   showToast(`已导出 ${arr.length} 条${c.label}记录`, 'success');
+}
+function exportQcExcel(type) {
+  const arr = getFilteredQc(type);
+  if (!arr.length) { showToast('当前没有可导出的记录', 'info'); return; }
+  _writeQcExcel(type, arr);
+}
+function batchExportQc(type) {
+  if (!canEditRole()) { showToast('当前角色无导出权限', 'error'); return; }
+  const c = QC_DEF[type];
+  const ids = Array.from(document.querySelectorAll('#'+c.tbody+' .qc-row-check:checked')).map(x=>x.value);
+  const arr = getFilteredQc(type).filter(r=>ids.includes(r.id));
+  if (!arr.length) { showToast('请先勾选要导出的记录', 'info'); return; }
+  _writeQcExcel(type, arr);
+}
+/* ===== 批量选择 / 批量删除 ===== */
+function toggleQcSelectAll(type, checked) {
+  const c = QC_DEF[type];
+  document.querySelectorAll('#'+c.tbody+' .qc-row-check').forEach(cb=>cb.checked=checked);
+  const sa = document.querySelector('#page-'+type+' .qc-select-all');
+  if (sa) { sa.checked = checked; sa.indeterminate = false; }
+  updateQcBatchBar(type);
+}
+function onQcRowCheck(type) {
+  const c = QC_DEF[type];
+  const all = document.querySelectorAll('#'+c.tbody+' .qc-row-check');
+  const checked = document.querySelectorAll('#'+c.tbody+' .qc-row-check:checked');
+  const sa = document.querySelector('#page-'+type+' .qc-select-all');
+  if (sa) {
+    sa.checked = all.length>0 && checked.length===all.length;
+    sa.indeterminate = checked.length>0 && checked.length<all.length;
+  }
+  updateQcBatchBar(type);
+}
+function updateQcBatchBar(type) {
+  const c = QC_DEF[type];
+  const all = document.querySelectorAll('#'+c.tbody+' .qc-row-check');
+  const n = document.querySelectorAll('#'+c.tbody+' .qc-row-check:checked').length;
+  const sa = document.querySelector('#page-'+type+' .qc-select-all');
+  if (sa) {
+    if (!all.length) { sa.checked = false; sa.indeterminate = false; }
+    else { sa.checked = n===all.length; sa.indeterminate = n>0 && n<all.length; }
+  }
+  const bar = document.getElementById(type+'-batch-bar');
+  if (!bar) return;
+  bar.style.display = n>0 ? 'flex' : 'none';
+  document.getElementById(type+'-batch-info').textContent = '已选 '+n+' 条';
+  const expBtn = document.getElementById(type+'-batch-export');
+  const delBtn = document.getElementById(type+'-batch-del');
+  if (expBtn) expBtn.style.display = canEditRole() ? 'inline-flex' : 'none';
+  if (delBtn) delBtn.style.display = isAdminRole() ? 'inline-flex' : 'none';
+}
+function batchDeleteQc(type) {
+  if (!isAdminRole()) { showToast('仅管理员可批量删除', 'error'); return; }
+  const c = QC_DEF[type];
+  const ids = Array.from(document.querySelectorAll('#'+c.tbody+' .qc-row-check:checked')).map(x=>x.value);
+  if (!ids.length) return;
+  if (!confirm(`确定删除选中的 ${ids.length} 条${c.label}记录吗？`)) return;
+  const arr = _qcGet(type).filter(x=>!ids.includes(x.id));
+  saveData(c.storage, arr);
+  try { bumpLedgerModified(); } catch (e) {}
+  addAuditLog('delete', '批量删除检验记录', `${c.label}：批量删除${ids.length}条`);
+  renderQcTable(type);
+  _qcAutoSync();
 }
 function importQcExcel(type) {
   if (!canEditRole()) { showToast('只读角色无法导入', 'error'); return; }
