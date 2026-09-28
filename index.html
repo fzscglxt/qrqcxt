@@ -2573,7 +2573,7 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                                     <th>发起时间</th>
                                     <th>跟踪等级</th>
                                     <th>当前阶段</th>
-                                    <th>10天倒计时</th>
+                                    <th>倒计时</th>
                                     <th>风险等级</th>
                                     <th>状态</th>
                                     <th>操作</th>
@@ -2625,7 +2625,7 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                         <!-- Countdown -->
                         <div class="detail-section">
                             <div class="detail-section-title">
-                                ⏱️ 10天倒计时总览
+                                ⏱️ 倒计时总览
                                 <span id="detail-countdown" class="countdown" style="margin-left:auto"></span>
                             </div>
                             <div class="progress-bar" style="height:10px;margin-top:8px">
@@ -3249,9 +3249,16 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                     <div class="form-error" id="err-report-date">请选择上报日期</div>
                 </div>
                 <div class="form-group">
-                    <label>发起日期</label>
-                    <input type="text" id="issue-form-created-date" readonly style="background:var(--bg-light);cursor:not-allowed;color:var(--text-secondary);font-family:monospace;font-size:12.5px" title="提交时自动生成，与今日一致">
-                    <div class="form-hint" style="font-size:11.5px;color:var(--text-tertiary);margin-top:4px">提交系统时自动生成，不可修改</div>
+                    <label>发起日期<span class="required">*</span></label>
+                    <input type="date" id="issue-form-created-date" onchange="syncIssueCloseDateDefault()" title="问题发起日期（YYYY-MM-DD），默认今日，补录可手动选择">
+                    <div class="form-hint" style="font-size:11.5px;color:var(--text-tertiary);margin-top:4px">默认今日可手选；时分取提交时刻</div>
+                    <div class="form-error" id="err-created-date">请选择发起日期</div>
+                </div>
+                <div class="form-group">
+                    <label>关闭日期<span class="required">*</span></label>
+                    <input type="date" id="issue-form-close-date" onchange="window._issueCloseDateTouched=true" title="计划闭环截止日期（YYYY-MM-DD），倒计时按此计算，默认=发起日期+10天">
+                    <div class="form-hint" style="font-size:11.5px;color:var(--text-tertiary);margin-top:4px">默认发起日期+10天，倒计时据此计算</div>
+                    <div class="form-error" id="err-close-date">请选择关闭日期（不早于发起日期）</div>
                 </div>
             </div>
 
@@ -3289,7 +3296,7 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                 <div style="font-size:12px;color:var(--text-secondary)">
                     <strong>⚠️ 时效提醒：</strong>提交后系统将自动：<br>
                     1. 启动第一阶段（临时措施）1天倒计时<br>
-                    2. 启动10天总闭环倒计时<br>
+                    2. 按关闭日期启动总闭环倒计时（默认10天）<br>
                     3. 超时将自动升级预警，不可暂停或关闭
                 </div>
             </div>
@@ -3332,13 +3339,13 @@ function refreshTrackingLevelHint(lv) {
         if (child) {
             child.style.color = 'var(--text-secondary)';
             child.innerHTML = lv === 'simple'
-                ? `<strong>✅ 简单跟踪 · 时效说明：</strong>总闭环倒计时不变 10 天，但流程仅 3 阶段：<br>
+                ? `<strong>✅ 简单跟踪 · 时效说明：</strong>总闭环倒计时默认 10 天（可在上方设置关闭日期），流程仅 3 阶段：<br>
                    1. 启动第①阶段（临时措施）1 天倒计时<br>
                    2. 完成第③阶段（验证措施）提交后，系统自动立即标记闭环，无需上传 PPT<br>
                    3. 超时升级预警规则不变`
                 : `<strong>⚠️ 完整跟踪 · 时效提醒：</strong>提交后系统将自动：<br>
                    1. 启动第一阶段（临时措施）1天倒计时<br>
-                   2. 启动10天总闭环倒计时<br>
+                   2. 按关闭日期启动总闭环倒计时（默认10天）<br>
                    3. 第 6 阶段（经验总结）必须上传经验总结 PPT 文档才能闭环<br>
                    4. 超时将自动升级预警，不可暂停或关闭`;
         }
@@ -4874,9 +4881,17 @@ function calculateCountdown(issue) {
         return { text: '已闭环', status: 'closed', percent: 100, suppressed: true };
     }
     const created = new Date(issue.createdAt);
-    const deadline = addDays(created, 10);
+    // 截止时间优先取「关闭日期」当天 23:59:59；历史数据无该字段时回退 createdAt+10天
+    let deadline, totalMs;
+    if (issue.closeDate) {
+        deadline = new Date(issue.closeDate + 'T23:59:59');
+        totalMs = deadline - created;
+        if (!isFinite(totalMs) || totalMs <= 0) totalMs = 24 * 60 * 60 * 1000;
+    } else {
+        deadline = addDays(created, 10);
+        totalMs = 10 * 24 * 60 * 60 * 1000;
+    }
     const now = new Date();
-    const totalMs = 10 * 24 * 60 * 60 * 1000;
     const elapsed = now - created;
     const remaining = deadline - now;
 
@@ -6747,6 +6762,14 @@ function hideDashboardLoading() {
 /* ===================== 问题台账 ===================== */
 let issueFormFiles = []; // 附件文件缓存（名称+大小信息，模拟上传）
 
+// 发起日期改变时，若用户未手动改过关闭日期，则自动 = 发起日期+10天
+function syncIssueCloseDateDefault() {
+    const cd = document.getElementById('issue-form-created-date')?.value;
+    const closeEl = document.getElementById('issue-form-close-date');
+    if (!cd || !closeEl) return;
+    if (window._issueCloseDateTouched) return;
+    closeEl.value = formatDate(addDays(parseLocalDate(cd), 10));
+}
 function openIssueForm() {
     if (!requireEditRole()) return;
     // 清空表单（含新增加的跟踪等级、上报日期字段）
@@ -6765,7 +6788,11 @@ function openIssueForm() {
         rdEl.max = today; // 不能选未来日期
     }
     const cdEl = document.getElementById('issue-form-created-date');
-    if (cdEl) cdEl.value = `${today}（提交后精确到时分秒）`;
+    if (cdEl) cdEl.value = today;
+    // 关闭日期：默认 = 发起日期(今日)+10天；重置“手动改过”标志
+    const closeEl = document.getElementById('issue-form-close-date');
+    window._issueCloseDateTouched = false;
+    if (closeEl) closeEl.value = formatDate(addDays(new Date(), 10));
 
     // 跟踪等级：默认选中 完整跟踪，同时触发一次级联说明刷新
     const tlSel = document.getElementById('issue-form-tracking-level');
@@ -6921,6 +6948,23 @@ function validateIssueForm() {
         reportDateErr.classList.remove('show');
     }
 
+    // 发起日期、关闭日期：必填 + 格式 + 先后关系（关闭日期不早于发起日期）
+    const createdDate = document.getElementById('issue-form-created-date')?.value?.trim() || '';
+    const closeDateV  = document.getElementById('issue-form-close-date')?.value?.trim() || '';
+    const createdErr  = document.getElementById('err-created-date');
+    const closeErr    = document.getElementById('err-close-date');
+    let createdMsg = '', closeMsg = '';
+    if (!createdDate) createdMsg = '请选择发起日期';
+    else if (!DATE_REG.test(createdDate)) createdMsg = '发起日期格式错误（应为 YYYY-MM-DD）';
+    else if (parseLocalDate(createdDate) > parseLocalDate(today)) createdMsg = '发起日期不能晚于今日';
+    if (!closeDateV) closeMsg = '请选择关闭日期';
+    else if (!DATE_REG.test(closeDateV)) closeMsg = '关闭日期格式错误（应为 YYYY-MM-DD）';
+    else if (createdDate && parseLocalDate(closeDateV) < parseLocalDate(createdDate)) closeMsg = '关闭日期不能早于发起日期';
+    if (createdMsg && createdErr) { createdErr.textContent = createdMsg; createdErr.classList.add('show'); valid = false; }
+    else if (createdErr) createdErr.classList.remove('show');
+    if (closeMsg && closeErr) { closeErr.textContent = closeMsg; closeErr.classList.add('show'); valid = false; }
+    else if (closeErr) closeErr.classList.remove('show');
+
     const fields = [
         { key: 'title', id: 'err-title', check: v => v.length >= 2, msg: '请输入问题标题' },
         { key: 'source', id: 'err-source', check: v => !!v, msg: '请选择上报场景' },
@@ -6956,8 +7000,12 @@ function submitIssueForm() {
     const trackingLevel = document.getElementById('issue-form-tracking-level').value;
     const stages = getStagesOfTracking(trackingLevel);
     const reportDate = document.getElementById('issue-form-report-date').value.trim();
-    const createdAt  = formatDateTime(new Date());
-    const createdDay = formatDate(new Date(createdAt));
+    // 发起日期取表单所选（默认今日），时分取提交时刻；关闭日期取表单所选（默认发起+10）
+    const createdDay = document.getElementById('issue-form-created-date').value.trim();
+    const closeDate  = document.getElementById('issue-form-close-date').value.trim();
+    const _submitNow = new Date();
+    const _hhmm = String(_submitNow.getHours()).padStart(2,'0') + ':' + String(_submitNow.getMinutes()).padStart(2,'0');
+    const createdAt  = `${createdDay} ${_hhmm}`;
     const reportDay  = reportDate;
     const dateDiff   = Math.floor((parseLocalDate(createdDay) - parseLocalDate(reportDay)) / 86400000);
 
@@ -6973,8 +7021,9 @@ function submitIssueForm() {
         batch: document.getElementById('issue-form-batch').value.trim(),
         description: document.getElementById('issue-form-desc').value.trim(),
         attachments: JSON.parse(JSON.stringify(issueFormFiles || [])),
-        reportDate: reportDate,            // 新增字段：上报日期（YYYY-MM-DD）
-        trackingLevel: trackingLevel,      // 新增字段：跟踪等级（'full' | 'simple'）
+        reportDate: reportDate,            // 上报日期（YYYY-MM-DD）
+        closeDate: closeDate,              // 计划关闭日期（YYYY-MM-DD），倒计时据此计算
+        trackingLevel: trackingLevel,      // 跟踪等级（'full' | 'simple'）
         currentStage: stages[0]?.num || 1,// 动态第一阶段（simple/full 都是 1=临时措施）
         closed: false,
         closedAt: null,
@@ -7010,7 +7059,7 @@ function submitIssueForm() {
     const issues = loadData(STORAGE_KEYS.ISSUES, []);
     issues.unshift(issue);
     saveData(STORAGE_KEYS.ISSUES, issues);
-    bumpLedgerModified(user);
+    bumpLedgerModified();
     
     addAuditLog('create', '创建问题单', `创建问题 ${issue.id}: ${issue.title}，来源: ${issue.source}，上报日期: ${reportDate}，跟踪等级: ${lvLabel}${issueFormFiles.length ? '，附件: '+issueFormFiles.length+'个' : ''}`);
     
@@ -7685,7 +7734,7 @@ function renderIssueDetail() {
         <div class="detail-item"><span class="detail-label">上报日期</span>${reportDateHtml}</div>
         <div class="detail-item"><span class="detail-label">发起时间</span><span class="detail-value">${issue.createdAt}</span></div>
         <div class="detail-item"><span class="detail-label">发起人</span><span class="detail-value">${issue.createdBy}</span></div>
-        <div class="detail-item"><span class="detail-label">预计闭环时间</span><span class="detail-value">${formatDateTime(addDays(new Date(issue.createdAt), 10))}</span></div>
+        <div class="detail-item"><span class="detail-label">计划关闭日期</span><span class="detail-value" style="font-family:monospace">${issue.closeDate || formatDate(addDays(new Date(issue.createdAt), 10))}</span></div>
         ${issue.closed ? `<div class="detail-item"><span class="detail-label">实际闭环时间</span><span class="detail-value" style="color:var(--success);font-weight:600">✅ ${issue.closedAt || '-'}</span></div>` : ''}
     `;
     
