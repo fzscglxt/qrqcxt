@@ -9792,10 +9792,24 @@ function _parseQcRows(type, rows) {
   };
   const head = (rows[0] || []).map(x => String(x).trim());
   const colMap = {};
+  const claimed = new Set();
+  // headers that must NOT be read as defect quantity
+  const NEG_QTY = ['来料','入库','检验','合格','送检','总检','抽检','到货','来货','收货'];
   let foundHeader = false;
+  const headerHit = (field, h, k) => h.indexOf(k) > -1 && !(field === '数量' && NEG_QTY.some(n => h.indexOf(n) > -1));
+  // pass 1: exact header match
   Object.keys(MAP).forEach(field => {
     for (let c = 0; c < head.length; c++) {
-      if (MAP[field].some(k => head[c] === k || head[c].indexOf(k) > -1)) { colMap[field] = c; foundHeader = true; break; }
+      if (claimed.has(c)) continue;
+      if (MAP[field].some(k => head[c] === k)) { colMap[field] = c; claimed.add(c); foundHeader = true; break; }
+    }
+  });
+  // pass 2: substring match, skipping columns already claimed (prevents 数量 matching 来料数量/检验数量)
+  Object.keys(MAP).forEach(field => {
+    if (colMap[field] !== undefined) return;
+    for (let c = 0; c < head.length; c++) {
+      if (claimed.has(c)) continue;
+      if (MAP[field].some(k => headerHit(field, head[c], k))) { colMap[field] = c; claimed.add(c); foundHeader = true; break; }
     }
   });
   let startRow = 0;
