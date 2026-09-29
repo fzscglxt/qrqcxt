@@ -4060,7 +4060,7 @@ function resetAnalyticalData() {
     // A. 数据看板图表
     if (typeof dashboardCharts === 'object' && dashboardCharts) {
         Object.values(dashboardCharts).forEach(c => {
-            try { (c||{}).(destroy||{}).(); } catch (e) {}
+            try { if (c && c.destroy) c.destroy(); } catch (e) {}
         });
     }
     if (typeof dashboardCharts !== 'undefined') {
@@ -4069,7 +4069,7 @@ function resetAnalyticalData() {
     // B. 报表中心图表
     if (typeof reportCharts === 'object' && reportCharts) {
         Object.values(reportCharts).forEach(c => {
-            try { (c||{}).(destroy||{}).(); } catch (e) {}
+            try { if (c && c.destroy) c.destroy(); } catch (e) {}
         });
     }
     if (typeof reportCharts !== 'undefined') {
@@ -4079,14 +4079,14 @@ function resetAnalyticalData() {
     ['trend-chart','category-chart','stage-chart','source-chart'].forEach(id => {
         const c = document.getElementById(id);
         if (!c) return;
-        const ctx = (c.getContext||{}).('2d');
+        const ctx = (c && c.getContext) ? c.getContext('2d') : null;
         if (ctx) { ctx.clearRect(0, 0, c.width, c.height); }
     });
     ['rpt-chart-closure','rpt-chart-duration','rpt-chart-overdue','rpt-chart-total',
      'rpt-chart-type','rpt-chart-trend-compare','rpt-chart-owner'].forEach(id => {
         const c = document.getElementById(id);
         if (!c) return;
-        const ctx = (c.getContext||{}).('2d');
+        const ctx = (c && c.getContext) ? c.getContext('2d') : null;
         if (ctx) { ctx.clearRect(0, 0, c.width, c.height); }
     });
     // D. 统计卡 DOM 清空 → 先置为 0 或空内容，给用户视觉反馈"确实被清空过"
@@ -5402,7 +5402,7 @@ function renderDashboardCharts(issues, periodIssues, period, analytics = {}) {
     // 若 8 张图任意 canvas 因为页面未加载找不到则跳过（兼容老旧初始化）
     const ENABLE_ALL = !!(ctxCategory && ctxStage && ctxSource && ctxRisk && ctxOwner && ctxStageHotspot && ctxProgress && ctxMiniTrend);
 
-    Object.values(dashboardCharts).forEach(c => (c||{}).(destroy||{}).());
+    Object.values(dashboardCharts).forEach(function(c){ if (c && c.destroy) c.destroy(); });
     dashboardCharts = {};
     if (!ENABLE_ALL) return;
 
@@ -5650,7 +5650,7 @@ function renderDashboardCharts(issues, periodIssues, period, analytics = {}) {
                 let a = 0, c = 0;
                 periodIssues.forEach(i => {
                     const ct = (function(){var _d=parseLocalDate(i.createdAt); return _d?_d.getTime():0;})();
-                    const clt = i.closed ? ((((function(){var _d=parseLocalDate(i.closedAt); return _d?_d.getTime():0;})()) : 0;
+                    const clt = i.closed ? ((function(){var _d=parseLocalDate(i.closedAt); return _d?_d.getTime():0;})()) : 0;
                     if (ct >= sT && ct < eT) a++;
                     if (clt && clt >= sT && clt < eT) c++;
                 });
@@ -5670,7 +5670,7 @@ function renderDashboardCharts(issues, periodIssues, period, analytics = {}) {
                 let a=0, c=0;
                 periodIssues.forEach(i=>{
                     const ct = (function(){var _d=parseLocalDate(i.createdAt); return _d?_d.getTime():0;})();
-                    const clt = i.closed ? ((((function(){var _d=parseLocalDate(i.closedAt); return _d?_d.getTime():0;})()) : 0;
+                    const clt = i.closed ? ((function(){var _d=parseLocalDate(i.closedAt); return _d?_d.getTime():0;})()) : 0;
                     if (ct >= s && ct <= e) a++;
                     if (clt && clt >= s && clt <= e) c++;
                 });
@@ -5689,7 +5689,7 @@ function renderDashboardCharts(issues, periodIssues, period, analytics = {}) {
                 let a=0,c=0;
                 periodIssues.forEach(i=>{
                     const ct=(function(){var _d=parseLocalDate(i.createdAt); return _d?_d.getTime():0;})();
-                    const clt=i.closed?((((function(){var _d=parseLocalDate(i.closedAt); return _d?_d.getTime():0;})()):0;
+                    const clt=i.closed?((function(){var _d=parseLocalDate(i.closedAt); return _d?_d.getTime():0;})()):0;
                     if (ct>=s&&ct<=e) a++;
                     if (clt&&clt>=s&&clt<=e) c++;
                 });
@@ -5713,7 +5713,7 @@ function renderDashboardCharts(issues, periodIssues, period, analytics = {}) {
                     let a=0,c=0;
                     periodIssues.forEach(i=>{
                         const ct=(function(){var _d=parseLocalDate(i.createdAt); return _d?_d.getTime():0;})();
-                        const clt=i.closed?((((function(){var _d=parseLocalDate(i.closedAt); return _d?_d.getTime():0;})()):0;
+                        const clt=i.closed?((function(){var _d=parseLocalDate(i.closedAt); return _d?_d.getTime():0;})()):0;
                         if (ct>=s&&ct<=e) a++;
                         if (clt&&clt>=s&&clt<=e) c++;
                     });
@@ -5730,7 +5730,7 @@ function renderDashboardCharts(issues, periodIssues, period, analytics = {}) {
                     let a=0,c=0;
                     periodIssues.forEach(i=>{
                         const ct=(function(){var _d=parseLocalDate(i.createdAt); return _d?_d.getTime():0;})();
-                        const clt=i.closed?((((function(){var _d=parseLocalDate(i.closedAt); return _d?_d.getTime():0;})()):0;
+                        const clt=i.closed?((function(){var _d=parseLocalDate(i.closedAt); return _d?_d.getTime():0;})()):0;
                         if (ct>=st&&ct<=et) a++;
                         if (clt&&clt>=st&&clt<=et) c++;
                     });
@@ -6755,12 +6755,12 @@ function applyCustomDateRange() {
     // 并吐司显示「耗时 / 图数 / 指标数」，确保"用户确认 → 结果实时响应"。
     const t0 = performance.now();
     const res = completeReanalyzeFromLedger({ silent: true });
-    const cost = (res||{}).(cost!=null?cost:Math).round(performance.now() - t0);
+    const cost = (res && res.cost != null) ? res.cost : Math.round(performance.now() - t0);
     const chartCount = Object.keys(window.dashboardCharts || {}).length + Object.keys(window.reportCharts || {}).length;
     const kpiCount = 10;    // 看板 10 张 QRQC 指标卡
     const rpCount  = 9;     // 报表中心 9 项分析指标
     showToast(
-        `✅ QRQC 重新分析完成：耗时 ${cost}ms，共更新 ${chartCount} 张图 + ${kpiCount + rpCount} 个指标，台账 ${(res||{}).(snap||{}).(total!=null?total:'—')} 条问题（已闭环 ${(res||{}).(snap||{}).(closed!=null?closed:'—')} / 处理中 ${(res||{}).(snap||{}).(processing!=null?processing:'—')} / 超时 ${(res||{}).(snap||{}).(overdue!=null?overdue:'—')}）`,
+        `✅ QRQC 重新分析完成：耗时 ${cost}ms，共更新 ${chartCount} 张图 + ${kpiCount + rpCount} 个指标，台账 ${(res && res.snap && res.snap.total != null) ? res.snap.total : '—'} 条问题（已闭环 ${(res && res.snap && res.snap.closed != null) ? res.snap.closed : '—'} / 处理中 ${(res && res.snap && res.snap.processing != null) ? res.snap.processing : '—'} / 超时 ${(res && res.snap && res.snap.overdue != null) ? res.snap.overdue : '—'}）`,
         'success'
     );
 }
@@ -6969,7 +6969,7 @@ function removeIssueFormFile(idx) {
 function validateIssueForm() {
     let valid = true;
     const today = formatDate(new Date());
-    const reportDate = (document.getElementById('issue-form-report-date')||{}).(value||{}).trim() || '';
+    const reportDate = ((document.getElementById('issue-form-report-date')||{}).value||'').trim() || '';
     const reportDateErr = document.getElementById('err-report-date');
 
     // 上报日期：必填 + 格式 + 业务规则
@@ -6996,8 +6996,8 @@ function validateIssueForm() {
     }
 
     // 发起日期、关闭日期：必填 + 格式 + 先后关系（关闭日期不早于发起日期）
-    const createdDate = (document.getElementById('issue-form-created-date')||{}).(value||{}).trim() || '';
-    const closeDateV  = (document.getElementById('issue-form-close-date')||{}).(value||{}).trim() || '';
+    const createdDate = ((document.getElementById('issue-form-created-date')||{}).value||'').trim() || '';
+    const closeDateV  = ((document.getElementById('issue-form-close-date')||{}).value||'').trim() || '';
     const createdErr  = document.getElementById('err-created-date');
     const closeErr    = document.getElementById('err-close-date');
     let createdMsg = '', closeMsg = '';
@@ -7142,7 +7142,7 @@ function submitIssueForm() {
 
 /* ============ 渲染问题台账表格 ============ */
 function renderIssueTable() {
-    const search = (document.getElementById('issue-search')||{}).(value||{}).trim().toLowerCase() || '';
+    const search = ((document.getElementById('issue-search')||{}).value||'').trim().toLowerCase() || '';
     const fSource = (document.getElementById('issue-filter-source')||{}).value || '';
     const fStage = (document.getElementById('issue-filter-stage')||{}).value || '';
     const fRisk = (document.getElementById('issue-filter-risk')||{}).value || '';
@@ -8382,7 +8382,7 @@ function submitStageForm() {
                 ? { attId: _fm.attId, name: _fm.name, size: _fm.size, type: _fm.type }
                 : (document.getElementById('stage-field-' + f.key + '-name').value || '');
         } else {
-            val = (document.getElementById('stage-field-' + f.key)||{}).(value||{}).trim() || '';
+            val = ((document.getElementById('stage-field-' + f.key)||{}).value||'').trim() || '';
         }
         data[f.key] = val;
         
@@ -8843,7 +8843,7 @@ function markAllAlertsRead() {
 
 /* ============ 审计日志 ============ */
 function renderAuditLog() {
-    const search = (document.getElementById('audit-search')||{}).(value||{}).trim().toLowerCase() || '';
+    const search = ((document.getElementById('audit-search')||{}).value||'').trim().toLowerCase() || '';
     const fType = (document.getElementById('audit-filter-type')||{}).value || '';
     const fUser = (document.getElementById('audit-filter-user')||{}).value || '';
     let logs = loadData(STORAGE_KEYS.AUDIT_LOG, []);
@@ -8939,7 +8939,7 @@ function exportIssuesExcel() {
         const s4 = (i.stageData||{}).stage4 || {};
         const s5 = (i.stageData||{}).stage5 || {};
         const s6 = (i.stageData||{}).stage6 || {};
-        const stageName = i.closed ? '已闭环' : (STAGES.find(s => s.num === i.currentStage))||{}).name || '-');
+        const stageName = i.closed ? '已闭环' : ((STAGES.find(s => s.num === i.currentStage)||{}).name || '-');
         const statusText = i.closed
             ? '已闭环'
             : ((i.stageOverdue || i.totalOverdue) ? '已超时' : ((i.stageWarning || i.totalWarning) ? '临期' : '处理中'));
@@ -10174,7 +10174,7 @@ document.addEventListener('click', e => {
 // 云端共享（Cloudflare Pages Functions + KV），与生产/模具/设备系统同构
 // 手动保存：侧边栏 💾 先拉版本再推送；进入系统自动拉云端最新；90 秒轮询他人更新
 // ============================================================
-const CLOUD_CONFIG = { apiBase: '' }; // 空串 = 走同源接口 /api/db
+const CLOUD_CONFIG = { apiBase: 'https://fz-qrqc-mgmt.pages.dev' }; // 空串 = 走同源接口 /api/db
 const QRQC_CLOUD_META_KEY = 'qrqc_cloud_meta_v1';
 
 // ============================================================
