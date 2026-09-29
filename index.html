@@ -122,6 +122,8 @@
         .sidebar-user .logout-btn:hover { color: var(--danger); background: rgba(234,67,53,0.1); }
         /* ===== 大屏看板（Kiosk）只读模式：隐藏保存按钮与用户区 ===== */
         body.kiosk-mode #cloud-save-btn, body.kiosk-mode #sidebar-user { display: none !important; }
+        body.kiosk-hidenav #sidebar { display: none !important; }
+        body.kiosk-hidenav .main { margin-left: 0 !important; }
         .sidebar-cloud { padding: 10px 16px; border-top: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; gap: 8px; font-size: 12px; color: #94a3b8; }
         .sidebar-cloud .cloud-dot { width: 8px; height: 8px; border-radius: 50%; background: #64748b; flex-shrink: 0; }
         .sidebar-cloud .cloud-dot.ok { background: #34a853; }
@@ -4413,6 +4415,8 @@ const DEFAULT_USERS = [
 ];
 
 function getCurrentUser() { return loadData(STORAGE_KEYS.USER, null); }
+function kioskUrlPage(){ try{ var p=new URLSearchParams(location.search); if(!p.has('kiosk')) return null; return p.get('page')||null; }catch(e){ return null; } }
+function kioskUrlHidenav(){ try{ return new URLSearchParams(location.search).get('hidenav')==='1'; }catch(e){ return false; } }
 function isKioskMode() {
     try { return new URLSearchParams(location.search).has('kiosk'); } catch (e) { return false; }
 }
@@ -10074,6 +10078,7 @@ function enterSystem() {
         // 清缓存 + 完全基于 ISSUES 重新分析看板/报表/台账，保证不存在历史缓存 / mock 数据
         completeReanalyzeFromLedger({ silent: true });
         refreshAll();
+        var _ksInitPage = kioskUrlPage(); if (_ksInitPage) { try { navigateTo(_ksInitPage); } catch(e) {} }
         // ===== 预警中心：启动双向一致性定时校验器（5分钟一次，发现不一致自动巡检重建）=====
         startAlertValidationScheduler();
         // ===== 跨设备数据检测（云端无数据时兜底引导导入）=====
@@ -10120,6 +10125,7 @@ document.addEventListener('DOMContentLoaded', () => {
         saveData(STORAGE_KEYS.USER, user);
     }
     if (isKioskMode()) document.body.classList.add('kiosk-mode');
+    if (kioskUrlHidenav()) document.body.classList.add('kiosk-hidenav');
     if (user) {
         enterSystem();
     } else {
