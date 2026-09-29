@@ -4060,7 +4060,7 @@ function resetAnalyticalData() {
     // A. 数据看板图表
     if (typeof dashboardCharts === 'object' && dashboardCharts) {
         Object.values(dashboardCharts).forEach(c => {
-            try { (c||{}).(destroy||{}).(); } catch (e) {}
+            try { c?.destroy?.(); } catch (e) {}
         });
     }
     if (typeof dashboardCharts !== 'undefined') {
@@ -4069,7 +4069,7 @@ function resetAnalyticalData() {
     // B. 报表中心图表
     if (typeof reportCharts === 'object' && reportCharts) {
         Object.values(reportCharts).forEach(c => {
-            try { (c||{}).(destroy||{}).(); } catch (e) {}
+            try { c?.destroy?.(); } catch (e) {}
         });
     }
     if (typeof reportCharts !== 'undefined') {
@@ -4079,14 +4079,14 @@ function resetAnalyticalData() {
     ['trend-chart','category-chart','stage-chart','source-chart'].forEach(id => {
         const c = document.getElementById(id);
         if (!c) return;
-        const ctx = (c.getContext||{}).('2d');
+        const ctx = c.getContext?.('2d');
         if (ctx) { ctx.clearRect(0, 0, c.width, c.height); }
     });
     ['rpt-chart-closure','rpt-chart-duration','rpt-chart-overdue','rpt-chart-total',
      'rpt-chart-type','rpt-chart-trend-compare','rpt-chart-owner'].forEach(id => {
         const c = document.getElementById(id);
         if (!c) return;
-        const ctx = (c.getContext||{}).('2d');
+        const ctx = c.getContext?.('2d');
         if (ctx) { ctx.clearRect(0, 0, c.width, c.height); }
     });
     // D. 统计卡 DOM 清空 → 先置为 0 或空内容，给用户视觉反馈"确实被清空过"
@@ -4158,7 +4158,7 @@ function completeReanalyzeFromLedger({ silent = false } = {}) {
     try {
         const user = getCurrentUser();
         addAuditLog('analysis', '重新分析(清缓存)',
-            `触发人：${(user||{}).name||'unknown'}(${(user||{}).role||'-'})，` +
+            `触发人：${user?.name||'unknown'}(${user?.role||'-'})，` +
             `耗时 ${cost}ms，` +
             `问题总数 ${snap.total}（已闭环 ${snap.closed} / 处理中 ${snap.processing} / 超时 ${snap.overdue}），` +
             `数据源唯一：STORAGE_KEYS.ISSUES（len=${snap.total}）`);
@@ -4761,8 +4761,8 @@ function navigateTo(page, issueId = null) {
     if (page === 'issues') syncDashboardRangeToLedger();   // 看板 → 台账
     if (page === 'dashboard') {
         // 台账 → 看板：如果台账填了日期，切回看板时自动设为 custom 周期
-        const hasLedgerDate = ((document.getElementById('ledger-date-start')||{}).value || '')
-                            || ((document.getElementById('ledger-date-end')||{}).value   || '');
+        const hasLedgerDate = (document.getElementById('ledger-date-start')?.value || '')
+                            || (document.getElementById('ledger-date-end')?.value   || '');
         if (hasLedgerDate) syncLedgerRangeToDashboard();
     }
 
@@ -5188,8 +5188,8 @@ function renderDashboard() {
         const riskWeight = { high: 10, medium: 6, low: 3 };
         const stageWeight = [0, 2, 3, 4, 6, 8, 10];   // 索引 0 占位，S1..S6 = 1..6
         openIssues.forEach(i => {
-            const rw = (riskWeight[i.risk]!=null?riskWeight[i.risk]:4);
-            const sw = (stageWeight[i.currentStage]!=null?stageWeight[i.currentStage]:2);
+            const rw = riskWeight[i.risk] ?? 4;
+            const sw = stageWeight[i.currentStage] ?? 2;
             let pw = 1;
             if (i.totalOverdue || i.stageOverdue) pw = i.totalOverdue ? 2.5 : 2;
             else if (i.totalWarning || i.stageWarning) pw = 1.2;
@@ -5252,13 +5252,13 @@ function renderDashboard() {
                 let pw = 1;
                 if (i.totalOverdue || i.stageOverdue) pw = i.totalOverdue ? 2.5 : 2;
                 else if (i.totalWarning || i.stageWarning) pw = 1.2;
-                const score = ((rw2[i.risk]!=null?rw2[i.risk]:4)) * ((sw2[i.currentStage]!=null?sw2[i.currentStage]:2)) * pw;
+                const score = (rw2[i.risk] ?? 4) * (sw2[i.currentStage] ?? 2) * pw;
                 return { issue: i, score: Math.round(score * 10) / 10 };
             }).sort((a, b) => b.score - a.score).slice(0, 5);
             redzoneHTML = redZoneCandidates.length ? redZoneCandidates.map((x, idx) => {
                 const i = x.issue;
                 const cd = calculateCountdown(i);
-                const stageName = (STAGES.find(s => s.num === i.currentStage)||{}).name || '-';
+                const stageName = STAGES.find(s => s.num === i.currentStage)?.name || '-';
                 const stageClass = i.stageOverdue ? 'stage-overdue' : `stage-${i.currentStage}`;
                 return `
                 <tr>
@@ -5302,7 +5302,7 @@ function renderDashboard() {
             const recent = [...issues].sort((a, b) => (parseLocalDate(b.createdAt)||0) - (parseLocalDate(a.createdAt)||0)).slice(0, 8);
             recentHTML = recent.length ? recent.map(i => {
                 const cd = calculateCountdown(i);
-                const stageName = i.closed ? '已闭环' : (STAGES.find(s => s.num === i.currentStage)||{}).name || '-';
+                const stageName = i.closed ? '已闭环' : STAGES.find(s => s.num === i.currentStage)?.name || '-';
                 const stageClass = i.closed ? 'stage-closed' : (i.stageOverdue ? 'stage-overdue' : `stage-${i.currentStage}`);
                 return `
                 <tr>
@@ -5402,7 +5402,7 @@ function renderDashboardCharts(issues, periodIssues, period, analytics = {}) {
     // 若 8 张图任意 canvas 因为页面未加载找不到则跳过（兼容老旧初始化）
     const ENABLE_ALL = !!(ctxCategory && ctxStage && ctxSource && ctxRisk && ctxOwner && ctxStageHotspot && ctxProgress && ctxMiniTrend);
 
-    Object.values(dashboardCharts).forEach(c => (c||{}).(destroy||{}).());
+    Object.values(dashboardCharts).forEach(c => c?.destroy?.());
     dashboardCharts = {};
     if (!ENABLE_ALL) return;
 
@@ -5561,8 +5561,8 @@ function renderDashboardCharts(issues, periodIssues, period, analytics = {}) {
             let prevAt = startTotal;
             for (let k = 0; k < 6; k++) {
                 const sKey = 'stage' + (k + 1);
-                const sData = (i.stageData||[])[sKey];
-                const submitAt = (sData||{})._submitTime ? parseLocalDate(sData._submitTime) : null;
+                const sData = i.stageData?.[sKey];
+                const submitAt = sData?._submitTime ? parseLocalDate(sData._submitTime) : null;
                 if (submitAt && prevAt) {
                     const d = daysBetween(prevAt, submitAt);
                     if (d >= 0) stageDurationsArr[k].push(d);
@@ -5616,7 +5616,7 @@ function renderDashboardCharts(issues, periodIssues, period, analytics = {}) {
                     legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 14 } },
                     tooltip: {
                         callbacks: {
-                            afterBody: () => (avgStageStay||[])[6] > 0
+                            afterBody: () => avgStageStay?.[6] > 0
                                 ? [`阶段平均停留：${avgStageStay.slice(0,6).map((d,i)=>`S${i+1}${d}天`).join(' · ')}`, `全局平均：${avgStageStay[6]} 天`]
                                 : []
                         }
@@ -5649,8 +5649,8 @@ function renderDashboardCharts(issues, periodIssues, period, analytics = {}) {
                 const sT = s.getTime(), eT = e.getTime();
                 let a = 0, c = 0;
                 periodIssues.forEach(i => {
-                    const ct = (function(){var _d=parseLocalDate(i.createdAt); return _d?_d.getTime():0;})();
-                    const clt = i.closed ? ((((function(){var _d=parseLocalDate(i.closedAt); return _d?_d.getTime():0;})()) : 0;
+                    const ct = parseLocalDate(i.createdAt)?.getTime() ?? 0;
+                    const clt = i.closed ? (parseLocalDate(i.closedAt)?.getTime() ?? 0) : 0;
                     if (ct >= sT && ct < eT) a++;
                     if (clt && clt >= sT && clt < eT) c++;
                 });
@@ -5669,8 +5669,8 @@ function renderDashboardCharts(issues, periodIssues, period, analytics = {}) {
                 labels.push(['一','二','三','四','五','六','日'][k]);
                 let a=0, c=0;
                 periodIssues.forEach(i=>{
-                    const ct = (function(){var _d=parseLocalDate(i.createdAt); return _d?_d.getTime():0;})();
-                    const clt = i.closed ? ((((function(){var _d=parseLocalDate(i.closedAt); return _d?_d.getTime():0;})()) : 0;
+                    const ct = parseLocalDate(i.createdAt)?.getTime() ?? 0;
+                    const clt = i.closed ? (parseLocalDate(i.closedAt)?.getTime() ?? 0) : 0;
                     if (ct >= s && ct <= e) a++;
                     if (clt && clt >= s && clt <= e) c++;
                 });
@@ -5688,8 +5688,8 @@ function renderDashboardCharts(issues, periodIssues, period, analytics = {}) {
                 const s=dayStart(d).getTime(), e=dayEnd(d).getTime();
                 let a=0,c=0;
                 periodIssues.forEach(i=>{
-                    const ct=(function(){var _d=parseLocalDate(i.createdAt); return _d?_d.getTime():0;})();
-                    const clt=i.closed?((((function(){var _d=parseLocalDate(i.closedAt); return _d?_d.getTime():0;})()):0;
+                    const ct=parseLocalDate(i.createdAt)?.getTime() ?? 0;
+                    const clt=i.closed?(parseLocalDate(i.closedAt)?.getTime() ?? 0):0;
                     if (ct>=s&&ct<=e) a++;
                     if (clt&&clt>=s&&clt<=e) c++;
                 });
@@ -5701,8 +5701,8 @@ function renderDashboardCharts(issues, periodIssues, period, analytics = {}) {
             labels = m12.labels; added = m12.added; closed = m12.closed; totalActive = m12.totalActive;
         } else {
             // custom：按 dashboardCustomRange.start/end 生成桶
-            const s0 = (dashboardCustomRange||{}).startDate ? dayStart(dashboardCustomRange.startDate) : dayStart(now);
-            const e0 = (dashboardCustomRange||{}).endDate   ? dayEnd(dashboardCustomRange.endDate)   : dayEnd(now);
+            const s0 = dashboardCustomRange?.startDate ? dayStart(dashboardCustomRange.startDate) : dayStart(now);
+            const e0 = dashboardCustomRange?.endDate   ? dayEnd(dashboardCustomRange.endDate)   : dayEnd(now);
             const _e0d = new Date(e0); _e0d.setHours(0,0,0,0);
             const totalDays = Math.max(1, Math.round((_e0d.getTime() - s0.getTime()) / 86400000) + 1);
             if (totalDays <= 14) {
@@ -5712,8 +5712,8 @@ function renderDashboardCharts(issues, periodIssues, period, analytics = {}) {
                     const s=dayStart(d).getTime(), e=dayEnd(d).getTime();
                     let a=0,c=0;
                     periodIssues.forEach(i=>{
-                        const ct=(function(){var _d=parseLocalDate(i.createdAt); return _d?_d.getTime():0;})();
-                        const clt=i.closed?((((function(){var _d=parseLocalDate(i.closedAt); return _d?_d.getTime():0;})()):0;
+                        const ct=parseLocalDate(i.createdAt)?.getTime() ?? 0;
+                        const clt=i.closed?(parseLocalDate(i.closedAt)?.getTime() ?? 0):0;
                         if (ct>=s&&ct<=e) a++;
                         if (clt&&clt>=s&&clt<=e) c++;
                     });
@@ -5729,8 +5729,8 @@ function renderDashboardCharts(issues, periodIssues, period, analytics = {}) {
                     const st=dayStart(ws).getTime(), et=dayEnd(we).getTime();
                     let a=0,c=0;
                     periodIssues.forEach(i=>{
-                        const ct=(function(){var _d=parseLocalDate(i.createdAt); return _d?_d.getTime():0;})();
-                        const clt=i.closed?((((function(){var _d=parseLocalDate(i.closedAt); return _d?_d.getTime():0;})()):0;
+                        const ct=parseLocalDate(i.createdAt)?.getTime() ?? 0;
+                        const clt=i.closed?(parseLocalDate(i.closedAt)?.getTime() ?? 0):0;
                         if (ct>=st&&ct<=et) a++;
                         if (clt&&clt>=st&&clt<=et) c++;
                     });
@@ -5906,8 +5906,8 @@ function updateCustomWeekRange() {
 function applyCustomWeekRange() {
     const sInp = document.getElementById('week-custom-start');
     const eInp = document.getElementById('week-custom-end');
-    const s = (sInp||{}).value ? new Date(sInp.value) : null;
-    const e = (eInp||{}).value ? new Date(eInp.value) : null;
+    const s = sInp?.value ? new Date(sInp.value) : null;
+    const e = eInp?.value ? new Date(eInp.value) : null;
     if (!s || !e || isNaN(s.getTime()) || isNaN(e.getTime())) {
         showToast('⚠️ 请选择有效的起止日期', 'warning'); return;
     }
@@ -6755,12 +6755,12 @@ function applyCustomDateRange() {
     // 并吐司显示「耗时 / 图数 / 指标数」，确保"用户确认 → 结果实时响应"。
     const t0 = performance.now();
     const res = completeReanalyzeFromLedger({ silent: true });
-    const cost = (res||{}).(cost!=null?cost:Math).round(performance.now() - t0);
+    const cost = res?.cost ?? Math.round(performance.now() - t0);
     const chartCount = Object.keys(window.dashboardCharts || {}).length + Object.keys(window.reportCharts || {}).length;
     const kpiCount = 10;    // 看板 10 张 QRQC 指标卡
     const rpCount  = 9;     // 报表中心 9 项分析指标
     showToast(
-        `✅ QRQC 重新分析完成：耗时 ${cost}ms，共更新 ${chartCount} 张图 + ${kpiCount + rpCount} 个指标，台账 ${(res||{}).(snap||{}).(total!=null?total:'—')} 条问题（已闭环 ${(res||{}).(snap||{}).(closed!=null?closed:'—')} / 处理中 ${(res||{}).(snap||{}).(processing!=null?processing:'—')} / 超时 ${(res||{}).(snap||{}).(overdue!=null?overdue:'—')}）`,
+        `✅ QRQC 重新分析完成：耗时 ${cost}ms，共更新 ${chartCount} 张图 + ${kpiCount + rpCount} 个指标，台账 ${res?.snap?.total ?? '—'} 条问题（已闭环 ${res?.snap?.closed ?? '—'} / 处理中 ${res?.snap?.processing ?? '—'} / 超时 ${res?.snap?.overdue ?? '—'}）`,
         'success'
     );
 }
@@ -6821,7 +6821,7 @@ let issueFormFiles = []; // 附件文件缓存（名称+大小信息，模拟上
 
 // 发起日期改变时，若用户未手动改过关闭日期，则自动 = 发起日期+10天
 function syncIssueCloseDateDefault() {
-    const cd = (document.getElementById('issue-form-created-date')||{}).value;
+    const cd = document.getElementById('issue-form-created-date')?.value;
     const closeEl = document.getElementById('issue-form-close-date');
     if (!cd || !closeEl) return;
     if (window._issueCloseDateTouched) return;
@@ -6969,7 +6969,7 @@ function removeIssueFormFile(idx) {
 function validateIssueForm() {
     let valid = true;
     const today = formatDate(new Date());
-    const reportDate = (document.getElementById('issue-form-report-date')||{}).(value||{}).trim() || '';
+    const reportDate = document.getElementById('issue-form-report-date')?.value?.trim() || '';
     const reportDateErr = document.getElementById('err-report-date');
 
     // 上报日期：必填 + 格式 + 业务规则
@@ -6996,8 +6996,8 @@ function validateIssueForm() {
     }
 
     // 发起日期、关闭日期：必填 + 格式 + 先后关系（关闭日期不早于发起日期）
-    const createdDate = (document.getElementById('issue-form-created-date')||{}).(value||{}).trim() || '';
-    const closeDateV  = (document.getElementById('issue-form-close-date')||{}).(value||{}).trim() || '';
+    const createdDate = document.getElementById('issue-form-created-date')?.value?.trim() || '';
+    const closeDateV  = document.getElementById('issue-form-close-date')?.value?.trim() || '';
     const createdErr  = document.getElementById('err-created-date');
     const closeErr    = document.getElementById('err-close-date');
     let createdMsg = '', closeMsg = '';
@@ -7075,11 +7075,11 @@ function submitIssueForm() {
         reportDate: reportDate,            // 上报日期（YYYY-MM-DD）
         closeDate: closeDate,              // 计划关闭日期（YYYY-MM-DD），倒计时据此计算
         trackingLevel: trackingLevel,      // 跟踪等级（'full' | 'simple'）
-        currentStage: (stages[0]||{}).num || 1,// 动态第一阶段（simple/full 都是 1=临时措施）
+        currentStage: stages[0]?.num || 1,// 动态第一阶段（simple/full 都是 1=临时措施）
         closed: false,
         closedAt: null,
         createdAt: createdAt,
-        createdBy: ((getCurrentUser())||{}).name || 'unknown',
+        createdBy: getCurrentUser()?.name || 'unknown',
         stageData: {},
         activity: [],
         stageOverdue: false,
@@ -7088,7 +7088,7 @@ function submitIssueForm() {
         totalWarning: false
     };
     
-    const lvLabel = (TRACKING_LEVELS[trackingLevel]||{}).label || '完整跟踪';
+    const lvLabel = TRACKING_LEVELS[trackingLevel]?.label || '完整跟踪';
     const firstStage = stages[0] || STAGES[0];
     let createText = `创建问题单（${lvLabel}），启动第 1 阶段「${firstStage.name}」，${firstStage.days}天倒计时开始`;
     if (reportDay !== createdDay && dateDiff > 0) {
@@ -7142,14 +7142,14 @@ function submitIssueForm() {
 
 /* ============ 渲染问题台账表格 ============ */
 function renderIssueTable() {
-    const search = (document.getElementById('issue-search')||{}).(value||{}).trim().toLowerCase() || '';
-    const fSource = (document.getElementById('issue-filter-source')||{}).value || '';
-    const fStage = (document.getElementById('issue-filter-stage')||{}).value || '';
-    const fRisk = (document.getElementById('issue-filter-risk')||{}).value || '';
-    const fOverdue = (document.getElementById('issue-filter-overdue')||{}).value || '';
+    const search = document.getElementById('issue-search')?.value?.trim().toLowerCase() || '';
+    const fSource = document.getElementById('issue-filter-source')?.value || '';
+    const fStage = document.getElementById('issue-filter-stage')?.value || '';
+    const fRisk = document.getElementById('issue-filter-risk')?.value || '';
+    const fOverdue = document.getElementById('issue-filter-overdue')?.value || '';
     // 日期范围（与数据看板 applyDateRangeFilter 共享同一函数，确保口径 100% 一致）
-    const fStart = (document.getElementById('ledger-date-start')||{}).value || '';
-    const fEnd   = (document.getElementById('ledger-date-end')||{}).value   || '';
+    const fStart = document.getElementById('ledger-date-start')?.value || '';
+    const fEnd   = document.getElementById('ledger-date-end')?.value   || '';
 
     let issues = loadData(STORAGE_KEYS.ISSUES, []);
 
@@ -7585,8 +7585,8 @@ function confirmPurgeAllIssues() {
     const reasonSel    = document.getElementById('purge-reason');
     const reasonRemark = document.getElementById('purge-reason-remark');
     const errReason    = document.getElementById('err-purge-reason');
-    const reason       = ((reasonSel||{}).value || '').trim();
-    const remark       = ((reasonRemark||{}).value || '').trim().slice(0, 80);
+    const reason       = (reasonSel?.value || '').trim();
+    const remark       = (reasonRemark?.value || '').trim().slice(0, 80);
     let valid = true;
     let errMsg  = '';
     if (!reason) { errMsg = '请选择删除理由'; valid = false; }
@@ -7773,7 +7773,7 @@ function renderIssueDetail() {
             <span class="badge" style="background:${getIssueTrackingLevel(issue)==='full'?'#1a73e8':'#34a853'};color:#fff;font-weight:600;padding:3px 10px;border-radius:999px">
               ${getIssueTrackingLevel(issue)==='full' ? '🛡️ 完整跟踪（6 阶段）' : '⚡ 简单跟踪（3 阶段）'}
             </span>
-            ${TRACKING_LEVELS[getIssueTrackingLevel(issue)] ? `<span style="font-size:12px;color:var(--text-tertiary);margin-left:8px">${TRACKING_LEVELS[getIssueTrackingLevel(issue)].stageNums.map((n,i)=>`${i+1}→${(STAGES.find(s=>s.num===n)||{}).shortName||''}`).join(' / ')}</span>` : ''}
+            ${TRACKING_LEVELS[getIssueTrackingLevel(issue)] ? `<span style="font-size:12px;color:var(--text-tertiary);margin-left:8px">${TRACKING_LEVELS[getIssueTrackingLevel(issue)].stageNums.map((n,i)=>`${i+1}→${STAGES.find(s=>s.num===n)?.shortName||''}`).join(' / ')}</span>` : ''}
           </span>
         </div>
         <div class="detail-item"><span class="detail-label">问题标题</span><span class="detail-value">${issue.title}</span></div>
@@ -7934,13 +7934,13 @@ function collectIssueAttachments(issue) {
 function renderDetailAttachments() {
     let list = currentDetailAttachments || [];
     // Search
-    const q = ((document.getElementById('attachments-search')||{}).value || '').toLowerCase().trim();
+    const q = (document.getElementById('attachments-search')?.value || '').toLowerCase().trim();
     if (q) list = list.filter(f => f.name.toLowerCase().includes(q) || f.sourceLabel.toLowerCase().includes(q));
     // Filter by type
-    const t = (document.getElementById('attachments-filter-type')||{}).value || '';
+    const t = document.getElementById('attachments-filter-type')?.value || '';
     if (t) list = list.filter(f => f.category === t);
     // Filter by source
-    const src = (document.getElementById('attachments-filter-source')||{}).value || '';
+    const src = document.getElementById('attachments-filter-source')?.value || '';
     if (src) list = list.filter(f => f.sourceKey === src);
 
     // Total shown
@@ -8098,7 +8098,7 @@ function renderDetailTimeline(issue) {
             <span class="badge" style="background:${trackingLevel==='full'?'#1a73e8':'#34a853'};color:#fff;font-weight:600">
               ${trackingLevel==='full'?'🛡️ 完整跟踪':'⚡ 简单跟踪'}
             </span>
-            <span>（${(lvCfg||{}).label || '完整跟踪'}：流程共 ${stages.length} 个阶段）</span>
+            <span>（${lvCfg?.label || '完整跟踪'}：流程共 ${stages.length} 个阶段）</span>
           </div>
         </div>
         <div class="stage-steps">${stages.map((s, stepIdx) => {
@@ -8242,7 +8242,7 @@ function openStageForm(issueId, stageNum = null) {
     
     document.getElementById('stage-form-issue-id').value = issueId;
     document.getElementById('stage-form-stage-num').value = num;
-    document.getElementById('stage-form-title').textContent = `✍️ 阶段${num}（${(TRACKING_LEVELS[trackingLevel]||{}).label||''}）：${stage.name} - 整改方案填写`;
+    document.getElementById('stage-form-title').textContent = `✍️ 阶段${num}（${TRACKING_LEVELS[trackingLevel]?.label||''}）：${stage.name} - 整改方案填写`;
     
     const isLastStage = isLastStageOfTracking(trackingLevel, num);
     document.getElementById('stage-form-submit-btn').textContent = isLastStage ? '✓ 提交并闭环问题' : '✓ 提交并进入下一阶段';
@@ -8252,7 +8252,7 @@ function openStageForm(issueId, stageNum = null) {
             <div style="font-weight:600;margin-bottom:4px">
                 ${isLastStage ? '📋 闭环验证' : '📌 阶段验证'}
                 <span style="margin-left:10px;font-size:12px;font-weight:400;color:var(--text-secondary)">
-                  跟踪等级：${(TRACKING_LEVELS[trackingLevel]||{}).label || '完整跟踪'}
+                  跟踪等级：${TRACKING_LEVELS[trackingLevel]?.label || '完整跟踪'}
                 </span>
             </div>
             <div style="font-size:12px;color:var(--text-secondary)">
@@ -8268,7 +8268,7 @@ function openStageForm(issueId, stageNum = null) {
             <div class="detail-item"><span class="detail-label">问题编号</span><span class="detail-value" style="font-family:monospace;color:var(--primary)">${issue.id}</span></div>
             <div class="detail-item"><span class="detail-label">问题标题</span><span class="detail-value">${issue.title}</span></div>
             <div class="detail-item"><span class="detail-label">当前阶段限时</span><span class="detail-value">${stage.days}天（发起后${stage.days}天内）</span></div>
-            <div class="detail-item"><span class="detail-label">当前倒计时</span><span class="detail-value">${((calculateStageCountdown(issue, num))||{}).text || '-'}</span></div>
+            <div class="detail-item"><span class="detail-label">当前倒计时</span><span class="detail-value">${calculateStageCountdown(issue, num)?.text || '-'}</span></div>
         </div>
         <hr style="border:none;border-top:1px solid var(--border-light);margin:20px 0">
     `;
@@ -8382,7 +8382,7 @@ function submitStageForm() {
                 ? { attId: _fm.attId, name: _fm.name, size: _fm.size, type: _fm.type }
                 : (document.getElementById('stage-field-' + f.key + '-name').value || '');
         } else {
-            val = (document.getElementById('stage-field-' + f.key)||{}).(value||{}).trim() || '';
+            val = document.getElementById('stage-field-' + f.key)?.value?.trim() || '';
         }
         data[f.key] = val;
         
@@ -8400,7 +8400,7 @@ function submitStageForm() {
     }
     
     data._submitTime = formatDateTime(new Date());
-    data._submitBy = ((getCurrentUser())||{}).name || 'unknown';
+    data._submitBy = getCurrentUser()?.name || 'unknown';
     data._trackingLevel = trackingLevel; // 归档时保留提交当时的跟踪等级
     
     // Save
@@ -8415,7 +8415,7 @@ function submitStageForm() {
         }
         issue.closed = true;
         issue.closedAt = formatDateTime(new Date());
-        const lvLabel = (TRACKING_LEVELS[trackingLevel]||{}).label || '完整跟踪';
+        const lvLabel = TRACKING_LEVELS[trackingLevel]?.label || '完整跟踪';
         issue.activity.push({
             type: 'success',
             time: formatDateTime(new Date()),
@@ -8430,7 +8430,7 @@ function submitStageForm() {
         issue.stageOverdue = false;
         issue.stageWarning = false;
         const nextStageDef = next ? getStageDefByNum(trackingLevel, next) : null;
-        const lvLabel = (TRACKING_LEVELS[trackingLevel]||{}).label || '完整跟踪';
+        const lvLabel = TRACKING_LEVELS[trackingLevel]?.label || '完整跟踪';
         issue.activity.push({
             type: 'success',
             time: formatDateTime(new Date()),
@@ -8449,7 +8449,7 @@ function submitStageForm() {
     
     if (issue.closed) {
         // 闭环成功通知
-        const lvLabel = (TRACKING_LEVELS[trackingLevel]||{}).label || '完整跟踪';
+        const lvLabel = TRACKING_LEVELS[trackingLevel]?.label || '完整跟踪';
         alert(`🎉 恭喜！问题已成功闭环！\n\n编号：${issue.id}\n跟踪等级：${lvLabel}\n闭环时间：${issue.closedAt}\n\n感谢所有参与人员的努力！`);
     } else {
         const next = nextStageNum(trackingLevel, stageNum);
@@ -8466,7 +8466,7 @@ function submitStageForm() {
 /* ============ 跟踪看板 ============ */
 function renderKanban() {
     const issues = loadData(STORAGE_KEYS.ISSUES, []);
-    const fSource = (document.getElementById('kanban-filter-source')||{}).value || '';
+    const fSource = document.getElementById('kanban-filter-source')?.value || '';
     const filtered = fSource ? issues.filter(i => i.source === fSource) : issues;
     const processing = filtered.filter(i => !i.closed);
     const closed = filtered.filter(i => i.closed);
@@ -8585,7 +8585,7 @@ function renderReports() {
     `;
 
     // Destroy old charts
-    Object.values(reportCharts).forEach(c => (c||{}).destroy());
+    Object.values(reportCharts).forEach(c => c?.destroy());
     reportCharts = {};
 
     // Ring: 闭环率
@@ -8607,8 +8607,8 @@ function renderReports() {
         let prevAt = startTotal;                       // S1 的起点 = 问题创建时间
         for (let k = 0; k < 6; k++) {
             const sKey = 'stage' + (k+1);
-            const sData = (i.stageData||[])[sKey];
-            const submitAt = (sData||{})._submitTime ? parseLocalDate(sData._submitTime) : null;
+            const sData = i.stageData?.[sKey];
+            const submitAt = sData?._submitTime ? parseLocalDate(sData._submitTime) : null;
             if (submitAt && prevAt) {
                 const d = daysBetween(prevAt, submitAt);
                 if (d >= 0) stageDurations[k].push(d);
@@ -8754,7 +8754,7 @@ function updateBadges() {
 }
 
 function renderAlerts() {
-    const filter = (document.getElementById('alert-filter-type')||{}).value || '';
+    const filter = document.getElementById('alert-filter-type')?.value || '';
     let alerts = loadData(STORAGE_KEYS.ALERTS, []);
     
     // ===== 权威统计：从 QRQC 问题台账 ISSUES 实时计算（彻底解决 ALERTS 历史消息重复/漏记导致的统计偏差）=====
@@ -8843,9 +8843,9 @@ function markAllAlertsRead() {
 
 /* ============ 审计日志 ============ */
 function renderAuditLog() {
-    const search = (document.getElementById('audit-search')||{}).(value||{}).trim().toLowerCase() || '';
-    const fType = (document.getElementById('audit-filter-type')||{}).value || '';
-    const fUser = (document.getElementById('audit-filter-user')||{}).value || '';
+    const search = document.getElementById('audit-search')?.value?.trim().toLowerCase() || '';
+    const fType = document.getElementById('audit-filter-type')?.value || '';
+    const fUser = document.getElementById('audit-filter-user')?.value || '';
     let logs = loadData(STORAGE_KEYS.AUDIT_LOG, []);
     
     // Populate user filter
@@ -8933,13 +8933,13 @@ function exportIssuesExcel() {
     ];
 
     const summaryRows = issues.map(i => {
-        const s1 = (i.stageData||{}).stage1 || {};
-        const s2 = (i.stageData||{}).stage2 || {};
-        const s3 = (i.stageData||{}).stage3 || {};
-        const s4 = (i.stageData||{}).stage4 || {};
-        const s5 = (i.stageData||{}).stage5 || {};
-        const s6 = (i.stageData||{}).stage6 || {};
-        const stageName = i.closed ? '已闭环' : (STAGES.find(s => s.num === i.currentStage))||{}).name || '-');
+        const s1 = i.stageData?.stage1 || {};
+        const s2 = i.stageData?.stage2 || {};
+        const s3 = i.stageData?.stage3 || {};
+        const s4 = i.stageData?.stage4 || {};
+        const s5 = i.stageData?.stage5 || {};
+        const s6 = i.stageData?.stage6 || {};
+        const stageName = i.closed ? '已闭环' : (STAGES.find(s => s.num === i.currentStage)?.name || '-');
         const statusText = i.closed
             ? '已闭环'
             : ((i.stageOverdue || i.totalOverdue) ? '已超时' : ((i.stageWarning || i.totalWarning) ? '临期' : '处理中'));
