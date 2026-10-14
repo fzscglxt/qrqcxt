@@ -10750,13 +10750,68 @@ function manualSave() {
         showToast('❌ 保存失败：' + (err && err.message ? err.message : err), 'error');
     });
 }
-// 业务数据有改动：仅标记待保存（不自动上传，等用户点 💾）
+// ===== 业务数据自动上云（防抖）：录入即存云，避免忘记点保存、刷新丢失 =====
+let _qrqcAutoTimer = null;
+let _qrqcAutoPushing = false;
+let _qrqcAutoDirty = false;
+// 业务数据有改动：1.5s 防抖合并后自动推送（只读角色/大屏、应用云端数据、启动引导期不触发）
 function scheduleCloudSave() {
     // _applyingCloud：正在应用云端数据；_qrqcBootstrapping：启动引导期（建演示数据/重算派生统计），均为误报来源
-    if (!cloud.ready || _applyingCloud || window._qrqcBootstrapping) return;
+    if (!isCloudConfigured() || !canEditRole()) return;
+    if (_applyingCloud || window._qrqcBootstrapping) return;
+    _qrqcAutoDirty = true;
     cloud.pending = true;
-    setCloudStatus('pending', '有未保存的修改，点击「💾」上传');
+    setCloudStatus('pending', '有改动，正在自动保存…');
+    if (_qrqcAutoTimer) clearTimeout(_qrqcAutoTimer);
+    _qrqcAutoTimer = setTimeout(() => _qrqcFlushAuto(), 1500);
 }
+function _qrqcFlushAuto() {
+    if (_qrqcAutoTimer) { clearTimeout(_qrqcAutoTimer); _qrqcAutoTimer = null; }
+    if (!isCloudConfigured() || !canEditRole()) { _qrqcAutoDirty = false; return; }
+    if (_applyingCloud || window._qrqcBootstrapping) { _qrqcAutoDirty = false; return; }
+    if (_qrqcAutoPushing) { // 推送中又有改动，稍后再推一次
+        _qrqcAutoDirty = true;
+        _qrqcAutoTimer = setTimeout(() => _qrqcFlushAuto(), 1500);
+        return;
+    }
+    _qrqcAutoPushing = true;
+    _qrqcAutoDirty = false;
+    setCloudStatus('loading', '正在自动保存到云端…');
+    const ensure = cloud.ready ? Promise.resolve() : pullCloudDB().then(function () { cloud.ready = true; });
+    ensure.then(function () { return pullCloudDB(); }).then(function () {
+        return pushCloudDB();
+    }).then(function (ok) {
+        if (ok) {
+            try { if (window.localBackup && localBackup.dirHandle) localBackup.save(); } catch (e) {}
+        } else if (cloud.ready === false) {
+            // 网络失败（pushCloudDB 已提示）：保留本机改动，30s 自动重试
+            _qrqcAutoDirty = true;
+            _qrqcAutoTimer = setTimeout(() => _qrqcFlushAuto(), 30000);
+        }
+        // 冲突(cloud.ready 仍 true)：pushCloudDB 已刷新为他人最新并提示，不重试以免覆盖
+    }).catch(function () {
+        _qrqcAutoDirty = true;
+        cloud.ready = false;
+        setCloudStatus('error', '云端暂未连接，改动已存本机，将自动重试');
+        _qrqcAutoTimer = setTimeout(() => _qrqcFlushAuto(), 30000);
+    }).then(function () { _qrqcAutoPushing = false; });
+}
+// 关闭/切走页面前最后兜底：keepalive 尽力把未推送改动发出
+function _qrqcBeaconFlush() {
+    if (!_qrqcAutoDirty || !isCloudConfigured() || !canEditRole()) return;
+    try {
+        const body = JSON.stringify({ db: buildCloudDB({ stripImages: true }), savedBy: _cloudSavedBy() });
+        fetch(CLOUD_CONFIG.apiBase + '/api/db', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'If-Version': String(cloud.version || 0) },
+            body: body, keepalive: true
+        }).catch(() => {});
+    } catch (e) {}
+}
+document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden' && _qrqcAutoDirty) { _qrqcFlushAuto(); _qrqcBeaconFlush(); }
+});
+window.addEventListener('pagehide', function () { _qrqcBeaconFlush(); });
 // 进入系统时首次同步：云端有数据则以云端为准；无数据则把本地数据建到云端
 function _localHasData() {
     try {
