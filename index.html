@@ -4679,15 +4679,29 @@ function handleLogin() {
 function finishLogin(user) {
     const all = loadData(STORAGE_KEYS.USERS, []);
     const rec = all.find(x => x.username === user.username);
-    if (rec) { rec.lastLogin = formatDateTime(new Date()); saveData(STORAGE_KEYS.USERS, all); }
-    saveData(STORAGE_KEYS.USER, { username: user.username, name: user.name, role: user.role, dept: user.dept });
-    addAuditLog('login', '用户登录', `${user.name} 登录系统`);
+    // 登录产生的登录时间/会话/审计日志只写本地，不触发整库推送（登录瞬间不应把本地旧数据覆盖云端）
+    const _prev = _applyingCloud;
+    _applyingCloud = true;
+    try {
+        if (rec) { rec.lastLogin = formatDateTime(new Date()); saveData(STORAGE_KEYS.USERS, all); }
+        saveData(STORAGE_KEYS.USER, { username: user.username, name: user.name, role: user.role, dept: user.dept });
+        addAuditLog('login', '用户登录', `${user.name} 登录系统`);
+    } finally {
+        _applyingCloud = _prev;
+    }
     enterSystem();
 }
 
 function handleLogout() {
     const user = getCurrentUser();
-    if (user) addAuditLog('login', '用户登出', `${user.name} 退出系统`);
+    // 登出审计日志同样不触发整库推送
+    const _prev = _applyingCloud;
+    _applyingCloud = true;
+    try {
+        if (user) addAuditLog('login', '用户登出', `${user.name} 退出系统`);
+    } finally {
+        _applyingCloud = _prev;
+    }
     localStorage.removeItem(STORAGE_KEYS.USER);
     document.getElementById('login-page').style.display = 'flex';
     document.querySelector('.app').style.display = 'none';
@@ -10644,6 +10658,7 @@ let cloud = {
     remoteUpdatedAt: 0,  // 云端最后修改时间(ms)
     cloudSyncedAt: 0,    // 本地最后成功同步时间(ms)
     pending: false,      // 有待推送的修改
+    bootstrapped: false, // 首次成功拉取云端最新前禁止自动推送，避免启动/登录阶段旧数据覆盖云端
     pollingTimer: null
 };
 function isCloudConfigured() {
@@ -10758,6 +10773,7 @@ let _qrqcAutoDirty = false;
 function scheduleCloudSave() {
     // _applyingCloud：正在应用云端数据；_qrqcBootstrapping：启动引导期（建演示数据/重算派生统计），均为误报来源
     if (!isCloudConfigured() || !canEditRole()) return;
+    if (!cloud.bootstrapped) return; // 首次成功拉取云端最新前（启动/登录阶段）禁止自动推送，避免本地旧数据覆盖云端
     if (_applyingCloud || window._qrqcBootstrapping) return;
     _qrqcAutoDirty = true;
     cloud.pending = true;
@@ -10768,6 +10784,7 @@ function scheduleCloudSave() {
 function _qrqcFlushAuto() {
     if (_qrqcAutoTimer) { clearTimeout(_qrqcAutoTimer); _qrqcAutoTimer = null; }
     if (!isCloudConfigured() || !canEditRole()) { _qrqcAutoDirty = false; return; }
+    if (!cloud.bootstrapped) { _qrqcAutoDirty = false; return; }
     if (_applyingCloud || window._qrqcBootstrapping) { _qrqcAutoDirty = false; return; }
     if (_qrqcAutoPushing) { // 推送中又有改动，稍后再推一次
         _qrqcAutoDirty = true;
@@ -10834,30 +10851,33 @@ function initCloudSync(onDone) {
         try { setCloudMeta({ cloudVersion: cloud.version || 0, localModifiedAt: getLastModifiedTs() || 0, cloudSyncedAt: Date.now() }); } catch (e) {}
         if (!db) {
             if (hasLocal) {
+                // 云端无数据、本机有数据：首次建库，保留本机等用户手动上传（不自动推）；但引导完成，允许后续编辑上云
+                cloud.bootstrapped = true;
+                if (_qrqcAutoTimer) { clearTimeout(_qrqcAutoTimer); _qrqcAutoTimer = null; }
+                _qrqcAutoDirty = false;
                 setCloudStatus('pending', '本机有数据，点「💾」上传云端');
             } else {
-                pushCloudDB();
+                // 云端无数据、本机也无数据：把初始库建到云端
+                pushCloudDB().then(function () { cloud.bootstrapped = true; }).catch(function () {});
                 setCloudStatus('synced', '已在服务器建立数据');
             }
-        } else if (!hasLocal) {
-            try { applyRemoteDB(db); } catch (e) { console.warn('applyRemoteDB error', e); }
-            setCloudStatus('synced', '已同步服务器最新数据');
         } else {
-            const remoteModified = Number(db._localModifiedAt) || cloud.remoteUpdatedAt || 0;
-            const localModified = getLastModifiedTs() || 0;
-            if (remoteModified > localModified) {
-                setCloudStatus('warn', '云端有新数据，点「↻」获取');
-                setTimeout(function () { showToast('🔄 云端有其他电脑更新的数据，点侧边栏 ↻ 获取最新（不会自动覆盖本机）', 'info'); }, 500);
-            } else if (cloud.pending) {
-                setCloudStatus('pending', '有未保存的修改，点「💾」上传');
-            } else {
-                setCloudStatus('synced', '本机已是最新');
-            }
+            // 云端有数据：进入/登录时一律以云端最新覆盖本机（applyRemoteDB 内部用 _applyingCloud 包裹，不回推）
+            try { applyRemoteDB(db); } catch (e) { console.warn('applyRemoteDB error', e); }
+            // 引导完成：打开自动推送，清掉启动阶段（建演示/登录前渲染）残留的本地改动标记
+            cloud.bootstrapped = true;
+            if (_qrqcAutoTimer) { clearTimeout(_qrqcAutoTimer); _qrqcAutoTimer = null; }
+            _qrqcAutoDirty = false;
+            cloud.pending = false;
+            try { setCloudMeta({ cloudVersion: cloud.version || 0, localModifiedAt: 0, cloudSyncedAt: Date.now() }); } catch (e) {}
+            setCloudStatus('synced', '已同步服务器最新数据');
         }
         if (onDone) onDone();
     }).catch(function (err) {
         cloud.ready = false;
         setCloudStatus('error', '服务器连接失败，当前为本地数据（点↻重试）');
+        // 断网兜底：本机有数据（源自云端或本机）则视为已引导，允许离线编辑、恢复后重推；首次即断网且无数据保持未引导
+        if (hasLocal) cloud.bootstrapped = true;
         if (onDone) onDone();
     });
 }
@@ -10870,6 +10890,9 @@ function reloadDataFromCloud() {
         if (!db) { setCloudStatus('synced', '云端暂无数据'); showToast('云端暂无数据', 'info'); return; }
         applyRemoteDB(db);
         cloud.ready = true;
+        cloud.bootstrapped = true;
+        if (_qrqcAutoTimer) { clearTimeout(_qrqcAutoTimer); _qrqcAutoTimer = null; }
+        _qrqcAutoDirty = false;
         try { setCloudMeta({ cloudVersion: cloud.version || 0, localModifiedAt: getLastModifiedTs() || 0, cloudSyncedAt: Date.now() }); } catch (e) {}
         setCloudStatus('synced', '已刷新为云端最新');
         showToast('已刷新为云端最新数据', 'success');
