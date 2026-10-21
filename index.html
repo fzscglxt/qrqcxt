@@ -4319,7 +4319,9 @@ function resetAnalyticalData() {
             STORAGE_KEYS.AUDIT_LOG, STORAGE_KEYS.USER, STORAGE_KEYS.SETTINGS,
             STORAGE_KEYS.LAST_PATROL, STORAGE_KEYS.LAST_MODIFIED_TS, STORAGE_KEYS.USERS,
             STORAGE_KEYS.INCOMING_QC, STORAGE_KEYS.STOCK_QC,
-            STORAGE_KEYS.PRODUCTS
+            STORAGE_KEYS.PRODUCTS,
+            // 附件迁移标记 + 云端元数据属于本地标记，绝不能被分析数据清理误删，否则附件迁移每次启动重复执行并触发自动上云
+            'qrqc_att_migrated_v1', 'qrqc_cloud_meta_v1'
         ]);
         localStorage.removeItem(STORAGE_KEYS.DASHBOARD_CACHE); // 分析缓存强制清零
         const toRemove = [];
@@ -4590,7 +4592,7 @@ function saveData(key, data) {
             throw e2;
         }
     }
-    if (typeof _applyingCloud !== 'undefined' && !_applyingCloud && typeof _isCloudSyncStorageKey === 'function' && _isCloudSyncStorageKey(key)) {
+    if (typeof _applyingCloud !== 'undefined' && !_applyingCloud && !window._qrqcMigratingAttachments && typeof _isCloudSyncStorageKey === 'function' && _isCloudSyncStorageKey(key)) {
         try { scheduleCloudSave(); } catch (e) {}
     }
 }
@@ -10495,6 +10497,8 @@ async function openStoredAttachment(attId, name){
 async function migrateAttachmentsToIDB(){
     const FLAG = 'qrqc_att_migrated_v1';
     if (localStorage.getItem(FLAG) === '1') return { skipped:true, moved:0 };
+    // 一次性附件迁移属于"非用户业务编辑"：其 saveData 不触发自动上云（迁移后数据与云端口径一致，云端本就剥离图片）
+    window._qrqcMigratingAttachments = true;
     let moved = 0, stripped = 0;
     async function walk(issue){
         if (!issue || !Array.isArray(issue.attachments)) return;
@@ -10513,13 +10517,17 @@ async function migrateAttachmentsToIDB(){
             if ('_imgStripped' in a) delete a._imgStripped;
         }
     }
-    const issues = loadData(STORAGE_KEYS.ISSUES, []);
-    for (const i of issues) await walk(i);
-    saveData(STORAGE_KEYS.ISSUES, issues);
-    const bin = loadData(STORAGE_KEYS.RECYCLE_BIN, []);
-    for (const b of bin) await walk(b);
-    saveData(STORAGE_KEYS.RECYCLE_BIN, bin);
-    localStorage.setItem(FLAG,'1');
+    try {
+        const issues = loadData(STORAGE_KEYS.ISSUES, []);
+        for (const i of issues) await walk(i);
+        saveData(STORAGE_KEYS.ISSUES, issues);
+        const bin = loadData(STORAGE_KEYS.RECYCLE_BIN, []);
+        for (const b of bin) await walk(b);
+        saveData(STORAGE_KEYS.RECYCLE_BIN, bin);
+        localStorage.setItem(FLAG,'1');
+    } finally {
+        window._qrqcMigratingAttachments = false;
+    }
     return { skipped:false, moved:moved, stripped:stripped };
 }
 
