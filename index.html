@@ -2516,6 +2516,9 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                 <span class="icon">📋</span><span>QRQC问题台账</span>
                 <span class="nav-badge" id="issue-badge">0</span>
             </div>
+            <div class="nav-item" data-page="complaints">
+                <span class="icon">📞</span><span>客诉问题台账</span>
+            </div>
             <div class="nav-item" data-page="detail">
                 <span class="icon">🔍</span><span>问题展开</span>
             </div>
@@ -2805,6 +2808,73 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                             <tbody id="issue-tbody"></tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ 客诉问题台账 Page ============ -->
+        <div class="page" id="page-complaints">
+            <div class="topbar">
+                <div>
+                    <div class="breadcrumb">
+                        <span>首页</span><span class="sep">/</span><span class="current">客诉问题台账</span>
+                    </div>
+                    <h1>📞 客诉问题台账</h1>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn btn-outline" onclick="exportComplaintsExcel()">📥 导出</button>
+                    <button class="btn btn-primary" id="btn-new-complaint" onclick="openComplaintForm()">➕ 新建客诉记录</button>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="panel-body">
+                    <div class="filter-bar">
+                        <div class="search-box"><input type="text" id="complaint-search" placeholder="搜索编号/描述/客户/责任人..." oninput="renderComplaintTable()"></div>
+                        <div class="ledger-date-wrap" title="按投诉日期范围筛选">
+                            <label class="date-label">📅 投诉日期：</label>
+                            <input type="date" id="complaint-date-start" onchange="renderComplaintTable()">
+                            <span class="date-sep">~</span>
+                            <input type="date" id="complaint-date-end" onchange="renderComplaintTable()">
+                            <button type="button" class="btn btn-outline btn-sm" onclick="clearComplaintFilter()" title="清除筛选">✕ 清除</button>
+                        </div>
+                        <select id="complaint-filter-formal" onchange="renderComplaintTable()">
+                            <option value="">全部</option>
+                            <option value="正式">正式投诉</option>
+                            <option value="非正式">非正式</option>
+                        </select>
+                        <select id="complaint-filter-risk" onchange="renderComplaintTable()">
+                            <option value="">全部风险</option>
+                            <option value="高">高风险</option>
+                            <option value="中">中风险</option>
+                            <option value="低">低风险</option>
+                        </select>
+                        <select id="complaint-filter-status" onchange="renderComplaintTable()">
+                            <option value="">全部状态</option>
+                            <option value="待处理">待处理</option>
+                            <option value="处理中">处理中</option>
+                            <option value="已闭环">已闭环</option>
+                        </select>
+                    </div>
+                    <div class="table-wrap">
+                        <table id="complaint-table">
+                            <thead>
+                                <tr>
+                                    <th style="white-space:nowrap">问题编号</th>
+                                    <th style="text-align:left">问题描述</th>
+                                    <th style="text-align:center">不良图示</th>
+                                    <th style="text-align:center">投诉日期</th>
+                                    <th style="text-align:center">来源客户</th>
+                                    <th style="text-align:center">是否正式</th>
+                                    <th style="text-align:center">责任人</th>
+                                    <th style="text-align:center">风险等级</th>
+                                    <th style="text-align:center">状态</th>
+                                    <th style="text-align:center">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="complaint-tbody"></tbody>
+                        </table>
+                    </div>
+                    <div class="qc-pagination" id="complaint-pagination" style="display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:wrap;margin-top:12px;"></div>
                 </div>
             </div>
         </div>
@@ -3124,12 +3194,12 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                     <div class="filter-bar">
                         <div class="ledger-date-wrap" title="按检验日期范围筛选">
                             <label class="date-label">📅 检验日期：</label>
-                            <input type="date" id="incoming-date-start" onchange="renderQcTable('incoming-qc')">
+                            <input type="date" id="incoming-date-start" onchange="renderQcTable('incoming-qc', true)">
                             <span class="date-sep">~</span>
-                            <input type="date" id="incoming-date-end" onchange="renderQcTable('incoming-qc')">
+                            <input type="date" id="incoming-date-end" onchange="renderQcTable('incoming-qc', true)">
                             <button type="button" class="btn btn-outline btn-sm" onclick="clearQcFilter('incoming-qc')" title="清除筛选">✕ 清除</button>
                         </div>
-                        <select id="incoming-supplier" onchange="renderQcTable('incoming-qc')">
+                        <select id="incoming-supplier" onchange="renderQcTable('incoming-qc', true)">
                             <option value="">全部供应商</option>
                             <option value="理实">理实</option>
                             <option value="均胜">均胜</option>
@@ -3170,6 +3240,7 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                             <tbody id="incoming-qc-tbody"></tbody>
                         </table>
                     </div>
+                    <div class="qc-pagination" id="incoming-qc-pagination" style="display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:wrap;margin-top:12px;"></div>
                 </div>
             </div>
         </div>
@@ -3194,12 +3265,12 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                     <div class="filter-bar">
                         <div class="ledger-date-wrap" title="按检验日期范围筛选">
                             <label class="date-label">📅 检验日期：</label>
-                            <input type="date" id="stock-date-start" onchange="renderQcTable('stock-qc')">
+                            <input type="date" id="stock-date-start" onchange="renderQcTable('stock-qc', true)">
                             <span class="date-sep">~</span>
-                            <input type="date" id="stock-date-end" onchange="renderQcTable('stock-qc')">
+                            <input type="date" id="stock-date-end" onchange="renderQcTable('stock-qc', true)">
                             <button type="button" class="btn btn-outline btn-sm" onclick="clearQcFilter('stock-qc')" title="清除筛选">✕ 清除</button>
                         </div>
-                        <select id="stock-supplier" onchange="renderQcTable('stock-qc')">
+                        <select id="stock-supplier" onchange="renderQcTable('stock-qc', true)">
                             <option value="">全部车间</option>
                             <option value="装配车间">装配车间</option>
                             <option value="注塑车间">注塑车间</option>
@@ -3236,6 +3307,7 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                             <tbody id="stock-qc-tbody"></tbody>
                         </table>
                     </div>
+                    <div class="qc-pagination" id="stock-qc-pagination" style="display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:wrap;margin-top:12px;"></div>
                 </div>
             </div>
         </div>
@@ -3668,6 +3740,73 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     </div>
 </div>
+<div class="modal-overlay" id="modal-complaint-form">
+    <div class="modal lg">
+        <div class="modal-header">
+            <span class="modal-title" id="complaint-form-title">➕ 新建客诉记录</span>
+            <button class="modal-close" onclick="closeModal('modal-complaint-form')">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="file" id="complaint-form-files" multiple accept="image/*" style="display:none" onchange="handleComplaintFileSelect(event)">
+            <div style="display:grid;grid-template-columns:1fr 1fr;column-gap:18px;">
+                <div class="form-group">
+                    <label>问题编号<span class="required">*</span></label>
+                    <input type="text" id="complaint-form-code" placeholder="自动生成，可修改">
+                </div>
+                <div class="form-group">
+                    <label>投诉日期<span class="required">*</span></label>
+                    <input type="date" id="complaint-form-date">
+                </div>
+                <div class="form-group">
+                    <label>来源客户<span class="required">*</span></label>
+                    <input type="text" id="complaint-form-customer" placeholder="请输入客户名称">
+                </div>
+                <div class="form-group">
+                    <label>是否正式<span class="required">*</span></label>
+                    <select id="complaint-form-formal">
+                        <option value="正式">正式投诉</option>
+                        <option value="非正式">非正式（口头/潜在）</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>责任人<span class="required">*</span></label>
+                    <input type="text" id="complaint-form-owner" placeholder="请输入责任人姓名">
+                </div>
+                <div class="form-group">
+                    <label>风险等级<span class="required">*</span></label>
+                    <select id="complaint-form-risk">
+                        <option value="高">高风险</option>
+                        <option value="中" selected>中风险</option>
+                        <option value="低">低风险</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>状态<span class="required">*</span></label>
+                    <select id="complaint-form-status">
+                        <option value="待处理">待处理</option>
+                        <option value="处理中">处理中</option>
+                        <option value="已闭环">已闭环</option>
+                    </select>
+                </div>
+                <div class="form-group" style="grid-column:1/-1">
+                    <label>问题描述<span class="required">*</span></label>
+                    <textarea id="complaint-form-desc" rows="3" placeholder="请描述客户投诉的问题现象、数量、影响等" style="width:100%;resize:vertical"></textarea>
+                </div>
+                <div class="form-group" style="grid-column:1/-1">
+                    <label>不良图示（可多选，仅支持图片，单张≤20MB）</label>
+                    <div id="complaint-upload-area" onclick="document.getElementById('complaint-form-files').click()" style="border:2px dashed var(--border);border-radius:8px;padding:18px;text-align:center;cursor:pointer;color:var(--text-tertiary);transition:border-color .15s">
+                        📷 点击选择不良图片（可多选）
+                    </div>
+                    <div id="complaint-form-files-grid" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px"></div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('modal-complaint-form')">取消</button>
+            <button class="btn btn-primary" onclick="submitComplaintForm()">💾 保存记录</button>
+        </div>
+    </div>
+</div>
 <div class="modal-overlay" id="modal-product-form">
     <div class="modal">
         <div class="modal-header">
@@ -4072,7 +4211,9 @@ const STORAGE_KEYS = {
     INCOMING_QC: 'qrqc_incoming_qc',
     STOCK_QC: 'qrqc_stock_qc',
     // 产品信息（物料清单导入：QAD号/方卓零件号 → 产品名称）
-    PRODUCTS: 'qrqc_products'
+    PRODUCTS: 'qrqc_products',
+    // 客诉问题台账
+    COMPLAINTS: 'qrqc_complaints'
 };
 
 /* ---------- 缓存时效工具（LAST_MODIFIED_TS）+ 台账最后修改记录（显式 SETTINGS 字段，满足审计需求）---------- */
@@ -4319,7 +4460,7 @@ function resetAnalyticalData() {
             STORAGE_KEYS.AUDIT_LOG, STORAGE_KEYS.USER, STORAGE_KEYS.SETTINGS,
             STORAGE_KEYS.LAST_PATROL, STORAGE_KEYS.LAST_MODIFIED_TS, STORAGE_KEYS.USERS,
             STORAGE_KEYS.INCOMING_QC, STORAGE_KEYS.STOCK_QC,
-            STORAGE_KEYS.PRODUCTS,
+            STORAGE_KEYS.PRODUCTS, STORAGE_KEYS.COMPLAINTS,
             // 附件迁移标记 + 云端元数据属于本地标记，绝不能被分析数据清理误删，否则附件迁移每次启动重复执行并触发自动上云
             'qrqc_att_migrated_v1', 'qrqc_cloud_meta_v1'
         ]);
@@ -4996,6 +5137,8 @@ function navigateTo(page, issueId = null) {
     if (page === 'incoming-qc') renderQcTable('incoming-qc');
     if (page === 'stock-qc') renderQcTable('stock-qc');
     if (page === 'products') renderProducts();
+    // ===== 客诉问题台账：进入页面即按最新数据与筛选重渲染 =====
+    if (page === 'complaints') renderComplaintTable();
 
     // ===== 预警中心专属：进入时先执行一次静默巡检（如超过阈值）+ 一致性校验，保证所见即最新 =====
     if (page === 'alerts') {
@@ -9274,6 +9417,11 @@ function exportAllData() {
         auditLog: loadData(STORAGE_KEYS.AUDIT_LOG, []),
         settings: loadData(STORAGE_KEYS.SETTINGS, {}),
         lastPatrol: loadData(STORAGE_KEYS.LAST_PATROL, ''),
+        users: loadData(STORAGE_KEYS.USERS, []),
+        incomingQc: loadData(STORAGE_KEYS.INCOMING_QC, []),
+        stockQc: loadData(STORAGE_KEYS.STOCK_QC, []),
+        products: loadData(STORAGE_KEYS.PRODUCTS, []),
+        complaints: loadData(STORAGE_KEYS.COMPLAINTS, []),
         lastModifiedTs: localStorage.getItem(STORAGE_KEYS.LAST_MODIFIED_TS) || '0',
         currentUser: loadData(STORAGE_KEYS.USER, null)
     };
@@ -9326,6 +9474,11 @@ function importAllData() {
                 if (data.auditLog !== undefined)   saveData(STORAGE_KEYS.AUDIT_LOG, data.auditLog);
                 if (data.settings !== undefined)   saveData(STORAGE_KEYS.SETTINGS, data.settings);
                 if (data.lastPatrol !== undefined) saveData(STORAGE_KEYS.LAST_PATROL, data.lastPatrol);
+                if (data.users !== undefined)      saveData(STORAGE_KEYS.USERS, data.users);
+                if (data.incomingQc !== undefined) saveData(STORAGE_KEYS.INCOMING_QC, data.incomingQc);
+                if (data.stockQc !== undefined)    saveData(STORAGE_KEYS.STOCK_QC, data.stockQc);
+                if (data.products !== undefined)   saveData(STORAGE_KEYS.PRODUCTS, data.products);
+                if (data.complaints !== undefined) saveData(STORAGE_KEYS.COMPLAINTS, data.complaints);
                 if (data.lastModifiedTs)           localStorage.setItem(STORAGE_KEYS.LAST_MODIFIED_TS, data.lastModifiedTs);
                 // currentUser 不覆盖（保持当前登录用户）
 
@@ -9739,29 +9892,71 @@ function getFilteredQc(type) {
   if (pv) arr = arr.filter(r => (r[c.partyField] || '') === pv);
   if (ds) arr = arr.filter(r => (r.inspectDate || '') >= ds);
   if (de) arr = arr.filter(r => (r.inspectDate || '') <= de);
-  arr.sort((a,b) => (a.inspectDate || '').localeCompare(b.inspectDate || ''));
+  // 日期从近到远（倒序）；同日期按批次号倒序，保证顺序稳定
+  arr.sort((a,b) => {
+    const dd = (b.inspectDate || '').localeCompare(a.inspectDate || '');
+    if (dd !== 0) return dd;
+    return (b.batchNo || '').localeCompare(a.batchNo || '');
+  });
   return arr;
 }
-function renderQcTable(type) {
+const QC_PAGE_SIZE = 15;
+const _qcPage = { 'incoming-qc': 1, 'stock-qc': 1 };
+function goQcPage(type, n) {
+  _qcPage[type] = n;
+  renderQcTable(type);
+}
+function _renderQcPagination(type, total, page, totalPages) {
+  const pagEl = document.getElementById(type + '-pagination');
+  if (!pagEl) return;
+  if (total <= QC_PAGE_SIZE) { pagEl.innerHTML = ''; return; }
+  let p = '';
+  p += `<button class="btn btn-outline btn-sm" onclick="goQcPage('${type}',1)" ${page===1?'disabled':''}>首页</button>`;
+  p += `<button class="btn btn-outline btn-sm" onclick="goQcPage('${type}',${page-1})" ${page===1?'disabled':''}>‹ 上一页</button>`;
+  const maxShow = 5;
+  let startP = Math.max(1, page - Math.floor(maxShow/2));
+  let endP = Math.min(totalPages, startP + maxShow - 1);
+  startP = Math.max(1, endP - maxShow + 1);
+  for (let i = startP; i <= endP; i++) {
+    const active = i === page;
+    p += `<button class="btn ${active?'btn-primary':'btn-outline'} btn-sm" onclick="goQcPage('${type}',${i})">${i}</button>`;
+  }
+  p += `<button class="btn btn-outline btn-sm" onclick="goQcPage('${type}',${page+1})" ${page===totalPages?'disabled':''}>下一页 ›</button>`;
+  p += `<button class="btn btn-outline btn-sm" onclick="goQcPage('${type}',${totalPages})" ${page===totalPages?'disabled':''}>末页</button>`;
+  p += `<span style="margin-left:8px;font-size:12px;color:var(--text-tertiary)">第 ${page}/${totalPages} 页 · 共 ${total} 条</span>`;
+  pagEl.innerHTML = p;
+}
+function renderQcTable(type, resetToFirst) {
   const c = QC_DEF[type];
   const tbody = document.getElementById(c.tbody);
   if (!tbody) return;
+  if (!_qcPage[type]) _qcPage[type] = 1;
+  if (resetToFirst) _qcPage[type] = 1;
   const arr = getFilteredQc(type);
   const canEdit = canEditRole();
-  if (!arr.length) {
+  const total = arr.length;
+  const totalPages = Math.max(1, Math.ceil(total / QC_PAGE_SIZE));
+  if (_qcPage[type] > totalPages) _qcPage[type] = totalPages;
+  if (_qcPage[type] < 1) _qcPage[type] = 1;
+  const page = _qcPage[type];
+  if (!total) {
     tbody.innerHTML = '<tr><td colspan="16" style="text-align:center;color:var(--text-tertiary);padding:28px">暂无检验记录，请点右上角「➕ 新增检验记录」或「📂 导入」</td></tr>';
+    _renderQcPagination(type, 0, 1, 1);
     updateQcBatchBar(type);
     return;
   }
+  const start = (page - 1) * QC_PAGE_SIZE;
+  const pageArr = arr.slice(start, start + QC_PAGE_SIZE);
   let html = '';
-  arr.forEach((r,i) => {
+  pageArr.forEach((r,i) => {
+    const idx = start + i + 1; // 全局序号（跨页连续）
     const ops = canEdit
       ? `<button class="btn btn-outline btn-sm" onclick="openQcForm('${type}','${r.id}')">编辑</button> <button class="btn btn-outline btn-sm" style="color:var(--danger)" onclick="deleteQcRecord('${type}','${r.id}')">删除</button>`
       : '<span style="color:var(--text-tertiary)">—</span>';
     const party = r[c.partyField] || '';
     html += `<tr>
       <td style="text-align:center"><input type="checkbox" class="qc-row-check" value="${_qcEsc(r.id)}" onchange="onQcRowCheck('${type}')"></td>
-      <td style="text-align:center">${i+1}</td>
+      <td style="text-align:center">${idx}</td>
       <td style="text-align:center">${_qcEsc(r.inspectDate)}</td>
       <td style="text-align:center">${_qcEsc(party)}</td>
       <td style="text-align:center">${_qcEsc(r.batchNo)}</td>
@@ -9779,6 +9974,7 @@ function renderQcTable(type) {
     </tr>`;
   });
   tbody.innerHTML = html;
+  _renderQcPagination(type, total, page, totalPages);
   updateQcBatchBar(type);
 }
 function clearQcFilter(type) {
@@ -9786,7 +9982,7 @@ function clearQcFilter(type) {
   document.getElementById(c.dStart).value = '';
   document.getElementById(c.dEnd).value = '';
   document.getElementById(c.partyControl).value = '';
-  renderQcTable(type);
+  renderQcTable(type, true);
 }
 let _qcType = 'incoming-qc', _qcEditId = null;
 function _qcSetField(id, val) { const el = document.getElementById(id); if (el) el.value = (val === null || val === undefined) ? '' : val; }
@@ -9829,6 +10025,324 @@ function openQcForm(type, id) {
   }
   showModal('modal-qc-form');
 }
+/* ===================== 客诉问题台账 ===================== */
+const COMPLAINT_PAGE_SIZE = 15;
+let _complaintPage = 1;
+let _complaintEditId = null;
+let _complaintFiles = [];
+function _getComplaints(){ return loadData(STORAGE_KEYS.COMPLAINTS, []); }
+function genComplaintCode(){
+    const d = new Date();
+    const ymd = d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+    const prefix = 'KS-' + ymd;
+    let maxSeq = 0;
+    _getComplaints().forEach(function(r){
+        const m = String(r.code||'').match(new RegExp('^'+prefix+'-(\\d+)$'));
+        if (m) maxSeq = Math.max(maxSeq, parseInt(m[1],10));
+    });
+    return prefix + '-' + String(maxSeq+1).padStart(3,'0');
+}
+function _complaintRiskBadge(risk){
+    if (risk==='高') return '<span class="badge badge-danger">高风险</span>';
+    if (risk==='低') return '<span class="badge badge-success">低风险</span>';
+    return '<span class="badge badge-warning">中风险</span>';
+}
+function _complaintStatusBadge(st){
+    if (st==='已闭环') return '<span class="badge badge-success">已闭环</span>';
+    if (st==='处理中') return '<span class="badge badge-primary">处理中</span>';
+    return '<span class="badge badge-danger">待处理</span>';
+}
+function _complaintFormalBadge(f){
+    if (f==='正式') return '<span class="badge badge-warning">正式</span>';
+    return '<span class="badge">非正式</span>';
+}
+function getFilteredComplaints(){
+    const kw = ((document.getElementById('complaint-search')||{}).value||'').trim().toLowerCase();
+    const ds = (document.getElementById('complaint-date-start')||{}).value || '';
+    const de = (document.getElementById('complaint-date-end')||{}).value || '';
+    const fFormal = (document.getElementById('complaint-filter-formal')||{}).value || '';
+    const fRisk = (document.getElementById('complaint-filter-risk')||{}).value || '';
+    const fStatus = (document.getElementById('complaint-filter-status')||{}).value || '';
+    let arr = _getComplaints().filter(function(r){
+        if (kw){
+            const hay = [r.code,r.description,r.customer,r.owner].join(' ').toLowerCase();
+            if (hay.indexOf(kw)===-1) return false;
+        }
+        if (ds && (!r.complaintDate || r.complaintDate < ds)) return false;
+        if (de && (!r.complaintDate || r.complaintDate > de)) return false;
+        if (fFormal && r.formal !== fFormal) return false;
+        if (fRisk && r.risk !== fRisk) return false;
+        if (fStatus && r.status !== fStatus) return false;
+        return true;
+    });
+    arr.sort(function(a,b){
+        const d = (b.complaintDate||'').localeCompare(a.complaintDate||'');
+        if (d!==0) return d;
+        return (b.code||'').localeCompare(a.code||'');
+    });
+    return arr;
+}
+function clearComplaintFilter(){
+    document.getElementById('complaint-search').value='';
+    document.getElementById('complaint-date-start').value='';
+    document.getElementById('complaint-date-end').value='';
+    document.getElementById('complaint-filter-formal').value='';
+    document.getElementById('complaint-filter-risk').value='';
+    document.getElementById('complaint-filter-status').value='';
+    _complaintPage = 1;
+    renderComplaintTable();
+}
+function goComplaintPage(n){ _complaintPage = n; renderComplaintTable(); }
+function _renderComplaintPagination(total, page, totalPages){
+    const pagEl = document.getElementById('complaint-pagination');
+    if (!pagEl) return;
+    if (total <= COMPLAINT_PAGE_SIZE){ pagEl.innerHTML = ''; return; }
+    let p = '';
+    p += `<button class="btn btn-outline btn-sm" onclick="goComplaintPage(1)" ${page===1?'disabled':''}>首页</button>`;
+    p += `<button class="btn btn-outline btn-sm" onclick="goComplaintPage(${page-1})" ${page===1?'disabled':''}>‹ 上一页</button>`;
+    const maxShow = 5;
+    let startP = Math.max(1, page - Math.floor(maxShow/2));
+    let endP = Math.min(totalPages, startP + maxShow - 1);
+    startP = Math.max(1, endP - maxShow + 1);
+    for (let i = startP; i <= endP; i++){
+        const active = i === page;
+        p += `<button class="btn ${active?'btn-primary':'btn-outline'} btn-sm" onclick="goComplaintPage(${i})">${i}</button>`;
+    }
+    p += `<button class="btn btn-outline btn-sm" onclick="goComplaintPage(${page+1})" ${page===totalPages?'disabled':''}>下一页 ›</button>`;
+    p += `<button class="btn btn-outline btn-sm" onclick="goComplaintPage(${totalPages})" ${page===totalPages?'disabled':''}>末页</button>`;
+    p += `<span style="margin-left:8px;font-size:12px;color:var(--text-tertiary)">第 ${page}/${totalPages} 页 · 共 ${total} 条</span>`;
+    pagEl.innerHTML = p;
+}
+async function _loadComplaintThumbs(){
+    const imgs = document.querySelectorAll('img.complaint-thumb[data-attid]');
+    imgs.forEach(function(img){
+        const attId = img.getAttribute('data-attid');
+        if (!attId || img.dataset.loaded) return;
+        img.dataset.loaded = '1';
+        AttDB.get(attId).then(function(rec){
+            if (rec && rec.blob){ img.src = URL.createObjectURL(rec.blob); }
+            else { img.removeAttribute('src'); img.alt = '无图'; }
+        }).catch(function(){ img.alt = '无图'; });
+    });
+}
+function renderComplaintTable(){
+    const tbody = document.getElementById('complaint-tbody');
+    if (!tbody) return;
+    const arr = getFilteredComplaints();
+    const total = arr.length;
+    const totalPages = Math.max(1, Math.ceil(total / COMPLAINT_PAGE_SIZE));
+    if (_complaintPage > totalPages) _complaintPage = totalPages;
+    if (_complaintPage < 1) _complaintPage = 1;
+    const page = _complaintPage;
+    const canEdit = canEditRole();
+    if (!total){
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--text-tertiary);padding:28px">暂无客诉记录，请点右上角「➕ 新建客诉记录」</td></tr>';
+        _renderComplaintPagination(0,1,1);
+        return;
+    }
+    const start = (page-1) * COMPLAINT_PAGE_SIZE;
+    const pageArr = arr.slice(start, start + COMPLAINT_PAGE_SIZE);
+    const esc = function(s){ return _qcEsc(s==null?'':String(s)); };
+    let html = '';
+    pageArr.forEach(function(r){
+        const atts = r.attachments || [];
+        let imgCell;
+        if (!atts.length){
+            imgCell = '<span style="color:var(--text-tertiary);font-size:12px">无</span>';
+        } else {
+            const first = atts[0];
+            imgCell = `<div style="display:flex;align-items:center;gap:4px;justify-content:center">
+                <img class="complaint-thumb" data-attid="${esc(first.attId)}" data-name="${esc(first.name)}" onclick="openStoredAttachment('${first.attId}', this.getAttribute('data-name'))" style="width:46px;height:46px;object-fit:cover;border-radius:6px;cursor:pointer;border:1px solid var(--border);background:#f1f5f9">
+                ${atts.length>1?'<span style="font-size:11px;color:var(--text-tertiary)">+'+(atts.length-1)+'</span>':''}
+            </div>`;
+        }
+        const ops = canEdit
+            ? `<button class="btn btn-outline btn-sm" onclick="openComplaintForm('${r.id}')">编辑</button> <button class="btn btn-outline btn-sm" style="color:var(--danger)" onclick="deleteComplaint('${r.id}')">删除</button>`
+            : '<span style="color:var(--text-tertiary)">—</span>';
+        html += `<tr>
+            <td style="text-align:center;white-space:nowrap;font-family:monospace">${esc(r.code)}</td>
+            <td style="text-align:left;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(r.description)}">${esc(r.description)}</td>
+            <td style="text-align:center">${imgCell}</td>
+            <td style="text-align:center">${esc(r.complaintDate)}</td>
+            <td style="text-align:center">${esc(r.customer)}</td>
+            <td style="text-align:center">${_complaintFormalBadge(r.formal)}</td>
+            <td style="text-align:center">${esc(r.owner)}</td>
+            <td style="text-align:center">${_complaintRiskBadge(r.risk)}</td>
+            <td style="text-align:center">${_complaintStatusBadge(r.status)}</td>
+            <td style="text-align:center;white-space:nowrap">${ops}</td>
+        </tr>`;
+    });
+    tbody.innerHTML = html;
+    _renderComplaintPagination(total, page, totalPages);
+    _loadComplaintThumbs();
+}
+function renderComplaintFormFiles(){
+    const grid = document.getElementById('complaint-form-files-grid');
+    if (!grid) return;
+    grid.innerHTML = _complaintFiles.map(function(f,i){
+        return `<div style="position:relative;width:88px;height:88px;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:#000">
+            <img class="complaint-form-thumb" data-idx="${i}" data-attid="${f.attId}" style="width:100%;height:100%;object-fit:cover">
+            <button type="button" onclick="removeComplaintFile(${i})" style="position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;border:none;background:rgba(0,0,0,.65);color:#fff;cursor:pointer;font-size:12px;line-height:1">✕</button>
+        </div>`;
+    }).join('');
+    _complaintFiles.forEach(function(f,i){
+        if (!f._previewUrl && f.attId){
+            AttDB.get(f.attId).then(function(rec){
+                if (rec && rec.blob){
+                    const img = grid.querySelector('img.complaint-form-thumb[data-idx="'+i+'"]');
+                    if (img){ const u = URL.createObjectURL(rec.blob); img.src = u; f._previewUrl = u; }
+                }
+            }).catch(function(){});
+        }
+    });
+}
+function openComplaintForm(id){
+    if (!canEditRole()){ showToast('当前角色为只读，无法新增/编辑客诉记录','error'); return; }
+    _complaintEditId = id || null;
+    _complaintFiles = [];
+    document.getElementById('complaint-form-code').value = '';
+    document.getElementById('complaint-form-date').value = '';
+    document.getElementById('complaint-form-desc').value = '';
+    document.getElementById('complaint-form-customer').value = '';
+    document.getElementById('complaint-form-owner').value = '';
+    document.getElementById('complaint-form-formal').value = '正式';
+    document.getElementById('complaint-form-risk').value = '中';
+    document.getElementById('complaint-form-status').value = '待处理';
+    document.getElementById('complaint-form-files-grid').innerHTML = '';
+    if (id){
+        const rec = _getComplaints().find(function(r){ return r.id===id; });
+        if (!rec){ showToast('记录不存在','error'); return; }
+        document.getElementById('complaint-form-title').textContent = '✏️ 编辑客诉记录';
+        document.getElementById('complaint-form-code').value = rec.code||'';
+        document.getElementById('complaint-form-date').value = rec.complaintDate||'';
+        document.getElementById('complaint-form-desc').value = rec.description||'';
+        document.getElementById('complaint-form-customer').value = rec.customer||'';
+        document.getElementById('complaint-form-owner').value = rec.owner||'';
+        document.getElementById('complaint-form-formal').value = rec.formal||'正式';
+        document.getElementById('complaint-form-risk').value = rec.risk||'中';
+        document.getElementById('complaint-form-status').value = rec.status||'待处理';
+        _complaintFiles = (rec.attachments||[]).map(function(a){
+            return { attId:a.attId, name:a.name, size:a.size, type:a.type, category:'image', _isNew:false };
+        });
+    } else {
+        document.getElementById('complaint-form-title').textContent = '➕ 新建客诉记录';
+        document.getElementById('complaint-form-code').value = genComplaintCode();
+        document.getElementById('complaint-form-date').value = formatDate(new Date());
+    }
+    renderComplaintFormFiles();
+    showModal('modal-complaint-form');
+}
+async function handleComplaintFileSelect(event){
+    const fileList = event.target.files;
+    await addComplaintFiles(fileList);
+    event.target.value = '';
+}
+async function addComplaintFiles(fileList){
+    if (!fileList || !fileList.length) return;
+    const MAX_SIZE = 20 * 1024 * 1024;
+    const IMAGE_EXTS = ['jpg','jpeg','png','gif','bmp','webp','svg','tif','tiff'];
+    let skipped = 0;
+    for (const file of Array.from(fileList)){
+        const ext = (file.name.split('.').pop()||'').toLowerCase();
+        const isImage = (file.type && file.type.startsWith('image/')) || IMAGE_EXTS.includes(ext);
+        if (!isImage || file.size > MAX_SIZE){ skipped++; continue; }
+        const attId = genAttId();
+        const rec = { attId:attId, name:file.name, size:file.size, type:file.type||'', category:'image', _isNew:true, _previewUrl:URL.createObjectURL(file) };
+        _complaintFiles.push(rec);
+        try { await AttDB.put(attId, file, { name:file.name, type:file.type||'' }); } catch(e){}
+    }
+    renderComplaintFormFiles();
+    if (skipped > 0) showToast('已忽略 '+skipped+' 个非图片或超过 20MB 的文件','warning');
+}
+function removeComplaintFile(idx){
+    const f = _complaintFiles[idx];
+    if (f && f._isNew){
+        try { if (f.attId) AttDB.del(f.attId); } catch(e){}
+        try { if (f._previewUrl) URL.revokeObjectURL(f._previewUrl); } catch(e){}
+    }
+    _complaintFiles.splice(idx,1);
+    renderComplaintFormFiles();
+}
+function submitComplaintForm(){
+    if (!canEditRole()){ showToast('当前角色为只读，无法保存客诉记录','error'); return; }
+    const code = document.getElementById('complaint-form-code').value.trim();
+    const date = document.getElementById('complaint-form-date').value;
+    const customer = document.getElementById('complaint-form-customer').value.trim();
+    const formal = document.getElementById('complaint-form-formal').value;
+    const owner = document.getElementById('complaint-form-owner').value.trim();
+    const risk = document.getElementById('complaint-form-risk').value;
+    const status = document.getElementById('complaint-form-status').value;
+    const desc = document.getElementById('complaint-form-desc').value.trim();
+    if (!code){ showToast('请填写问题编号','error'); return; }
+    if (!date){ showToast('请选择投诉日期','error'); return; }
+    if (!customer){ showToast('请填写来源客户','error'); return; }
+    if (!owner){ showToast('请填写责任人','error'); return; }
+    if (!desc){ showToast('请填写问题描述','error'); return; }
+    const attachments = _complaintFiles.map(function(f){
+        return { attId:f.attId, name:f.name, size:f.size, type:f.type, category:'image' };
+    });
+    const list = _getComplaints();
+    const dup = list.find(function(r){ return r.code===code && r.id!==_complaintEditId; });
+    if (dup){ showToast('问题编号「'+code+'」已存在，请修改','error'); return; }
+    const now = formatDateTime(new Date());
+    if (_complaintEditId){
+        const idx = list.findIndex(function(r){ return r.id===_complaintEditId; });
+        if (idx > -1){
+            const oldAtts = list[idx].attachments || [];
+            oldAtts.forEach(function(oa){
+                if (!attachments.some(function(n){ return n.attId===oa.attId; })){
+                    try { AttDB.del(oa.attId); } catch(e){}
+                }
+            });
+            list[idx] = Object.assign({}, list[idx], {
+                code:code, description:desc, complaintDate:date, customer:customer, formal:formal,
+                owner:owner, risk:risk, status:status, attachments:attachments, updatedAt:now
+            });
+        }
+    } else {
+        list.push({
+            id:'CP'+Date.now()+Math.floor(Math.random()*1000),
+            code:code, description:desc, complaintDate:date, customer:customer, formal:formal,
+            owner:owner, risk:risk, status:status, attachments:attachments, createdAt:now
+        });
+    }
+    saveData(STORAGE_KEYS.COMPLAINTS, list);
+    try { addAuditLog(_complaintEditId?'edit':'create', _complaintEditId?'编辑客诉记录':'新增客诉记录', code+' '+customer+' '+status+' '+risk+'风险'); } catch(e){}
+    closeModal('modal-complaint-form');
+    _complaintPage = 1;
+    renderComplaintTable();
+    _qcAutoSync();
+    showToast('客诉记录已保存','success');
+}
+function deleteComplaint(id){
+    if (!canEditRole()){ showToast('当前角色为只读，无法删除','error'); return; }
+    const list = _getComplaints();
+    const rec = list.find(function(r){ return r.id===id; });
+    if (!rec) return;
+    if (!confirm('确定删除客诉记录「'+rec.code+'」吗？\n该记录的不良图示也会一并删除。')) return;
+    (rec.attachments||[]).forEach(function(a){ try { AttDB.del(a.attId); } catch(e){} });
+    saveData(STORAGE_KEYS.COMPLAINTS, list.filter(function(r){ return r.id!==id; }));
+    try { addAuditLog('delete','删除客诉记录', rec.code+' '+rec.customer); } catch(e){}
+    renderComplaintTable();
+    _qcAutoSync();
+    showToast('已删除客诉记录','success');
+}
+function exportComplaintsExcel(){
+    try {
+        const arr = getFilteredComplaints();
+        if (!arr.length){ showToast('当前筛选条件下没有可导出的记录','warning'); return; }
+        const header = ['问题编号','问题描述','投诉日期','来源客户','是否正式','责任人','风险等级','状态','不良图示数'];
+        const rows = arr.map(function(r){
+            return [r.code,r.description,r.complaintDate,r.customer,r.formal,r.owner,r.risk,r.status,(r.attachments||[]).length];
+        });
+        const ws = XLSX.utils.aoa_to_sheet([header].concat(rows));
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, '客诉问题台账');
+        XLSX.writeFile(wb, '客诉问题台账_'+formatDate(new Date())+'.xlsx');
+        try { addAuditLog('export','导出客诉问题台账','共'+arr.length+'条'); } catch(e){}
+    } catch(e){ showToast('导出失败：'+e.message,'error'); }
+}
+
 // 检验记录写入本机后立即同步云端（点保存即上云并备份），避免刷新时云端旧数据覆盖尚未上云的记录
 function _qcAutoSync() {
   try {
@@ -9873,7 +10387,7 @@ function submitQcForm() {
   try { bumpLedgerModified(); } catch (e) {}
   addAuditLog(_qcEditId ? 'edit' : 'create', _qcEditId ? '编辑检验记录' : '新增检验记录', `${c.label}：${rec.productName || ''} 批次${rec.batchNo || ''} 不良${rec.qty} ${c.partyLabel}${party}`);
   closeModal('modal-qc-form');
-  renderQcTable(_qcType);
+  renderQcTable(_qcType, !_qcEditId); // 新增后回到第1页（最新记录），编辑保持当前页
   _qcAutoSync();
 }
 function deleteQcRecord(type, id) {
@@ -10542,7 +11056,8 @@ const CLOUD_SYNC_FIELDS = [
     { field: 'users',      key: STORAGE_KEYS.USERS,       def: [] },
     { field: 'incomingQc', key: STORAGE_KEYS.INCOMING_QC, def: [] },
     { field: 'stockQc',    key: STORAGE_KEYS.STOCK_QC,    def: [] },
-    { field: 'products',   key: STORAGE_KEYS.PRODUCTS,     def: [] }
+    { field: 'products',   key: STORAGE_KEYS.PRODUCTS,     def: [] },
+    { field: 'complaints', key: STORAGE_KEYS.COMPLAINTS,   def: [] }
 ];
 function _isCloudSyncStorageKey(key) {
     return CLOUD_SYNC_FIELDS.some(function (f) { return f.key === key; });
@@ -10591,7 +11106,7 @@ function buildCloudDB(options) {
     const db = { _meta: { system: 'QRQC快速反应管理系统', version: 'v1.0', syncedAt: formatDateTime(new Date()) } };
     CLOUD_SYNC_FIELDS.forEach(function (f) {
         let val = loadData(f.key, f.def);
-        if (strip && (f.field === 'issues' || f.field === 'recycleBin') && Array.isArray(val)) {
+        if (strip && (f.field === 'issues' || f.field === 'recycleBin' || f.field === 'complaints') && Array.isArray(val)) {
             val = val.map(_stripIssueImages);
         }
         db[f.field] = val;
@@ -10609,6 +11124,7 @@ function applyRemoteDB(remote) {
         // 云端 KV 不存附件 base64；写回本机前按 id 合并本机原图，避免空 dataUrl 清空本机图片
         const _localIssues = loadData(STORAGE_KEYS.ISSUES, []);
         const _localBin = loadData(STORAGE_KEYS.RECYCLE_BIN, []);
+        const _localComplaints = loadData(STORAGE_KEYS.COMPLAINTS, []);
         const _mergeById = function (arr, localArr) {
             if (!Array.isArray(arr)) return arr;
             return arr.map(function (ri) {
@@ -10618,6 +11134,7 @@ function applyRemoteDB(remote) {
         };
         if (Array.isArray(remote.issues)) remote.issues = _mergeById(remote.issues, _localIssues);
         if (Array.isArray(remote.recycleBin)) remote.recycleBin = _mergeById(remote.recycleBin, _localBin);
+        if (Array.isArray(remote.complaints)) remote.complaints = _mergeById(remote.complaints, _localComplaints);
         CLOUD_SYNC_FIELDS.forEach(function (f) {
             if (remote[f.field] !== undefined) saveData(f.key, remote[f.field]);
         });
@@ -11128,6 +11645,9 @@ function toggleUsersNav() {
     // 「➕ 新建问题单」：查看员不可见
     const newBtn = document.getElementById('btn-new-issue');
     if (newBtn) newBtn.style.display = ROLES_ALLOW_EDIT.includes(role) ? '' : 'none';
+    // 「➕ 新建客诉记录」：查看员不可见
+    const newComplaintBtn = document.getElementById('btn-new-complaint');
+    if (newComplaintBtn) newComplaintBtn.style.display = ROLES_ALLOW_EDIT.includes(role) ? '' : 'none';
 }
 
 function renderUserTable() {
