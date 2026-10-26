@@ -2861,6 +2861,7 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                                 <tr>
                                     <th style="white-space:nowrap">问题编号</th>
                                     <th style="text-align:left">问题描述</th>
+                                    <th style="text-align:center">产品名称</th>
                                     <th style="text-align:center">不良图示</th>
                                     <th style="text-align:center">投诉日期</th>
                                     <th style="text-align:center">来源客户</th>
@@ -3762,6 +3763,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <input type="text" id="complaint-form-customer" placeholder="请输入客户名称">
                 </div>
                 <div class="form-group">
+                    <label>产品名称</label>
+                    <input type="text" id="complaint-form-product" placeholder="请输入产品名称（可留空）">
+                </div>
+                <div class="form-group">
                     <label>是否正式<span class="required">*</span></label>
                     <select id="complaint-form-formal">
                         <option value="正式">正式投诉</option>
@@ -3807,6 +3812,69 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     </div>
 </div>
+
+<!-- ===== Modal: 客诉整改方案填写（处理按钮） ===== -->
+<div class="modal-overlay" id="modal-complaint-rework">
+    <div class="modal lg">
+        <div class="modal-header">
+            <span class="modal-title">✍️ 整改方案填写</span>
+            <button class="modal-close" onclick="closeModal('modal-complaint-rework')">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="complaint-rework-id">
+            <div class="detail-grid">
+                <div class="detail-item"><span class="detail-label">问题编号</span><span class="detail-value" id="rework-show-code" style="font-family:monospace;color:var(--primary)">-</span></div>
+                <div class="detail-item"><span class="detail-label">产品名称</span><span class="detail-value" id="rework-show-product">-</span></div>
+                <div class="detail-item" style="grid-column:1/-1"><span class="detail-label">问题描述</span><span class="detail-value" id="rework-show-desc">-</span></div>
+            </div>
+            <hr style="border:none;border-top:1px solid var(--border-light);margin:16px 0">
+            <div style="display:grid;grid-template-columns:1fr 1fr;column-gap:18px;">
+                <div class="form-group" style="grid-column:1/-1">
+                    <label>原因分析<span class="required">*</span></label>
+                    <textarea id="complaint-rework-cause" rows="3" placeholder="请分析客户投诉的根本原因..." style="width:100%;resize:vertical"></textarea>
+                </div>
+                <div class="form-group" style="grid-column:1/-1">
+                    <label>临时措施<span class="required">*</span></label>
+                    <textarea id="complaint-rework-temp" rows="3" placeholder="请描述临时遏制措施..." style="width:100%;resize:vertical"></textarea>
+                </div>
+                <div class="form-group" style="grid-column:1/-1">
+                    <label>长期措施<span class="required">*</span></label>
+                    <textarea id="complaint-rework-long" rows="3" placeholder="请描述长期纠正措施..." style="width:100%;resize:vertical"></textarea>
+                </div>
+                <div class="form-group" style="grid-column:1/-1">
+                    <label>更改措施<span class="required">*</span></label>
+                    <textarea id="complaint-rework-change" rows="3" placeholder="请描述需更改的文件、工艺、图纸等..." style="width:100%;resize:vertical"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>断点时间<span class="required">*</span></label>
+                    <input type="date" id="complaint-rework-breakpoint" value="">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>📎 附件资料中心（可上传文件，单文件≤20MB）</label>
+                <input type="file" id="complaint-rework-files" multiple style="display:none" onchange="handleComplaintReworkFileSelect(event)">
+                <div class="file-upload-area" id="complaint-rework-upload-area" onclick="document.getElementById('complaint-rework-files').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="event.preventDefault();handleComplaintReworkFileDrop(event)">
+                    <div class="file-upload-icon">📎</div>
+                    <div class="file-upload-text">点击或拖拽文件到此处上传</div>
+                    <div class="file-upload-hint">支持图片 / 文档 / 表格 / PDF / 压缩包等，单文件 ≤ 20MB</div>
+                </div>
+                <div id="complaint-rework-files-grid" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px"></div>
+            </div>
+            <div style="margin-top:16px;padding:12px;background:var(--cell);border-radius:8px;font-size:12px;color:var(--text-secondary);border:1px solid var(--border)">
+                <strong style="color:var(--danger)">🔒 数据安全声明：</strong>
+                本系统执行全程可溯原则，一旦提交：<br>
+                1. 所有整改方案数据永久留痕，不可删除或篡改<br>
+                2. 操作将被记入审计日志，支持精准溯源<br>
+                3. 整改方案提交后该客诉进入「处理中」状态，由责任部门跟进直至闭环
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('modal-complaint-rework')">取消</button>
+            <button class="btn btn-primary" onclick="submitComplaintRework()">✓ 提交整改方案</button>
+        </div>
+    </div>
+</div>
+
 <div class="modal-overlay" id="modal-product-form">
     <div class="modal">
         <div class="modal-header">
@@ -10065,7 +10133,7 @@ function getFilteredComplaints(){
     const fStatus = (document.getElementById('complaint-filter-status')||{}).value || '';
     let arr = _getComplaints().filter(function(r){
         if (kw){
-            const hay = [r.code,r.description,r.customer,r.owner].join(' ').toLowerCase();
+            const hay = [r.code,r.description,r.customer,r.owner,r.productName].join(' ').toLowerCase();
             if (hay.indexOf(kw)===-1) return false;
         }
         if (ds && (!r.complaintDate || r.complaintDate < ds)) return false;
@@ -10136,7 +10204,7 @@ function renderComplaintTable(){
     const page = _complaintPage;
     const canEdit = canEditRole();
     if (!total){
-        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--text-tertiary);padding:28px">暂无客诉记录，请点右上角「➕ 新建客诉记录」</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:var(--text-tertiary);padding:28px">暂无客诉记录，请点右上角「➕ 新建客诉记录」</td></tr>';
         _renderComplaintPagination(0,1,1);
         return;
     }
@@ -10156,12 +10224,14 @@ function renderComplaintTable(){
                 ${atts.length>1?'<span style="font-size:11px;color:var(--text-tertiary)">+'+(atts.length-1)+'</span>':''}
             </div>`;
         }
+        const notClosed = r.status !== '已闭环';
         const ops = canEdit
-            ? `<button class="btn btn-outline btn-sm" onclick="openComplaintForm('${r.id}')">编辑</button> <button class="btn btn-outline btn-sm" style="color:var(--danger)" onclick="deleteComplaint('${r.id}')">删除</button>`
+            ? `${notClosed ? `<button class="btn btn-primary btn-sm" onclick="openComplaintRework('${r.id}')">处理</button> ` : ''}<button class="btn btn-outline btn-sm" onclick="openComplaintForm('${r.id}')">编辑</button> <button class="btn btn-outline btn-sm" style="color:var(--danger)" onclick="deleteComplaint('${r.id}')">删除</button>`
             : '<span style="color:var(--text-tertiary)">—</span>';
         html += `<tr>
             <td style="text-align:center;white-space:nowrap;font-family:monospace">${esc(r.code)}</td>
             <td style="text-align:left;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(r.description)}">${esc(r.description)}</td>
+            <td style="text-align:center;white-space:nowrap">${esc(r.productName)||'<span style="color:var(--text-tertiary)">-</span>'}</td>
             <td style="text-align:center">${imgCell}</td>
             <td style="text-align:center">${esc(r.complaintDate)}</td>
             <td style="text-align:center">${esc(r.customer)}</td>
@@ -10204,6 +10274,7 @@ function openComplaintForm(id){
     document.getElementById('complaint-form-date').value = '';
     document.getElementById('complaint-form-desc').value = '';
     document.getElementById('complaint-form-customer').value = '';
+    document.getElementById('complaint-form-product').value = '';
     document.getElementById('complaint-form-owner').value = '';
     document.getElementById('complaint-form-formal').value = '正式';
     document.getElementById('complaint-form-risk').value = '中';
@@ -10217,6 +10288,7 @@ function openComplaintForm(id){
         document.getElementById('complaint-form-date').value = rec.complaintDate||'';
         document.getElementById('complaint-form-desc').value = rec.description||'';
         document.getElementById('complaint-form-customer').value = rec.customer||'';
+        document.getElementById('complaint-form-product').value = rec.productName||'';
         document.getElementById('complaint-form-owner').value = rec.owner||'';
         document.getElementById('complaint-form-formal').value = rec.formal||'正式';
         document.getElementById('complaint-form-risk').value = rec.risk||'中';
@@ -10268,6 +10340,7 @@ function submitComplaintForm(){
     const code = document.getElementById('complaint-form-code').value.trim();
     const date = document.getElementById('complaint-form-date').value;
     const customer = document.getElementById('complaint-form-customer').value.trim();
+    const product = document.getElementById('complaint-form-product').value.trim();
     const formal = document.getElementById('complaint-form-formal').value;
     const owner = document.getElementById('complaint-form-owner').value.trim();
     const risk = document.getElementById('complaint-form-risk').value;
@@ -10295,14 +10368,14 @@ function submitComplaintForm(){
                 }
             });
             list[idx] = Object.assign({}, list[idx], {
-                code:code, description:desc, complaintDate:date, customer:customer, formal:formal,
+                code:code, description:desc, complaintDate:date, customer:customer, productName:product, formal:formal,
                 owner:owner, risk:risk, status:status, attachments:attachments, updatedAt:now
             });
         }
     } else {
         list.push({
             id:'CP'+Date.now()+Math.floor(Math.random()*1000),
-            code:code, description:desc, complaintDate:date, customer:customer, formal:formal,
+            code:code, description:desc, complaintDate:date, customer:customer, productName:product, formal:formal,
             owner:owner, risk:risk, status:status, attachments:attachments, createdAt:now
         });
     }
@@ -10314,6 +10387,125 @@ function submitComplaintForm(){
     _qcAutoSync();
     showToast('客诉记录已保存','success');
 }
+
+/* ============ 客诉整改方案（处理按钮 → 整改方案填写） ============ */
+let _complaintReworkFiles = [];
+function openComplaintRework(id){
+    if (!canEditRole()){ showToast('当前角色为只读，无法处理客诉','error'); return; }
+    const rec = _getComplaints().find(function(r){ return r.id===id; });
+    if (!rec){ showToast('记录不存在','error'); return; }
+    if (rec.status === '已闭环'){ showToast('该客诉已闭环，无需再处理','warning'); return; }
+    document.getElementById('complaint-rework-id').value = rec.id;
+    document.getElementById('rework-show-code').textContent = rec.code||'-';
+    document.getElementById('rework-show-product').textContent = rec.productName||'-';
+    document.getElementById('rework-show-desc').textContent = rec.description||'-';
+    document.getElementById('complaint-rework-cause').value = (rec.rework && rec.rework.causeAnalysis)||'';
+    document.getElementById('complaint-rework-temp').value = (rec.rework && rec.rework.tempMeasures)||'';
+    document.getElementById('complaint-rework-long').value = (rec.rework && rec.rework.longMeasures)||'';
+    document.getElementById('complaint-rework-change').value = (rec.rework && rec.rework.changeMeasures)||'';
+    document.getElementById('complaint-rework-breakpoint').value = (rec.rework && rec.rework.breakpointDate)||formatDate(new Date());
+    _complaintReworkFiles = ((rec.rework && rec.rework.attachments)||[]).map(function(a){
+        return { attId:a.attId, name:a.name, size:a.size, type:a.type||'', _isNew:false };
+    });
+    renderComplaintReworkFiles();
+    showModal('modal-complaint-rework');
+}
+function renderComplaintReworkFiles(){
+    const grid = document.getElementById('complaint-rework-files-grid');
+    if (!grid) return;
+    if (!_complaintReworkFiles.length){
+        grid.innerHTML = '<span style="font-size:12px;color:var(--text-tertiary)">暂无附件</span>';
+        return;
+    }
+    grid.innerHTML = _complaintReworkFiles.map(function(f,i){
+        const icon = getFileIcon(f.name||'');
+        return `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:var(--cell)">
+            <span>${icon}</span>
+            <span style="font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px" title="${_qcEsc(f.name||'')}">${_qcEsc(f.name||'')}</span>
+            <span style="font-size:11px;color:var(--text-tertiary)">${f.size?((f.size/1024).toFixed(1)+'KB'):''}</span>
+            <button type="button" onclick="removeComplaintReworkFile(${i})" style="width:20px;height:20px;border-radius:50%;border:none;background:rgba(0,0,0,.55);color:#fff;cursor:pointer;font-size:12px;line-height:1" title="移除">✕</button>
+        </div>`;
+    }).join('');
+}
+function handleComplaintReworkFileSelect(event){
+    addComplaintReworkFiles(event.target.files);
+    event.target.value = '';
+}
+function handleComplaintReworkFileDrop(event){
+    event.currentTarget.classList.remove('dragover');
+    addComplaintReworkFiles(event.dataTransfer.files);
+}
+async function addComplaintReworkFiles(fileList){
+    if (!fileList || !fileList.length) return;
+    const MAX_SIZE = 20 * 1024 * 1024;
+    let skipped = 0;
+    for (const file of Array.from(fileList)){
+        if (file.size > MAX_SIZE){ skipped++; continue; }
+        const attId = genAttId();
+        _complaintReworkFiles.push({ attId:attId, name:file.name, size:file.size, type:file.type||'', _isNew:true });
+        try { await AttDB.put(attId, file, { name:file.name, type:file.type||'' }); } catch(e){}
+    }
+    renderComplaintReworkFiles();
+    if (skipped > 0) showToast('已忽略 '+skipped+' 个超过 20MB 的文件','warning');
+}
+function removeComplaintReworkFile(idx){
+    const f = _complaintReworkFiles[idx];
+    if (!f) return;
+    if (f._isNew){
+        try { if (f.attId) AttDB.del(f.attId); } catch(e){}
+    }
+    _complaintReworkFiles.splice(idx,1);
+    renderComplaintReworkFiles();
+}
+function submitComplaintRework(){
+    if (!canEditRole()){ showToast('当前角色为只读，无法提交整改方案','error'); return; }
+    const id = document.getElementById('complaint-rework-id').value;
+    const cause = document.getElementById('complaint-rework-cause').value.trim();
+    const temp = document.getElementById('complaint-rework-temp').value.trim();
+    const long = document.getElementById('complaint-rework-long').value.trim();
+    const change = document.getElementById('complaint-rework-change').value.trim();
+    const bp = document.getElementById('complaint-rework-breakpoint').value;
+    if (!cause){ showToast('请填写原因分析','error'); return; }
+    if (!temp){ showToast('请填写临时措施','error'); return; }
+    if (!long){ showToast('请填写长期措施','error'); return; }
+    if (!change){ showToast('请填写更改措施','error'); return; }
+    if (!bp){ showToast('请选择断点时间','error'); return; }
+    const list = _getComplaints();
+    const idx = list.findIndex(function(r){ return r.id===id; });
+    if (idx < 0){ showToast('记录不存在','error'); return; }
+    const rec = list[idx];
+    const now = formatDateTime(new Date());
+    const attachments = _complaintReworkFiles.map(function(f){
+        return { attId:f.attId, name:f.name, size:f.size, type:f.type||'' };
+    });
+    const oldAtts = (rec.rework && rec.rework.attachments) || [];
+    oldAtts.forEach(function(oa){
+        if (!attachments.some(function(n){ return n.attId===oa.attId; })){
+            try { AttDB.del(oa.attId); } catch(e){}
+        }
+    });
+    list[idx] = Object.assign({}, rec, {
+        status: rec.status === '待处理' ? '处理中' : rec.status,
+        rework: {
+            causeAnalysis: cause,
+            tempMeasures: temp,
+            longMeasures: long,
+            changeMeasures: change,
+            breakpointDate: bp,
+            attachments: attachments,
+            submittedAt: now,
+            submittedBy: ((getCurrentUser())||{}).name || 'unknown'
+        },
+        updatedAt: now
+    });
+    saveData(STORAGE_KEYS.COMPLAINTS, list);
+    try { addAuditLog('rework','提交客诉整改方案', rec.code+' '+rec.customer+' 断点：'+bp); } catch(e){}
+    closeModal('modal-complaint-rework');
+    renderComplaintTable();
+    _qcAutoSync();
+    showToast('整改方案已提交','success');
+}
+
 function deleteComplaint(id){
     if (!canEditRole()){ showToast('当前角色为只读，无法删除','error'); return; }
     const list = _getComplaints();
@@ -10331,9 +10523,9 @@ function exportComplaintsExcel(){
     try {
         const arr = getFilteredComplaints();
         if (!arr.length){ showToast('当前筛选条件下没有可导出的记录','warning'); return; }
-        const header = ['问题编号','问题描述','投诉日期','来源客户','是否正式','责任人','风险等级','状态','不良图示数'];
+        const header = ['问题编号','问题描述','产品名称','投诉日期','来源客户','是否正式','责任人','风险等级','状态','不良图示数'];
         const rows = arr.map(function(r){
-            return [r.code,r.description,r.complaintDate,r.customer,r.formal,r.owner,r.risk,r.status,(r.attachments||[]).length];
+            return [r.code,r.description,r.productName||'',r.complaintDate,r.customer,r.formal,r.owner,r.risk,r.status,(r.attachments||[]).length];
         });
         const ws = XLSX.utils.aoa_to_sheet([header].concat(rows));
         const wb = XLSX.utils.book_new();
