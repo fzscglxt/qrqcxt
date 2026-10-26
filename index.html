@@ -2852,7 +2852,7 @@ input[type=file]::file-selector-button:hover { background: var(--primary-light);
                             <option value="">全部状态</option>
                             <option value="待处理">待处理</option>
                             <option value="处理中">处理中</option>
-                            <option value="已闭环">已闭环</option>
+                            <option value="已处理">已处理</option>
                         </select>
                     </div>
                     <div class="table-wrap">
@@ -3790,7 +3790,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <select id="complaint-form-status">
                         <option value="待处理">待处理</option>
                         <option value="处理中">处理中</option>
-                        <option value="已闭环">已闭环</option>
+                        <option value="已处理">已处理</option>
                     </select>
                 </div>
                 <div class="form-group" style="grid-column:1/-1">
@@ -10099,6 +10099,18 @@ let _complaintPage = 1;
 let _complaintEditId = null;
 let _complaintFiles = [];
 function _getComplaints(){ return loadData(STORAGE_KEYS.COMPLAINTS, []); }
+/* 客诉状态迁移：旧值「已闭环」→「已处理」（一次性；渲染层已兼容旧值，此处同步归一历史数据） */
+let _complaintStatusMigrated = false;
+function migrateComplaintStatus(){
+    if (_complaintStatusMigrated) return;
+    const list = _getComplaints();
+    let changed = false;
+    list.forEach(function(r){
+        if (r.status === '已闭环'){ r.status = '已处理'; changed = true; }
+    });
+    if (changed){ saveData(STORAGE_KEYS.COMPLAINTS, list); }
+    _complaintStatusMigrated = true;
+}
 function genComplaintCode(){
     const d = new Date();
     const ymd = d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
@@ -10116,7 +10128,7 @@ function _complaintRiskBadge(risk){
     return '<span class="badge badge-warning">中风险</span>';
 }
 function _complaintStatusBadge(st){
-    if (st==='已闭环') return '<span class="badge badge-success">已闭环</span>';
+    if (st==='已处理' || st==='已闭环') return '<span class="badge badge-success">已处理</span>';
     if (st==='处理中') return '<span class="badge badge-primary">处理中</span>';
     return '<span class="badge badge-danger">待处理</span>';
 }
@@ -10140,7 +10152,8 @@ function getFilteredComplaints(){
         if (de && (!r.complaintDate || r.complaintDate > de)) return false;
         if (fFormal && r.formal !== fFormal) return false;
         if (fRisk && r.risk !== fRisk) return false;
-        if (fStatus && r.status !== fStatus) return false;
+        // 状态筛选：兼容历史数据中的旧值「已闭环」，按「已处理」统一筛选
+        if (fStatus && r.status !== fStatus && !(fStatus === '已处理' && r.status === '已闭环')) return false;
         return true;
     });
     arr.sort(function(a,b){
@@ -10196,6 +10209,7 @@ async function _loadComplaintThumbs(){
 function renderComplaintTable(){
     const tbody = document.getElementById('complaint-tbody');
     if (!tbody) return;
+    migrateComplaintStatus(); // 状态名称归一：旧「已闭环」→「已处理」
     const arr = getFilteredComplaints();
     const total = arr.length;
     const totalPages = Math.max(1, Math.ceil(total / COMPLAINT_PAGE_SIZE));
@@ -10224,7 +10238,7 @@ function renderComplaintTable(){
                 ${atts.length>1?'<span style="font-size:11px;color:var(--text-tertiary)">+'+(atts.length-1)+'</span>':''}
             </div>`;
         }
-        const notClosed = r.status !== '已闭环';
+        const notClosed = r.status !== '已处理' && r.status !== '已闭环';
         const ops = canEdit
             ? `${notClosed ? `<button class="btn btn-primary btn-sm" onclick="openComplaintRework('${r.id}')">处理</button> ` : ''}<button class="btn btn-outline btn-sm" onclick="openComplaintForm('${r.id}')">编辑</button> <button class="btn btn-outline btn-sm" style="color:var(--danger)" onclick="deleteComplaint('${r.id}')">删除</button>`
             : '<span style="color:var(--text-tertiary)">—</span>';
@@ -10394,7 +10408,7 @@ function openComplaintRework(id){
     if (!canEditRole()){ showToast('当前角色为只读，无法处理客诉','error'); return; }
     const rec = _getComplaints().find(function(r){ return r.id===id; });
     if (!rec){ showToast('记录不存在','error'); return; }
-    if (rec.status === '已闭环'){ showToast('该客诉已闭环，无需再处理','warning'); return; }
+    if (rec.status === '已处理' || rec.status === '已闭环'){ showToast('该客诉已处理，无需再处理','warning'); return; }
     document.getElementById('complaint-rework-id').value = rec.id;
     document.getElementById('rework-show-code').textContent = rec.code||'-';
     document.getElementById('rework-show-product').textContent = rec.productName||'-';
